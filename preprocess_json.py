@@ -21,6 +21,11 @@ def prefix_comments():
         'lua': ['--'],
         'r': ['#'],
         'rkt': [';;'],
+        'clj': [';'],
+        'coq': ['(*'],
+        'cpp': ['//', '/*'],
+        'cs': ['//', '/*'],
+        'py': ['#', '"""', "'''"],
     }
 
 def postfix_comments():
@@ -31,6 +36,11 @@ def postfix_comments():
         'lua': [],
         'r': [],
         'rkt': [],
+        'clj': [],
+        'coq': ['*)'],
+        'cpp': ['*/'],
+        'cs': ['*/'],
+        'py': ['"""', "'''"],
     }
 
 def _clean_code(completion):
@@ -88,9 +98,15 @@ def remove_code_from_bottom(prompt: str, language: str) -> str:
     if not lines:
         return ""
 
-    start_patterns = prefix_comments().get(language, [])
-    end_patterns = postfix_comments().get(language, [])
+    if prefix_comments().get(language, []):
+        start_patterns = prefix_comments()[language]
+    else:
+        start_patterns = ['"""', "'''"]
 
+    if postfix_comments().get(language, []):
+        end_patterns = postfix_comments()[language]
+    else:
+        end_patterns = ['"""', "'''"]
 
     # Search from bottom up
     for i in range(len(lines) - 1, -1, -1):
