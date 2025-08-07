@@ -274,7 +274,7 @@ account. We wil walk you through evaluating this model.
 Congratulations if you made it this far! Evaluating fine-tuned MultiPL-T
 models is not very different from evaluating a base model.
 
-## Quick Start with Bash Automation Script
+## Quick Start with Bash Automation Script (Qwen)
 
 For streamlined evaluation using our forked evaluation pipeline, you can use the provided automation script that simplifies the process of running evaluations across different models, thinking modes, and programming languages.
 
