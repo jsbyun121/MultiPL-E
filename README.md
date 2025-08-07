@@ -348,11 +348,12 @@ Example:
 ```
 
 Or you can just run python file one by one.
+(There is only 1 option of MAX_TOKENS for no-thinking generation which is 1024.)
 
 ```bash
 python3 pass_k ./after_proc_<MAX_TOKENS>/qwen-<MODEL_SIZE>-<think/>-4/result/<lang>
 
 Example:
-python3 pass_k ./after_proc_2048/qwen-4b-4/result/rkt
-python3 pass_k ./after_proc_1024/qwen-0.6b-think-4/result/r
+python3 pass_k ./after_proc_1024/qwen-4b-4/result/rkt
+python3 pass_k ./after_proc_2048/qwen-0.6b-think-4/result/r
 ```
