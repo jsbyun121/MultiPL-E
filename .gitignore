@@ -9,6 +9,5 @@ out_preprocessed/
 raw/
 pass_k_results/
 slurm-*
-before_proc_1024/
-before_proc_2048/
-after_proc_1024/
+before_proc_*/
+after_proc_*/

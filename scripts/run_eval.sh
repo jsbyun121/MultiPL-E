@@ -93,11 +93,11 @@ fi
 if [[ "$THINKING" == "think" ]]; then
 THINKING_FLAG=""
 THINKING_SUFFIX="-think"
-BATCH_THINK=12
+BATCH_THINK=6
 else
 THINKING_FLAG="--no-thinking"
 THINKING_SUFFIX=""
-BATCH_THINK=18
+BATCH_THINK=9
 fi
 
 # Construct output directory

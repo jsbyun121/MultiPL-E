@@ -278,6 +278,8 @@ models is not very different from evaluating a base model.
 
 For streamlined evaluation using our forked evaluation pipeline, you can use the provided automation script that simplifies the process of running evaluations across different models, thinking modes, and programming languages.
 
+!! Execute below commands on the virtual environment!!
+
 ### Prerequisites for Bash Script
 
 1. Ensure you have the same Python prerequisites as listed in the main tutorial
@@ -345,7 +347,7 @@ Example:
 
 ```
 
-Or you can just run python file with one by one.
+Or you can just run python file one by one.
 
 ```bash
 python3 pass_k ./after_proc_<MAX_TOKENS>/qwen-<MODEL_SIZE>-<think/>-4/result/<lang>

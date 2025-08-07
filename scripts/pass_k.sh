@@ -4,7 +4,25 @@
 MODELS=("0.6b" "4b")
 THINKING_MODES=("think" "")
 LANGUAGES=("jl" "lua" "ml" "r" "rkt")
-BASE_DIR="/home/junsoo/MultiPL-E/after_proc"
+
+# Check if MAX_TOKENS is provided as argument
+if [[ $# -ne 1 ]]; then
+    echo "Error: MAX_TOKENS argument is required"
+    echo "Usage: $0 <MAX_TOKENS>"
+    echo "Example: $0 512"
+    exit 1
+fi
+
+MAX_TOKENS=$1
+
+# Validate MAX_TOKENS is a number
+if ! [[ "$MAX_TOKENS" =~ ^[0-9]+$ ]]; then
+    echo "Error: MAX_TOKENS must be a positive integer"
+    echo "Provided: $MAX_TOKENS"
+    exit 1
+fi
+
+BASE_DIR="/home/junsoo/MultiPL-E/after_proc_${MAX_TOKENS}"
 RESULTS_FILE="pass_k_results_$(date +%Y%m%d_%H%M%S).txt"
 
 # Function to log with timestamp
@@ -48,17 +66,19 @@ run_pass_k() {
     if output=$(python3 pass_k.py "$result_path" 2>&1); then
         echo "$output" | tee -a "$RESULTS_FILE"
         log_message "SUCCESS: Completed $config_name"
+        return 0
     else
         log_message "ERROR: Failed to run $config_name"
         echo "$output" | tee -a "$RESULTS_FILE"
+        return 1
     fi
-    
-    echo "" >> "$RESULTS_FILE"
 }
 
 # Main execution
 main() {
     log_message "Starting pass_k evaluation for all configurations"
+    log_message "MAX_TOKENS: $MAX_TOKENS"
+    log_message "BASE_DIR: $BASE_DIR"
     log_message "Results will be saved to: $RESULTS_FILE"
     echo ""
     
@@ -80,7 +100,7 @@ main() {
                 else
                     ((skipped_configs++))
                 fi
-                echo ""
+                echo "" >> "$RESULTS_FILE"
             done
         done
     done
@@ -98,20 +118,42 @@ main() {
         log_message ""
         log_message "You can view the complete results with:"
         log_message "cat $RESULTS_FILE"
+        log_message ""
+        log_message "Or view only the summary statistics:"
+        log_message "grep -E '(pass@|Model:|SUCCESS:|SKIP:|ERROR:)' $RESULTS_FILE"
     fi
 }
 
-# Check if pass_k.py exists
-if [[ ! -f "pass_k.py" ]]; then
-    echo "Error: pass_k.py not found in current directory"
+# Validation checks
+validate_environment() {
+    local errors=0
+    
+    # Check if pass_k.py exists
+    if [[ ! -f "pass_k.py" ]]; then
+        echo "Error: pass_k.py not found in current directory"
+        ((errors++))
+    fi
+    
+    # Check if base directory exists
+    if [[ ! -d "$BASE_DIR" ]]; then
+        echo "Error: Base directory $BASE_DIR not found"
+        echo "Make sure MAX_TOKENS is set correctly and the directory exists"
+        ((errors++))
+    fi
+    
+    # Check if python3 is available
+    if ! command -v python3 &> /dev/null; then
+        echo "Error: python3 could not be found"
+        ((errors++))
+    fi
+    
+    return $errors
+}
+
+# Run validation and main function
+if validate_environment; then
+    main
+else
+    echo "Please fix the above errors before running the script"
     exit 1
 fi
-
-# Check if base directory exists
-if [[ ! -d "$BASE_DIR" ]]; then
-    echo "Error: Base directory $BASE_DIR not found"
-    exit 1
-fi
-
-# Run main function
-main
