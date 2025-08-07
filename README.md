@@ -302,3 +302,46 @@ Example:
 ./scripts/run_eval.sh -m 0.6B -t think -l rkt -x 2048
 
 ```
+
+You can just run as below to run generations of all language at once with specific max_token_len.
+
+```bash
+chmod +x ./scripts/batch_run_eval_1024.sh
+./scripts/batch_run_eval_1024.sh
+
+chmod +x ./scripts/batch_run_eval_2048.sh
+./scripts/batch_run_eval_1024.sh
+
+chmod +x ./scripts/batch_run_eval_4096.sh
+./scripts/batch_run_eval_1024.sh
+
+```
+
+After generation, you have to preprocess generations before evaluation. below is the code.
+
+```bash
+chmod +x ./scripts/docker.sh
+./scripts/docker.sh [Options]
+
+Options:
+  -m, --model     Model size (0.6B or 4B)
+  -t, --thinking  Thinking mode (think or nothink)
+  -l, --lang      Programming language (jl, lua, ml, r, rkt)
+  -h, --help      Display this help message
+  -x, --max-tokens  Maximum tokens (optional, default is 2048)
+
+Example:
+./scripts/docker.sh -m 0.6B -t think -l rkt -x 2048
+
+```
+
+After preprocessing, finally you can run evaluation. below is the code.
+```bash
+chmod +x ./scripts/pass_k.sh
+./scripts/pass_k.sh [Max tokens]
+
+Example:
+./scripts/pass_k.sh 1024
+
+```
+
