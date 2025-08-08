@@ -7,7 +7,7 @@ from tqdm import tqdm
 import sys
 from typing import List
 
-DATASET_REVISION = "8a4cb75204eb3d5855a81778db6b95bfc80c9136"
+DATASET_REVISION = "3a9e8d226c127392ce81dca29d09f33f0ce3247d"
 
 
 def partial_arg_parser():
@@ -77,11 +77,6 @@ def partial_arg_parser():
         default=0.95,
         help="Top-p value for sampling",
     )
-    args.add_argument(
-        "--save-raw",
-        action="store_true",
-        help="Save raw completions before stop token processing",
-    )
     return args
 
 
@@ -105,7 +100,7 @@ def make_main(args, model_name, gen_completions):
 
     exp_dir = Path(args.output_dir)
     if not exp_dir.exists():
-        exp_dir.mkdir(parents=True, exist_ok=True)
+        exp_dir.mkdir()
 
     if args.use_local:
         problems = datasets.load_dataset(
@@ -174,12 +169,10 @@ def make_main(args, model_name, gen_completions):
             stop=stop
         )
         modified_problems = set()
-        for item, (pre_completion, raw_completion) in zip(batch, new_completions):
-            # Handle different completion types
-            if isinstance(pre_completion, str) and isinstance(raw_completion, str):
-                completion = pre_completion
-                raw_completion = raw_completion
-
+        for item, a_completion in zip(batch, new_completions):
+            # if a_completion is just a string, run normal completion
+            if isinstance(a_completion, str):
+                completion = a_completion
             else:
                 # assert it's a 3-tuple
                 assert len(
@@ -190,13 +183,8 @@ def make_main(args, model_name, gen_completions):
                 all_completions[item["name"]]["tokens_info"].append(
                     {"cumulative_logprob": logprob, "len": num_tokens})
 
-            all_completions[item["name"]]["completions"].append(completion)
-
-            # Save raw completions if requested
-            if args.save_raw:
-                if "raw_completions" not in all_completions[item["name"]]:
-                    all_completions[item["name"]]["raw_completions"] = []
-                all_completions[item["name"]]["raw_completions"].append(raw_completion)
+            all_completions[item["name"]
+                            ]["completions"].append(completion)
             modified_problems.add(item["name"])
 
         for name in modified_problems:
@@ -206,7 +194,6 @@ def make_main(args, model_name, gen_completions):
 
 def read_completions(exp_dir, temperature, top_p, max_tokens, problem):
     problem_filename = exp_dir / f"{problem['name']}.json.gz"
-    # print(f"DEBUG: Checking file: {problem_filename}, exists: {problem_filename.exists()}")
     if problem_filename.exists():
         with gzip.open(problem_filename, "rt") as f:
             existing = json.loads(f.read())

@@ -319,7 +319,19 @@ chmod +x ./scripts/batch_run_eval_4096.sh
 
 ```
 
-After generation, you have to preprocess generations before evaluation. below is the code.
+After generation, you have to preprocess generations before evaluation. below is the code example.
+
+```bash
+python preprocess_json.py <path/to/raw/results> <path/you/want/to/save/results>
+
+Example:
+python preprocess_json.py ~/junsoo/MultiPL-E/before_proc_1024/qwen-0.6b-4 after_proc/qwen-0.6b-think-4
+
+
+```
+
+After preprocessing, you can get a compiled result json with docker.
+below is the code.
 
 ```bash
 chmod +x ./scripts/docker.sh
@@ -354,6 +366,6 @@ Or you can just run python file one by one.
 python3 pass_k ./after_proc_<MAX_TOKENS>/qwen-<MODEL_SIZE>-<think/>-4/result/<lang>
 
 Example:
-python3 pass_k ./after_proc_1024/qwen-4b-4/result/rkt
-python3 pass_k ./after_proc_2048/qwen-0.6b-think-4/result/r
+python3 pass_k ./after_proc/qwen-4b-4/result/rkt
+python3 pass_k ./after_proc_2048/qwen-0.6b-4/result/r
 ```

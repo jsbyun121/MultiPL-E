@@ -2,36 +2,34 @@
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [OPTIONS]"
-    echo "Options:"
-    echo "  -m, --model       Model size (0.6B or 4B)"
-    echo "  -t, --thinking    Thinking mode (think or nothink)"
-    echo "  -l, --lang        Programming language (jl, lua, ml, r, rkt)"
-    echo "  -x, --max-tokens  Maximum tokens (optional, default is 2048)"
-    echo "  -h, --help        Display this help message"
+    echo "Usage: $0 -m <model_alias> -l <language> [OPTIONS]"
     echo ""
-    echo "Examples:"
-    echo "  $0 -m 0.6B -t think -l rkt"
-    echo "  $0 -m 4B -t nothink -l lua -x 1024"
-    echo "  $0 --model 0.6B --thinking think --lang rkt --max-tokens 2048"
+    echo "Required Arguments:"
+    echo "  -m, --model      Model alias. Must be one of:"
+    echo "                   'qwen-think', 'qwen-instruct', 'gpt-oss'"
+    echo "  -l, --lang       Programming language (e.g., rkt, lua, py)."
+    echo ""
+    echo "Optional Arguments:"
+    echo "  -x, --max-tokens Maximum tokens used during generation (for qwen-think)."
+    echo "                   This is used to find the correct input directory."
+    echo "  -h, --help       Display this help message."
+    echo ""
+    echo "Example:"
+    echo "  $0 -m qwen-think -l rkt -x 1024"
+    echo "  $0 -m qwen-instruct -l py"
     exit 1
 }
 
 # Default values
 MODEL=""
-THINKING=""
 LANG=""
-MAX_TOKENS="2048"  # Set default value
+MAX_TOKENS="" # No default, only used for qwen-think
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
         -m|--model)
             MODEL="$2"
-            shift 2
-            ;;
-        -t|--thinking)
-            THINKING="$2"
             shift 2
             ;;
         -l|--lang)
@@ -53,77 +51,51 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Validate required arguments
-if [[ -z "$MODEL" || -z "$THINKING" || -z "$LANG" ]]; then
-    echo "Error: All required options (model, thinking, lang) must be specified."
+if [[ -z "$MODEL" || -z "$LANG" ]]; then
+    echo "Error: Model alias (-m) and language (-l) are required."
     usage
 fi
 
-# Validate model option
-if [[ "$MODEL" != "0.6B" && "$MODEL" != "4B" ]]; then
-    echo "Error: Model must be '0.6B' or '4B'"
-    echo "Provided: '$MODEL'"
-    exit 1
-fi
+# --- NEW LOGIC TO MATCH YOUR PYTHON SCRIPT ---
 
-# Validate thinking option
-if [[ "$THINKING" != "nothink" && "$THINKING" != "think" ]]; then
-    echo "Error: Thinking mode must be 'nothink' or 'think'"
-    echo "Provided: '$THINKING'"
-    exit 1
-fi
+# Variables for constructing the path
+MODEL_DIR=""
+TOKEN_SUFFIX=""
 
-# Validate language option
-if [[ ! "$LANG" =~ ^(jl|lua|ml|r|rkt)$ ]]; then
-    echo "Error: Language must be one of: jl, lua, ml, r, rkt"
-    echo "Provided: '$LANG'"
-    exit 1
-fi
+case "$MODEL" in
+    "qwen-think")
+        MODEL_DIR="qwen_4b"
+        if [[ -z "$MAX_TOKENS" ]]; then
+            echo "Error: --max-tokens is required for the 'qwen-think' model."
+            exit 1
+        fi
+        TOKEN_SUFFIX="_${MAX_TOKENS}"
+        ;;
+    "qwen-instruct")
+        MODEL_DIR="qwen_4b"
+        ;;
+    "gpt-oss")
+        MODEL_DIR="gpt_20b"
+        ;;
+    *)
+        echo "Error: Invalid model alias '$MODEL'."
+        usage
+        ;;
+esac
 
-# Validate max_tokens is a positive integer
-if ! [[ "$MAX_TOKENS" =~ ^[0-9]+$ ]]; then
-    echo "Error: MAX_TOKENS must be a positive integer"
-    echo "Provided: '$MAX_TOKENS'"
-    exit 1
-fi
-
-# Set model directory based on size
-if [[ "$MODEL" == "0.6B" ]]; then
-    MODEL_DIR="qwen-0.6b"
-else
-    MODEL_DIR="qwen-4b"
-fi
-
-# Set thinking suffix
-if [[ "$THINKING" == "think" ]]; then
-    THINKING_SUFFIX="-think"
-else
-    THINKING_SUFFIX=""
-fi
-
-# Construct the directory path
-BASE_DIR="./after_proc_${MAX_TOKENS}/${MODEL_DIR}${THINKING_SUFFIX}-4"
+# Construct the base directory path to match the Python script's output
+BASE_DIR="./after_proc_${MODEL_DIR}${TOKEN_SUFFIX}"
 
 echo "Configuration:"
-echo "  Model: $MODEL"
-echo "  Thinking: $THINKING"
+echo "  Model Alias: $MODEL"
 echo "  Language: $LANG"
-echo "  Max Tokens: $MAX_TOKENS"
-echo "  Base Directory: $BASE_DIR"
+echo "  Target Directory: ${BASE_DIR}/${LANG}"
 echo ""
 
-# Check if the base directory exists
-if [[ ! -d "$BASE_DIR" ]]; then
-    echo "Error: Directory $BASE_DIR does not exist"
-    echo "Please check if:"
-    echo "  1. The after_proc_${MAX_TOKENS} directory exists"
-    echo "  2. The model directory ${MODEL_DIR}${THINKING_SUFFIX}-4 exists within it"
-    echo "  3. The path is correct relative to the current directory"
-    exit 1
-fi
-
-# Check if the language subdirectory exists
-if [[ ! -d "$BASE_DIR/$LANG" ]]; then
-    echo "Error: Language directory $BASE_DIR/$LANG does not exist"
+# Check if the target directory exists
+if [[ ! -d "${BASE_DIR}/${LANG}" ]]; then
+    echo "Error: Directory ${BASE_DIR}/${LANG} does not exist."
+    echo "Please ensure you have run the generation script first and the path is correct."
     exit 1
 fi
 
@@ -134,7 +106,7 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # Create result directory if it doesn't exist
-mkdir -p "$BASE_DIR/result/$LANG"
+mkdir -p "${BASE_DIR}/result/${LANG}"
 
 # Construct the Docker command
 CMD="docker run --rm --network none --user $(id -u):$(id -g) \
@@ -143,16 +115,15 @@ CMD="docker run --rm --network none --user $(id -u):$(id -g) \
     --dir /out/${LANG} \
     --output-dir /out/result/${LANG}"
 
-# Display the command that will be executed
+# Display and execute the command
 echo "Executing Docker command:"
 echo "$CMD"
 echo ""
 
-# Execute the command and capture the exit status
 if eval "$CMD"; then
     echo ""
     echo "✅ Evaluation completed successfully!"
-    echo "Results saved to: $BASE_DIR/result/$LANG"
+    echo "Results saved to: ${BASE_DIR}/result/${LANG}"
 else
     echo ""
     echo "❌ Evaluation failed!"

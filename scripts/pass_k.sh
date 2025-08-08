@@ -1,159 +1,138 @@
 #!/bin/bash
 
-# Configuration
-MODELS=("0.6b" "4b")
-THINKING_MODES=("think" "")
+# --- Configuration & Usage ---
+usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo "Summarizes pass@k results for the specified models."
+    echo ""
+    echo "Options:"
+    echo "  -m, --models     A comma-separated list of model aliases to run."
+    echo "                   (e.g., 'qwen-think,qwen-instruct'). Default: all."
+    echo "  -x, --max-tokens The token count used for 'qwen-think' directories (default: 1024)."
+    echo "  -h, --help       Display this help message."
+    echo ""
+    echo "Example:"
+    echo "  # Summarize results for all models, assuming 1024 tokens for qwen-think"
+    echo "  $0"
+    echo ""
+    echo "  # Summarize for qwen-think only, specifying 4096 tokens"
+    echo "  $0 -m qwen-think -x 4096"
+}
+
+# --- Default Values ---
+MODELS_TO_RUN="qwen-instruct,qwen-think,gpt-oss"
+MAX_TOKENS="1024"
 LANGUAGES=("jl" "lua" "ml" "r" "rkt")
 
-# Check if MAX_TOKENS is provided as argument
-if [[ $# -ne 1 ]]; then
-    echo "Error: MAX_TOKENS argument is required"
-    echo "Usage: $0 <MAX_TOKENS>"
-    echo "Example: $0 512"
-    exit 1
-fi
+# --- Argument Parsing ---
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -m|--models)
+            MODELS_TO_RUN="$2"
+            shift 2
+            ;;
+        -x|--max-tokens)
+            MAX_TOKENS="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            usage
+            exit 1
+            ;;
+    esac
+done
 
-MAX_TOKENS=$1
-
-# Validate MAX_TOKENS is a number
-if ! [[ "$MAX_TOKENS" =~ ^[0-9]+$ ]]; then
-    echo "Error: MAX_TOKENS must be a positive integer"
-    echo "Provided: $MAX_TOKENS"
-    exit 1
-fi
-
-BASE_DIR="/home/junsoo/MultiPL-E/after_proc_${MAX_TOKENS}"
-RESULTS_FILE="pass_k_results_$(date +%Y%m%d_%H%M%S).txt"
-
-# Function to log with timestamp
-log_message() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$RESULTS_FILE"
-}
-
-# Function to run pass_k.py and capture results
+# --- Function to run pass_k.py ---
 run_pass_k() {
-    local model=$1
-    local thinking=$2
-    local lang=$3
+    local model_alias=$1
+    local lang=$2
     
-    # Construct directory path
-    local dir_name="qwen-${model}"
-    if [[ -n "$thinking" ]]; then
-        dir_name="${dir_name}-${thinking}"
-    fi
-    dir_name="${dir_name}-4"
+    local model_dir=""
+    local token_suffix=""
     
-    local result_path="${BASE_DIR}/${dir_name}/result/${lang}"
+    # Determine directory structure based on model alias
+    case "$model_alias" in
+        "qwen-think")
+            model_dir="qwen_4b"
+            token_suffix="_${MAX_TOKENS}"
+            ;;
+        "qwen-instruct")
+            model_dir="qwen_4b"
+            ;;
+        "gpt-oss")
+            model_dir="gpt_20b"
+            ;;
+        *)
+            echo "ERROR: Unknown model alias '$model_alias' in run_pass_k"
+            return 1
+            ;;
+    esac
+
+    # Construct the path to the 'result' directory created by the Docker script
+    local result_path="./after_proc_${model_dir}${token_suffix}/result/${lang}"
     
-    # Check if directory exists
+    # Check if the result directory exists
     if [[ ! -d "$result_path" ]]; then
-        log_message "SKIP: Directory not found: $result_path"
+        echo "SKIP: ${model_alias}-${lang} (directory not found at ${result_path})"
         return 1
     fi
     
-    # Create header for this configuration
-    local config_name="Model: ${model}, Thinking: ${thinking:-none}, Language: ${lang}"
-    log_message "=================================================="
-    log_message "Running: $config_name"
-    log_message "Path: $result_path"
-    log_message "=================================================="
+    echo "Running: ${model_alias} on ${lang}"
     
-    # Run pass_k.py and capture output
-    local cmd="python3 pass_k.py $result_path"
-    log_message "Command: $cmd"
-    
-    # Execute and capture both stdout and stderr
-    if output=$(python3 pass_k.py "$result_path" 2>&1); then
-        echo "$output" | tee -a "$RESULTS_FILE"
-        log_message "SUCCESS: Completed $config_name"
+    # Run pass_k.py and capture results
+    if output=$(python3 pass_k.py "$result_path" 2>/dev/null); then
+        # Extract pass@1 value from CSV output (3rd column)
+        pass_at_1=$(echo "$output" | tail -n 1 | cut -d',' -f3)
+        echo "${model_alias}-${lang}: ${pass_at_1}"
+        # Append to the main results file
+        echo "${model_alias}-${lang},${pass_at_1}" >> "$RESULTS_FILE"
         return 0
     else
-        log_message "ERROR: Failed to run $config_name"
-        echo "$output" | tee -a "$RESULTS_FILE"
+        echo "ERROR: ${model_alias}-${lang} failed to execute pass_k.py"
         return 1
     fi
 }
 
-# Main execution
-main() {
-    log_message "Starting pass_k evaluation for all configurations"
-    log_message "MAX_TOKENS: $MAX_TOKENS"
-    log_message "BASE_DIR: $BASE_DIR"
-    log_message "Results will be saved to: $RESULTS_FILE"
-    echo ""
-    
-    local total_configs=0
-    local completed_configs=0
-    local skipped_configs=0
-    
-    # Calculate total configurations
-    total_configs=$((${#MODELS[@]} * 2 * ${#LANGUAGES[@]}))
-    log_message "Total configurations to process: $total_configs"
-    echo ""
-    
-    # Iterate through all combinations
-    for model in "${MODELS[@]}"; do
-        for thinking_mode in "${THINKING_MODES[@]}"; do
-            for lang in "${LANGUAGES[@]}"; do
-                if run_pass_k "$model" "$thinking_mode" "$lang"; then
-                    ((completed_configs++))
-                else
-                    ((skipped_configs++))
-                fi
-                echo "" >> "$RESULTS_FILE"
-            done
-        done
+# --- Main Execution ---
+RESULTS_FILE="results_summary_$(date +%Y%m%d_%H%M%S).csv"
+echo "Results will be saved to: $RESULTS_FILE"
+echo "========================================"
+
+# Write header to results file
+echo "Model-Language,Pass@1" > "$RESULTS_FILE"
+
+total=0
+completed=0
+
+# Convert comma-separated string to array
+IFS=',' read -r -a models_array <<< "$MODELS_TO_RUN"
+
+for model in "${models_array[@]}"; do
+    for lang in "${LANGUAGES[@]}"; do
+        ((total++))
+        if run_pass_k "$model" "$lang"; then
+            ((completed++))
+        fi
     done
-    
-    # Summary
-    log_message "=================================================="
-    log_message "SUMMARY"
-    log_message "=================================================="
-    log_message "Total configurations: $total_configs"
-    log_message "Completed successfully: $completed_configs"
-    log_message "Skipped (directory not found): $skipped_configs"
-    log_message "Results saved to: $RESULTS_FILE"
-    
-    if [[ $completed_configs -gt 0 ]]; then
-        log_message ""
-        log_message "You can view the complete results with:"
-        log_message "cat $RESULTS_FILE"
-        log_message ""
-        log_message "Or view only the summary statistics:"
-        log_message "grep -E '(pass@|Model:|SUCCESS:|SKIP:|ERROR:)' $RESULTS_FILE"
-    fi
-}
+done
 
-# Validation checks
-validate_environment() {
-    local errors=0
-    
-    # Check if pass_k.py exists
-    if [[ ! -f "pass_k.py" ]]; then
-        echo "Error: pass_k.py not found in current directory"
-        ((errors++))
-    fi
-    
-    # Check if base directory exists
-    if [[ ! -d "$BASE_DIR" ]]; then
-        echo "Error: Base directory $BASE_DIR not found"
-        echo "Make sure MAX_TOKENS is set correctly and the directory exists"
-        ((errors++))
-    fi
-    
-    # Check if python3 is available
-    if ! command -v python3 &> /dev/null; then
-        echo "Error: python3 could not be found"
-        ((errors++))
-    fi
-    
-    return $errors
-}
+# --- Summary ---
+echo "========================================"
+echo "Summary: $completed/$total tasks completed."
+echo "Results saved to: $RESULTS_FILE"
 
-# Run validation and main function
-if validate_environment; then
-    main
-else
-    echo "Please fix the above errors before running the script"
-    exit 1
+if [[ $completed -gt 0 ]]; then
+    echo ""
+    echo "--- Results Summary ---"
+    # Use 'column' for nice formatting if available
+    if command -v column &> /dev/null; then
+        cat "$RESULTS_FILE" | column -s, -t
+    else
+        cat "$RESULTS_FILE"
+    fi
 fi

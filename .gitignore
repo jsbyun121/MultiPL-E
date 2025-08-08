@@ -11,3 +11,4 @@ pass_k_results/
 slurm-*
 before_proc_*/
 after_proc_*/
+results*

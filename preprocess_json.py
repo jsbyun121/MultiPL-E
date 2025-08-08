@@ -81,9 +81,6 @@ def _clean_code(completion):
 def process_raw_completions(raw_completions: List[str]) -> List[str]:
     cleaned_completions = []
     for raw_completion in raw_completions:
-        # Check if </think> exists before splitting
-        if "</think>" in raw_completion:
-            raw_completion = raw_completion.split("</think>", 1)[1]
 
         raw_completion = _clean_code(raw_completion)
         cleaned_completions.append(raw_completion)
@@ -154,11 +151,12 @@ def process_json_file(input_path: Path, output_path: Path, dry_run: bool = False
         
         processed_prompt = remove_code_from_bottom(original_prompt, language) + '\n'
         processed_completions = process_raw_completions(raw_completions) if raw_completions else ""
+
+        data["completions"] = processed_completions
         
         if processed_prompt != original_prompt:
             # Modify the data structure
             data["prompt"] = processed_prompt
-            data["completions"] = processed_completions
             stats["modified"] = 1
             
             print(f"Modified {input_path.name}:")
