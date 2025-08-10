@@ -71,7 +71,7 @@ TOKEN_SUFFIX="" # Suffix for the output directory
 case "$MODEL" in
     "qwen-think")
         MODEL_NAME="Qwen/Qwen3-4B-Thinking-2507"
-        MODEL_DIR="qwen_4b"
+        MODEL_DIR="qwen_2507_4b"
         BATCH_SIZE=16
         TEMP=0.6
         # Only 'qwen-think' uses the max-tokens flag and has a token-specific output folder
@@ -80,14 +80,14 @@ case "$MODEL" in
         ;;
     "qwen-instruct")
         MODEL_NAME="Qwen/Qwen3-4B-Instruct-2507"
-        MODEL_DIR="qwen_4b"
+        MODEL_DIR="qwen_2507_4b"
         BATCH_SIZE=32
         TEMP=0.7
         # No extra flags or token suffix for instruct model
         ;;
     "gpt-oss")
         MODEL_NAME="openai/gpt-oss-20b"
-        MODEL_DIR="gpt_20b"
+        MODEL_DIR="gpt_oss_20b"
         BATCH_SIZE=4 # Use a smaller batch size for the 20B model
         TEMP=0.6
         EXTRA_FLAGS="--reasoning-level ${REASONING}"

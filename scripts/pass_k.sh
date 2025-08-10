@@ -58,14 +58,14 @@ run_pass_k() {
     # Determine directory structure based on model alias
     case "$model_alias" in
         "qwen-think")
-            model_dir="qwen_4b"
+            model_dir="qwen_2507_4b"
             token_suffix="_${MAX_TOKENS}"
             ;;
         "qwen-instruct")
-            model_dir="qwen_4b"
+            model_dir="qwen_2507_4b"
             ;;
         "gpt-oss")
-            model_dir="gpt_20b"
+            model_dir="gpt_oss_20b"
             ;;
         *)
             echo "ERROR: Unknown model alias '$model_alias' in run_pass_k"
