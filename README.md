@@ -37,14 +37,11 @@ Example:
 You can just run as below to run generations of all language at once with specific max_token_len.
 
 ```bash
-chmod +x ./scripts/batch_run_eval_1024.sh
-./scripts/batch_run_eval_1024.sh
+chmod +x ./scripts/batch_run_eval.sh
 
-chmod +x ./scripts/batch_run_eval_2048.sh
-./scripts/batch_run_eval_1024.sh
-
-chmod +x ./scripts/batch_run_eval_4096.sh
-./scripts/batch_run_eval_1024.sh
+Example:
+./scripts/batch_run_eval.sh qwen-think 4096
+./scripts/batch_run_eval.sh qwen-instruct
 
 ```
 

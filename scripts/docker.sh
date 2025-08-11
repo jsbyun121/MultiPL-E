@@ -64,7 +64,7 @@ TOKEN_SUFFIX=""
 
 case "$MODEL" in
     "qwen-think")
-        MODEL_DIR="qwen_4b"
+        MODEL_DIR="qwen_2507_4b"
         if [[ -z "$MAX_TOKENS" ]]; then
             echo "Error: --max-tokens is required for the 'qwen-think' model."
             exit 1
@@ -72,7 +72,7 @@ case "$MODEL" in
         TOKEN_SUFFIX="_${MAX_TOKENS}"
         ;;
     "qwen-instruct")
-        MODEL_DIR="qwen_4b"
+        MODEL_DIR="qwen_2507_4b"
         ;;
     "gpt-oss")
         MODEL_DIR="gpt_20b"

@@ -23,4 +23,3 @@ def gzip_json(path: Path, data: dict) -> None:
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
-

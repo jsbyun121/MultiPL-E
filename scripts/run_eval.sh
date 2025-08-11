@@ -109,7 +109,7 @@ OUTPUT_DIR="before_proc_${MODEL_DIR}${TOKEN_SUFFIX}/${LANG}"
 mkdir -p ${OUTPUT_DIR}
 
 # Construct the final command, conditionally adding flags via EXTRA_FLAGS
-CMD="python automodel_qwen.py \
+CMD="python automodel_instruct.py \
     --name ${MODEL_NAME} \
     --root-dataset humaneval \
     --lang ${LANG} \
