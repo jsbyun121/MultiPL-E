@@ -1,7 +1,7 @@
 """
 This script produces completions for roughly any AutoModelForCausalLM.
 """
-from multipl_e.completions import make_main, stop_at_stop_token, partial_arg_parser
+from multipl_e.completions import make_main, partial_arg_parser
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import itertools
