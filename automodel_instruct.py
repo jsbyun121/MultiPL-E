@@ -9,10 +9,16 @@ from typing import List
 from transformers import pipeline
 
 class Model:
-    def __init__(self, name, revision, model_kwargs, tokenizer_name=None, tokenizer_revision=None,  use_chat_template=True, reasoning_level="high"):
-        dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+    def __init__(self, name, revision, model_kwargs, tokenizer_name=None, tokenizer_revision=None,  use_chat_template=True):
+        if "qwen" in name.lower():
+            dtype = torch.bfloat16
+        elif "openai" in name.lower():
+            dtype = "auto"
+        else:
+            raise ValueError(f"Unsupported model: {name}")
+        
         self.model = AutoModelForCausalLM.from_pretrained(
-            name, revision=revision, torch_dtype=dtype, trust_remote_code=True, **model_kwargs
+            name, revision=revision, torch_dtype=dtype, device_map="auto", trust_remote_code=True, **model_kwargs
         ).cuda()
         self.tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_name or name,
@@ -30,7 +36,6 @@ class Model:
         self.use_chat_template = use_chat_template
         self.team_name = name.split("/")[0]
         self.model_name = name.split("/")[1]
-        self.reasoning_level = reasoning_level
         self.enable_thinking = "think" in self.model_name.lower()
 
         assert (
@@ -87,18 +92,25 @@ class Model:
             for prompt in prompts:
                 if self.team_name.lower() == "qwen":
                     system_msg = "You are a helpful assistant."
+                    messages = [
+                        {"role": "system", "content": system_msg},
+                        {"role": "user", "content": f"Using given examples and the signature, generate the missing implementation by wrapping your code in ```language markdown blocks:\n\n{prompt}\n\n"}
+                    ]
+                    text = self.tokenizer.apply_chat_template(
+                        messages,
+                        tokenize=False,
+                        add_generation_prompt=True
+                    )
                 elif self.team_name.lower() == "openai":
-                    system_msg = f"You are a helpful assistant.\nReasoning: {self.reasoning_level}"
-
-                messages = [
-                    {"role": "system", "content": system_msg},
-                    {"role": "user", "content": f"Using given examples and the signature, generate the missing implementation by wrapping your code in ```language markdown blocks:\n\n{prompt}\n\n"}
-                ]
-                text = self.tokenizer.apply_chat_template(
-                    messages,
-                    tokenize=False,
-                    add_generation_prompt=True
-                )
+                    messages = [
+                        {"role": "user", "content": f"Using given examples and the signature, generate the missing implementation by wrapping your code in ```language markdown blocks:\n\n{prompt}\n\n"}
+                    ]
+                    text = self.tokenizer.apply_chat_template(
+                        messages,
+                        tokenize=False,
+                        add_generation_prompt=True,
+                        reasoning_effort="medium"
+                    )
                 formatted_prompts.append(text)
             final_prompts = formatted_prompts
         else:
@@ -127,38 +139,6 @@ class Model:
         # Return the generated tensors along with the original 'input_ids' to use as a separation criterion.
         return output_tensors, inputs['input_ids']
 
-
-    def _is_special_token_id(self, token_id: int) -> bool:
-        """
-        Identifies special tokens that should be filtered out, focusing on
-        padding and system tokens rather than markdown content tokens.
-        """
-        # Check for padding and BOS tokens
-        if token_id == self.tokenizer.pad_token_id:
-            return True
-        if self.tokenizer.bos_token_id is not None and token_id == self.tokenizer.bos_token_id:
-            return True
-            
-        # Check for end-of-sequence and other critical special tokens
-        if token_id == self.tokenizer.eos_token_id:
-            return True
-            
-        return False
-
-    def _remove_until_endthink_token(self, full_token_ids: List[int]) -> List[int]:
-        """
-        Removes tokens until the </think> token, which is used to indicate the start of the generated
-        response. This is useful for models that use a chat template with thinking mode.
-        """
-        think_token_id = self.tokenizer.convert_tokens_to_ids("</think>")
-        
-        if think_token_id in full_token_ids:
-            think_pos = full_token_ids.index(think_token_id)
-            result = full_token_ids[think_pos + 1:]
-            return result
-        else:
-            return full_token_ids
-        
     def _is_pad_or_bos_token_id(self, token_id: int) -> bool:
         if token_id == self.tokenizer.pad_token_id:
             return True
@@ -278,8 +258,13 @@ class Model:
         # Get token IDs from tensor
         token_ids = output_tensor.tolist()
 
-        # Convert </think> to token ID
-        endthink_token_id = self.tokenizer.convert_tokens_to_ids("</think>")
+        if self.team_name.lower() == "qwen":
+            # Convert </think> to token ID
+            endthink_token_id = self.tokenizer.convert_tokens_to_ids("</think>")
+        elif self.team_name.lower() == "openai":
+            raise NotImplementedError("Thinking mode is not supported for OpenAI models.")
+        else:
+            raise ValueError(f"Unsupported model: {self.team_name}")
 
         # Check if </think> token is missing
         if endthink_token_id not in token_ids:
@@ -300,10 +285,6 @@ def automodel_partial_arg_parser():
     args.add_argument("--flash-attention2", action="store_true")
     args.add_argument("--use-chat-template", action="store_true",
                         help="Use chat template for the model. This is useful for models that support chat templates, such as Qwen and OpenAI models.")
-    args.add_argument("--reasoning-level", type=str, default="h",
-                        help="Set the reasoning level for thinking mode (default: 'h'). "
-                            "Options: 'l'(low), 'm'(medium), 'h'(high). "
-                            "This is only used for OpenAI oss models.")
     return args
 
 
@@ -326,28 +307,12 @@ def main():
     if args.flash_attention2:
         model_kwargs["attn_implementation"] = "flash_attention_2"
 
-    # Convert reasoning level shorthand to full names
-    reasoning_level = args.reasoning_level.lower()
-    if reasoning_level == "l":
-        reasoning_level = "low"
-    elif reasoning_level == "m":
-        reasoning_level = "medium"
-    elif reasoning_level == "h":
-        reasoning_level = "high"
-    elif reasoning_level not in ["low", "medium", "high"]:
-        raise ValueError("Invalid reasoning level. Choose from 'l', 'm', 'h', 'low', 'medium', or 'high'.")
-
-    if args.name.split("/")[0].lower() == "openai":
-        # For OpenAI models, set reasoning level in model_kwargs
-        model_kwargs["reasoning_level"] = reasoning_level
-
     model = Model(
         args.name, args.revision,
         model_kwargs=model_kwargs,
         tokenizer_name=args.tokenizer_name,
         tokenizer_revision=args.tokenizer_revision,
         use_chat_template=args.use_chat_template,
-        reasoning_level=reasoning_level,
     )
 
     name = do_name_override(args)

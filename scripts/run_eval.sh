@@ -13,7 +13,6 @@ usage() {
     echo ""
     echo "Optional Arguments:"
     echo "  -x, --max-tokens Maximum number of new tokens for 'qwen-think' (default: 1024)."
-    echo "  -r, --reasoning  Reasoning level for OpenAI model (low, medium, high). Default: 'high'."
     echo "  -h, --help       Display this help message."
     echo ""
     echo "Example: $0 -m qwen-think -l rkt -x 4096"
@@ -25,7 +24,6 @@ usage() {
 MODEL=""
 LANG=""
 MAX_TOKENS="1024" # Changed default to 1024
-REASONING="high"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -40,10 +38,6 @@ while [[ $# -gt 0 ]]; do
         ;;
     -x|--max-tokens)
         MAX_TOKENS="$2"
-        shift 2
-        ;;
-    -r|--reasoning)
-        REASONING="$2"
         shift 2
         ;;
     -h|--help)
@@ -81,7 +75,7 @@ case "$MODEL" in
     "qwen-instruct")
         MODEL_NAME="Qwen/Qwen3-4B-Instruct-2507"
         MODEL_DIR="qwen_2507_4b"
-        BATCH_SIZE=32
+        BATCH_SIZE=8
         TEMP=0.7
         # No extra flags or token suffix for instruct model
         ;;
@@ -90,19 +84,12 @@ case "$MODEL" in
         MODEL_DIR="gpt_oss_20b"
         BATCH_SIZE=4 # Use a smaller batch size for the 20B model
         TEMP=0.6
-        EXTRA_FLAGS="--reasoning-level ${REASONING}"
         ;;
     *)
         echo "Error: Invalid model alias '$MODEL'."
         usage
         ;;
 esac
-
-# Validate reasoning level for OpenAI model
-if [[ "$MODEL" == "gpt-oss" && ! "$REASONING" =~ ^(low|medium|high)$ ]]; then
-    echo "Error: Reasoning level for gpt-oss must be 'low', 'medium', or 'high'."
-    exit 1
-fi
 
 # Construct a clean output directory
 OUTPUT_DIR="before_proc_${MODEL_DIR}${TOKEN_SUFFIX}/${LANG}"
