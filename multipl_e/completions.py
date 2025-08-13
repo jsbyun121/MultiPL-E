@@ -181,14 +181,7 @@ def make_main(args, model_name, gen_completions):
                 raw_completion = raw_completion
 
             else:
-                # assert it's a 3-tuple
-                assert len(
-                    a_completion) == 3, "Completion must be a 3-tuple or a string"
-                completion, logprob, num_tokens = a_completion
-                if "tokens_info" not in all_completions[item["name"]]:
-                    all_completions[item["name"]]["tokens_info"] = []
-                all_completions[item["name"]]["tokens_info"].append(
-                    {"cumulative_logprob": logprob, "len": num_tokens})
+                raise ValueError(f"{pre_completion} should be a string")
 
             all_completions[item["name"]]["completions"].append(completion)
 

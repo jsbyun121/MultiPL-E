@@ -36,7 +36,10 @@ class Model:
         self.use_chat_template = use_chat_template
         self.team_name = name.split("/")[0]
         self.model_name = name.split("/")[1]
-        self.enable_thinking = "think" in self.model_name.lower()
+        if self.model_name in ["Qwen3-4B-Thinking-2507", "gpt-oss-20b"]:
+            self.enable_thinking = True
+        else:
+            self.enable_thinking = False
 
         assert (
             len(self._all_special_token_ids) >= 1
@@ -210,16 +213,17 @@ class Model:
     def _handle_thinking_budget(self, prompt, output_tensor, input_length, temperature, top_p, stop):
         """Handle incomplete thinking processes and regenerate if needed."""
         
-        complete_status = self._is_complete(output_tensor)
-
         if self.enable_thinking:
-
-            if complete_status:
+            if self._is_thinking_complete(output_tensor):
                 pre_completion, raw_completion = self.decode_single_output(output_tensor, input_length)
                 return (pre_completion, raw_completion)
-
             else:
-                thinking_suffix = "\nConsidering the limited time by the user, I have to give the solution based on the thinking directly now.\n</think>\n\n"
+                if self.team_name.lower() == "qwen":
+                    thinking_suffix = "\nConsidering the limited time by the user, I have to give the solution based on the thinking directly now.\n</think>\n\n"
+                elif self.team_name.lower() == "openai":
+                    thinking_suffix = "\nConsidering the limited time by the user, I have to give the solution based on the thinking directly now.<|end|><|start|>assistant<|channel|>final<|message|>"
+                else:
+                    raise ValueError(f"Unsupported model: {self.team_name}")
 
                 # Get the partial completion and add suffix
                 processed_completion = self.tokenizer.decode(output_tensor, skip_special_tokens=False)
@@ -252,23 +256,19 @@ class Model:
             pre_completion, raw_completion = self.decode_single_output(output_tensor, input_length)
             return (pre_completion, raw_completion)
 
-    def _is_complete(self, output_tensor) -> bool:
-        """Check if the process is complete."""
+    def _is_thinking_complete(self, output_tensor) -> bool:
+        """Check if thinking process is complete."""
 
-        # Get token IDs from tensor
-        token_ids = output_tensor.tolist()
+        output_string = self.tokenizer.decode(output_tensor)
 
         if self.team_name.lower() == "qwen":
-            # Convert </think> to token ID
-            endthink_token_id = self.tokenizer.convert_tokens_to_ids("</think>")
+            if not "</think>" in output_string:
+                return False
         elif self.team_name.lower() == "openai":
-            raise NotImplementedError("Thinking mode is not supported for OpenAI models.")
+            if not "<|end|><|start|>assistant<|channel|>final<|message|>" in output_string:
+                return False
         else:
             raise ValueError(f"Unsupported model: {self.team_name}")
-
-        # Check if </think> token is missing
-        if endthink_token_id not in token_ids:
-            return False
 
         return True
 
