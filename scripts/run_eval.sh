@@ -126,4 +126,15 @@ echo "Executing command:"
 # Using 'xargs' to clean up extra whitespace for cleaner output
 echo "$CMD" | xargs
 echo ""
-eval "$CMD" | xargs
+
+python automodel_instruct.py \
+    --name ${MODEL_NAME} \
+    --root-dataset humaneval \
+    --lang ${LANG} \
+    --temperature ${TEMP} \
+    --completion-limit 4 \
+    --output-dir ${OUTPUT_DIR} \
+    --batch-size ${BATCH_SIZE} \
+    --save-raw \
+    --use-chat-template \
+    ${EXTRA_FLAGS}

@@ -13,9 +13,15 @@ pip install 'huggingface_hub[cli]'
 docker pull ghcr.io/nuprl/multipl-e-evaluation
 ```
 
+To enable MXFP4 inference for GPT-OSS (in Hopper or Blackwell architectures / e.g., H100 GPUs), install:
+```bash
+pip install triton kernels
+pip install -U "git+https://github.com/triton-lang/triton.git@f33bcbd4f1051d0d9ea3fdfc0b2e68f53ededfe4#subdirectory=python/triton_kernels"
+```
+
 ## Quick Start with Bash Automation Script
 
-Supported models: Qwen3-2507, Qwen3
+Supported models: Qwen3-2507, Qwen3, GPT-OSS
 
 The bash script provides a convenient wrapper around the evaluation pipeline with the following options:
 
