@@ -65,25 +65,26 @@ TOKEN_SUFFIX="" # Suffix for the output directory
 case "$MODEL" in
     "qwen-think")
         MODEL_NAME="Qwen/Qwen3-4B-Thinking-2507"
-        MODEL_DIR="qwen_2507_4b"
+        MODEL_DIR="Qwen_Qwen3-4B-Thinking-2507"
         BATCH_SIZE=16
         TEMP=0.6
         # Only 'qwen-think' uses the max-tokens flag and has a token-specific output folder
         EXTRA_FLAGS="--max-tokens ${MAX_TOKENS}"
-        TOKEN_SUFFIX="_${MAX_TOKENS}"
+        TOKEN_SUFFIX="_mt_${MAX_TOKENS}"
         ;;
     "qwen-instruct")
         MODEL_NAME="Qwen/Qwen3-4B-Instruct-2507"
-        MODEL_DIR="qwen_2507_4b"
+        MODEL_DIR="Qwen_Qwen3-4B-Instruct-2507"
         BATCH_SIZE=8
         TEMP=0.7
-        # No extra flags or token suffix for instruct model
+        TOKEN_SUFFIX="_mt_${MAX_TOKENS}"
         ;;
     "gpt-oss")
         MODEL_NAME="openai/gpt-oss-20b"
-        MODEL_DIR="gpt_oss_20b"
+        MODEL_DIR="openai_gpt-oss-20b"
         BATCH_SIZE=4 # Use a smaller batch size for the 20B model
         TEMP=0.6
+        TOKEN_SUFFIX="_mt_${MAX_TOKENS}"
         ;;
     *)
         echo "Error: Invalid model alias '$MODEL'."
