@@ -77,15 +77,36 @@ def _clean_code(completion):
         # Fallback: clean up the completion as-is
         result = ""
         return result
-        
-def process_raw_completions(raw_completions: List[str]) -> List[str]:
+
+def process_raw_completions(raw_completions: List[str], model: str) -> List[str]:
     cleaned_completions = []
     for raw_completion in raw_completions:
-
+        raw_completion = remove_until_end_reasoning(raw_completion, model)
         raw_completion = _clean_code(raw_completion)
         cleaned_completions.append(raw_completion)
 
     return cleaned_completions
+
+def remove_until_end_reasoning(raw_completion: str, model: str) -> str:
+    """Remove text before the end of reasoning marker based on model type."""
+    model = model.lower()
+
+    if "qwen3" in model and "think" in model:
+        # Qwen 모델: </think> 이후의 텍스트만 반환
+        end_reasoning_pattern = r"</think>"
+    elif "gpt-oss" in model:
+        # OpenAI 모델: <|end|><|start|>assistant<|channel|>final<|message|> 이후
+        end_reasoning_pattern = r"<\|end\|><\|start\|>assistant<\|channel\|>final<\|message\|>"
+    elif model == "":
+        raise ValueError("You must put a model name as arg")
+    else:
+        return raw_completion
+    
+    match = re.search(end_reasoning_pattern, raw_completion)
+    if match:
+        return raw_completion[match.start():]
+    return raw_completion
+
 
 def remove_code_from_bottom(prompt: str, language: str) -> str:
     """
@@ -129,7 +150,7 @@ def remove_code_from_bottom(prompt: str, language: str) -> str:
     # No comments found, return original
     return '\n'.join(lines)
 
-def process_json_file(input_path: Path, output_path: Path, dry_run: bool = False) -> Dict[str, int]:
+def process_json_file(input_path: Path, output_path: Path, dry_run: bool = False, model: str = "") -> Dict[str, int]:
     """Process a single JSON file to separate signature from prompt"""
     stats = {"processed": 0, "signature removed": 0, "errors": 0}
     
@@ -150,7 +171,7 @@ def process_json_file(input_path: Path, output_path: Path, dry_run: bool = False
         raw_completions = data.get("raw_completions", "")
         
         processed_prompt = remove_code_from_bottom(original_prompt, language) + '\n'
-        processed_completions = process_raw_completions(raw_completions) if raw_completions else ""
+        processed_completions = process_raw_completions(raw_completions, model) if raw_completions else ""
 
         data["completions"] = processed_completions
         
@@ -190,6 +211,8 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Show what would be changed without modifying files")
     parser.add_argument("--pattern", type=str, default="**/*.json*", help="File pattern to match")
     parser.add_argument("--language", type=str, help="Process only files with specific language")
+    parser.add_argument("--model", "-m", type=str, help="Give information about the model")
+
     
     args = parser.parse_args()
     
@@ -233,7 +256,7 @@ def main():
         output_path = args.output_dir / relative_path
         
         # Process the file
-        stats = process_json_file(json_file, output_path, args.dry_run)
+        stats = process_json_file(json_file, output_path, args.dry_run, args.model)
         
         for key in total_stats:
             total_stats[key] += stats[key]
