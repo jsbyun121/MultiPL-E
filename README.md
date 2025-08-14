@@ -54,11 +54,12 @@ Example:
 After generation, you have to preprocess generations before evaluation. below is the code example.
 
 ```bash
-python preprocess_json.py <path/to/raw/results> <path/you/want/to/save/results>
+python preprocess_json.py <path/to/raw/results> <path/you/want/to/save/results> <model_name> --model <model_type>
 
 Example:
-python preprocess_json.py ~/junsoo/MultiPL-E/before_proc_qwen_4b_2048 after_proc_qwen_4b_2048
-python preprocess_json.py ~/junsoo/MultiPL-E/before_proc_qwen_4b after_proc_qwen_4b
+python preprocess_json.py ~/junsoo/MultiPL-E/before_proc_qwen_4b_2048 after_proc_qwen_4b_2048 --model qwen-think
+python preprocess_json.py ~/junsoo/MultiPL-E/before_proc_qwen_4b after_proc_qwen_4b --model qwen-instruct
+python preprocess_json.py ~/junsoo/MultiPL-E/before_proc_gpt_oss_20b after_proc_gpt_oss_20b --model gpt-oss
 
 ```
 

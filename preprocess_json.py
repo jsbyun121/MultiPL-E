@@ -91,11 +91,11 @@ def remove_until_end_reasoning(raw_completion: str, model: str) -> str:
     """Remove text before the end of reasoning marker based on model type."""
     model = model.lower()
 
-    if "qwen3" in model and "think" in model:
-        # Qwen 모델: </think> 이후의 텍스트만 반환
+    if "qwen" in model and "think" in model:
+        # Qwen model: return texts after </think>
         end_reasoning_pattern = r"</think>"
-    elif "gpt-oss" in model:
-        # OpenAI 모델: <|end|><|start|>assistant<|channel|>final<|message|> 이후
+    elif "gpt" in model and "oss" in model:
+        # OpenAI model: <|end|><|start|>assistant<|channel|>final<|message|> 이후
         end_reasoning_pattern = r"<\|end\|><\|start\|>assistant<\|channel\|>final<\|message\|>"
     elif model == "":
         raise ValueError("You must put a model name as arg")
