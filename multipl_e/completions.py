@@ -77,11 +77,6 @@ def partial_arg_parser():
         default=0.95,
         help="Top-p value for sampling",
     )
-    args.add_argument(
-        "--save-raw",
-        action="store_true",
-        help="Save raw completions before stop token processing",
-    )
     return args
 
 
@@ -147,11 +142,11 @@ def make_main(args, model_name, gen_completions):
 
         assert completions["temperature"] == args.temperature, "Temperature must be the same for all completions"
 
-        if len(completions["completions"]) >= args.completion_limit:
+        if len(completions["pre_completions"]) >= args.completion_limit:
             continue
 
         num_new_completions = args.completion_limit - \
-            len(completions["completions"])
+            len(completions["pre_completions"])
 
         if args.prompt_prefix is not None:
             prompt = args.prompt_prefix + completions["prompt"]
@@ -174,22 +169,21 @@ def make_main(args, model_name, gen_completions):
             stop=stop
         )
         modified_problems = set()
-        for item, (pre_completion, raw_completion) in zip(batch, new_completions):
+        for item, (pre_completion, post_completion) in zip(batch, new_completions):
             # Handle different completion types
-            if isinstance(pre_completion, str) and isinstance(raw_completion, str):
+            if isinstance(pre_completion, str) and isinstance(post_completion, str):
                 completion = pre_completion
-                raw_completion = raw_completion
+                post_completion = post_completion
 
             else:
                 raise ValueError(f"{pre_completion} should be a string")
 
-            all_completions[item["name"]]["completions"].append(completion)
+            all_completions[item["name"]]["pre_completions"].append(completion)
 
-            # Save raw completions if requested
-            if args.save_raw:
-                if "raw_completions" not in all_completions[item["name"]]:
-                    all_completions[item["name"]]["raw_completions"] = []
-                all_completions[item["name"]]["raw_completions"].append(raw_completion)
+            if "post_completions" not in all_completions[item["name"]]:
+                all_completions[item["name"]]["post_completions"] = []
+            
+            all_completions[item["name"]]["post_completions"].append(post_completion) 
             modified_problems.add(item["name"])
 
         for name in modified_problems:
@@ -213,7 +207,7 @@ def read_completions(exp_dir, temperature, top_p, max_tokens, problem):
         "max_tokens": max_tokens,
         "prompt": problem["prompt"],
         "tests": problem["tests"],
-        "completions": [],
+        "pre_completions": [],
         "stop_tokens": problem["stop_tokens"],
     }
     return (new_completions["name"], new_completions)

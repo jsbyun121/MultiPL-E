@@ -39,7 +39,7 @@ if [[ "$model_alias" == "qwen-instruct" || "$model_alias" == "all" ]]; then
       job_name="qwen_instruct_${lang}"
       command_to_run="bash scripts/run_eval.sh -m qwen-instruct -l ${lang}"
       echo "Submitting job: ${job_name}"
-      bsr r3 1 -j "${job_name}" -c "${command_to_run}"
+      bsr r3 1 -exclude lemon -j "${job_name}" -c "${command_to_run}"
       echo "--------------------"
     done
 fi
@@ -51,7 +51,7 @@ if [[ "$model_alias" == "qwen-think" || "$model_alias" == "all" ]]; then
       job_name="qwen_think_${lang}_${max_tokens}"
       command_to_run="bash scripts/run_eval.sh -m qwen-think -l ${lang} -x ${max_tokens}"
       echo "Submitting job: ${job_name}"
-      bsr r3 1 -j "${job_name}" -c "${command_to_run}"
+      bsr r3 1 -exclude lemon -j "${job_name}" -c "${command_to_run}"
       echo "--------------------"
     done
 fi
@@ -60,10 +60,10 @@ fi
 if [[ "$model_alias" == "gpt-oss" || "$model_alias" == "all" ]]; then
     echo "--- Submitting jobs for gpt-oss ---"
     for lang in "${languages[@]}"; do
-      job_name="gpt_oss_${lang}"
-      command_to_run="bash scripts/run_eval.sh -m gpt-oss -l ${lang}"
+      job_name="gpt_oss_${lang}_${max_tokens}"
+      command_to_run="bash scripts/run_eval.sh -m gpt-oss -l ${lang} -x ${max_tokens}"
       echo "Submitting job: ${job_name}"
-      bsr r3 1 -j "${job_name}" -c "${command_to_run}"
+      bsr a1 1 -j "${job_name}" -c "${command_to_run}"
       echo "--------------------"
     done
 fi

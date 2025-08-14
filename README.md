@@ -46,20 +46,21 @@ You can just run as below to run generations of all language at once with specif
 chmod +x ./scripts/batch_run_eval.sh
 
 Example:
-./scripts/batch_run_eval.sh qwen-think 4096
-./scripts/batch_run_eval.sh qwen-instruct
+./scripts/batch_run_eval.sh -m qwen-think -l rkt -x 4096
+./scripts/batch_run_eval.sh -m gpt-oss -l r -x 4096
+./scripts/batch_run_eval.sh -m qwen-instruct -l lua
 
 ```
 
 After generation, you have to preprocess generations before evaluation. below is the code example.
 
 ```bash
-python preprocess_json.py <path/to/raw/results> <path/you/want/to/save/results> <model_name> --model <model_type>
+python preprocess_json.py <path/to/raw/results> <path/you/want/to/save/results> --model <model_type>
 
 Example:
-python preprocess_json.py ~/junsoo/MultiPL-E/before_proc_qwen_4b_2048 after_proc_qwen_4b_2048 --model qwen-think
-python preprocess_json.py ~/junsoo/MultiPL-E/before_proc_qwen_4b after_proc_qwen_4b --model qwen-instruct
-python preprocess_json.py ~/junsoo/MultiPL-E/before_proc_gpt_oss_20b after_proc_gpt_oss_20b --model gpt-oss
+python preprocess_json.py ~/MultiPL-E/before_proc_Qwen_Qwen3-4B-Thinking-2507_mt_2048 after_proc_Qwen_Qwen3-4B-Thinking-2507_mt_2048 --model qwen-think
+python preprocess_json.py ~/MultiPL-E/before_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024 after_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024 --model qwen-instruct
+python preprocess_json.py ~/MultiPL-E/before_proc_openai_gpt-oss-20b_mt_4096 after_proc_openai_gpt-oss-20b_mt_4096 --model gpt-oss
 
 ```
 
@@ -71,24 +72,22 @@ chmod +x ./scripts/docker.sh
 ./scripts/docker.sh [Options]
 
 Options:
-  -m, --model     Model size (0.6B or 4B)
-  -t, --thinking  Thinking mode (think or nothink)
   -l, --lang      Programming language (jl, lua, ml, r, rkt)
   -h, --help      Display this help message
-  -x, --max-tokens  Maximum tokens (optional, default is 2048)
+  -d, --dir       Directory of JSON files
 
 Example:
-./scripts/docker.sh -m 0.6B -t think -l rkt -x 2048
+./scripts/docker.sh -l r,rkt,ml -d ./before_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024
 
 ```
 
 After preprocessing, finally you can run evaluation. below is the code.
 ```bash
 chmod +x ./scripts/pass_k.sh
-./scripts/pass_k.sh [Max tokens]
+./scripts/pass_k.sh -d <result_base_dir>
 
 Example:
-./scripts/pass_k.sh 1024
+./scripts/pass_k.sh -d ./after_proc_Qwen_Qwen3-4B-Thinking-2507_mt_4096/result
 
 ```
 
@@ -97,10 +96,10 @@ Or you can just run python file one by one.
 
 ```bash
 Think(qwen_2507_4b):
-python pass_k ./after_proc_qwen_2507_4b<_MAX_TOKENS>/result/<lang>
+python pass_k.py ./<result_base_dir>/<lang>
 
 Instruct(qwen_2507_4b):
-python pass_k ./after_proc_qwen_2507_4b/result/<lang>
+python pass_k.py ./after_proc_Qwen_Qwen3-4B-Thinking-2507_mt_4096/result/<lang>
 ```
 
 

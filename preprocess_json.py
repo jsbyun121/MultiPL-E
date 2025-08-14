@@ -78,16 +78,16 @@ def _clean_code(completion):
         result = ""
         return result
 
-def process_raw_completions(raw_completions: List[str], model: str) -> List[str]:
+def process_post_completions(post_completions: List[str], model: str) -> List[str]:
     cleaned_completions = []
-    for raw_completion in raw_completions:
-        raw_completion = remove_until_end_reasoning(raw_completion, model)
-        raw_completion = _clean_code(raw_completion)
-        cleaned_completions.append(raw_completion)
+    for post_completion in post_completions:
+        post_completion = remove_until_end_reasoning(post_completion, model)
+        post_completion = _clean_code(post_completion)
+        cleaned_completions.append(post_completion)
 
     return cleaned_completions
 
-def remove_until_end_reasoning(raw_completion: str, model: str) -> str:
+def remove_until_end_reasoning(post_completion: str, model: str) -> str:
     """Remove text before the end of reasoning marker based on model type."""
     model = model.lower()
 
@@ -100,12 +100,12 @@ def remove_until_end_reasoning(raw_completion: str, model: str) -> str:
     elif model == "":
         raise ValueError("You must put a model name as arg")
     else:
-        return raw_completion
+        return post_completion
     
-    match = re.search(end_reasoning_pattern, raw_completion)
+    match = re.search(end_reasoning_pattern, post_completion)
     if match:
-        return raw_completion[match.start():]
-    return raw_completion
+        return post_completion[match.start():]
+    return post_completion
 
 
 def remove_code_from_bottom(prompt: str, language: str) -> str:
@@ -152,7 +152,7 @@ def remove_code_from_bottom(prompt: str, language: str) -> str:
 
 def process_json_file(input_path: Path, output_path: Path, dry_run: bool = False, model: str = "") -> Dict[str, int]:
     """Process a single JSON file to separate signature from prompt"""
-    stats = {"processed": 0, "signature removed": 0, "errors": 0}
+    stats = {"processed": 0, "modified": 0, "errors": 0}
     
     try:
         # Read the file (handle both .json and .json.gz)
@@ -168,12 +168,16 @@ def process_json_file(input_path: Path, output_path: Path, dry_run: bool = False
         # Remove code from bottom, keeping headers and comments
         original_prompt = data.get("prompt", "")
         language = data.get("language", "")
-        raw_completions = data.get("raw_completions", "")
+        post_completions = data.get("post_completions", "")
         
         processed_prompt = remove_code_from_bottom(original_prompt, language) + '\n'
-        processed_completions = process_raw_completions(raw_completions, model) if raw_completions else ""
+        processed_completions = process_post_completions(post_completions, model) if post_completions else ""
 
         data["completions"] = processed_completions
+
+        for key in ["post_completions", "pre_completions"]:
+            if key in data:
+                del data[key]
         
         if processed_prompt != original_prompt:
             # Modify the data structure

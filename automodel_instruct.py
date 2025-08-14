@@ -177,13 +177,13 @@ class Model:
             clean_up_tokenization_spaces=False,
             skip_special_tokens=False,
         )
-        raw_completion = self.tokenizer.decode(
+        post_completion = self.tokenizer.decode(
             self._remove_padding_tokens(full_token_ids[input_length:]),
             clean_up_tokenization_spaces=False,
             skip_special_tokens=False,
         )
 
-        return (pre_completion, raw_completion)
+        return (pre_completion, post_completion)
 
     def completions(
         self, prompts: List[str], max_tokens: int, temperature: float, top_p: float, stop
@@ -215,8 +215,8 @@ class Model:
         
         if self.enable_thinking:
             if self._is_thinking_complete(output_tensor):
-                pre_completion, raw_completion = self.decode_single_output(output_tensor, input_length)
-                return (pre_completion, raw_completion)
+                pre_completion, post_completion = self.decode_single_output(output_tensor, input_length)
+                return (pre_completion, post_completion)
             else:
                 if self.team_name.lower() == "qwen":
                     thinking_suffix = "\nConsidering the limited time by the user, I have to give the solution based on the thinking directly now.\n</think>\n\n"
@@ -244,17 +244,17 @@ class Model:
 
 
                 # Combine original thinking + suffix + new completion
-                pre_completion, raw_completion = self.decode_single_output(
+                pre_completion, post_completion = self.decode_single_output(
                     new_tensor, new_input_length
                 )
 
-                return (pre_completion, raw_completion)
+                return (pre_completion, post_completion)
                 
             
         else:
             # Non-thinking mode processing
-            pre_completion, raw_completion = self.decode_single_output(output_tensor, input_length)
-            return (pre_completion, raw_completion)
+            pre_completion, post_completion = self.decode_single_output(output_tensor, input_length)
+            return (pre_completion, post_completion)
 
     def _is_thinking_complete(self, output_tensor) -> bool:
         """Check if thinking process is complete."""

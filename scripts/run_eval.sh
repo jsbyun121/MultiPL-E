@@ -66,7 +66,7 @@ case "$MODEL" in
     "qwen-think")
         MODEL_NAME="Qwen/Qwen3-4B-Thinking-2507"
         MODEL_DIR="Qwen_Qwen3-4B-Thinking-2507"
-        BATCH_SIZE=16
+        BATCH_SIZE=4
         TEMP=0.6
         # Only 'qwen-think' uses the max-tokens flag and has a token-specific output folder
         EXTRA_FLAGS="--max-tokens ${MAX_TOKENS}"
@@ -75,7 +75,7 @@ case "$MODEL" in
     "qwen-instruct")
         MODEL_NAME="Qwen/Qwen3-4B-Instruct-2507"
         MODEL_DIR="Qwen_Qwen3-4B-Instruct-2507"
-        BATCH_SIZE=8
+        BATCH_SIZE=16
         TEMP=0.7
         TOKEN_SUFFIX="_mt_${MAX_TOKENS}"
         ;;
@@ -84,6 +84,7 @@ case "$MODEL" in
         MODEL_DIR="openai_gpt-oss-20b"
         BATCH_SIZE=4 # Use a smaller batch size for the 20B model
         TEMP=0.6
+        EXTRA_FLAGS="--max-tokens ${MAX_TOKENS}"
         TOKEN_SUFFIX="_mt_${MAX_TOKENS}"
         ;;
     *)
@@ -105,7 +106,6 @@ CMD="python automodel_instruct.py \
     --completion-limit 4 \
     --output-dir ${OUTPUT_DIR} \
     --batch-size ${BATCH_SIZE} \
-    --save-raw \
     --use-chat-template \
     ${EXTRA_FLAGS}"
 
@@ -123,6 +123,5 @@ python automodel_instruct.py \
     --completion-limit 4 \
     --output-dir ${OUTPUT_DIR} \
     --batch-size ${BATCH_SIZE} \
-    --save-raw \
     --use-chat-template \
     ${EXTRA_FLAGS}
