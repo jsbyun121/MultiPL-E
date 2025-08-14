@@ -95,7 +95,7 @@ def remove_until_end_reasoning(post_completion: str, model: str) -> str:
         # Qwen model: return texts after </think>
         end_reasoning_pattern = r"</think>"
     elif "gpt" in model and "oss" in model:
-        # OpenAI model: <|end|><|start|>assistant<|channel|>final<|message|> 이후
+        # OpenAI model: <|end|><|start|>assistant<|channel|>final<|message|>
         end_reasoning_pattern = r"<\|end\|><\|start\|>assistant<\|channel\|>final<\|message\|>"
     elif model == "":
         raise ValueError("You must put a model name as arg")

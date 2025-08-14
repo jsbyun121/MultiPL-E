@@ -170,19 +170,7 @@ def make_main(args, model_name, gen_completions):
         )
         modified_problems = set()
         for item, (pre_completion, post_completion) in zip(batch, new_completions):
-            # Handle different completion types
-            if isinstance(pre_completion, str) and isinstance(post_completion, str):
-                completion = pre_completion
-                post_completion = post_completion
-
-            else:
-                raise ValueError(f"{pre_completion} should be a string")
-
-            all_completions[item["name"]]["pre_completions"].append(completion)
-
-            if "post_completions" not in all_completions[item["name"]]:
-                all_completions[item["name"]]["post_completions"] = []
-            
+            all_completions[item["name"]]["pre_completions"].append(pre_completion)
             all_completions[item["name"]]["post_completions"].append(post_completion) 
             modified_problems.add(item["name"])
 
@@ -208,6 +196,7 @@ def read_completions(exp_dir, temperature, top_p, max_tokens, problem):
         "prompt": problem["prompt"],
         "tests": problem["tests"],
         "pre_completions": [],
+        "post_completions": [],
         "stop_tokens": problem["stop_tokens"],
     }
     return (new_completions["name"], new_completions)
