@@ -1,0 +1,3345 @@
+As per my standing instructions, analyze each code-execution result provided. For every item, produce a structured report as follows.
+
+1) Status
+Status: "OK" (Success) or else (Failure)
+Evidence: include exit code, error status, and whether stderr is empty/non-empty (quote the first relevant line).
+
+If Failure (non-zero exit code, error status, or non-empty stderr)
+Root Cause Analysis
+Explain why it failed, grounded in the logs/trace.
+Point to the exact faulty locations (file and line numbers if available). Quote the minimal offending snippets.
+Recommended Fix (Minimal Patch)
+Provide brief code segments (3–7 lines each) that would correct the issue.
+If multiple faults exist, list fixes in order of impact.
+Final Answer
+Classify the ultimate source of failure as one of: faulty problem setting / wrong test case / incorrect code implementation.
+State it on a single line: Final Answer: <chosen category>.
+
+If Success (exit code 0 and empty stderr)
+Critical Correctness Review
+Do not assume success means correctness.
+Check if the code's logic truly matches the intended problem requirements, including edge cases and corner conditions.
+Identify any silent errors, logical flaws, or incompleteness that would still pass execution but fail semantically.
+If the implementation is sound, explain why it is correct. If not, explain the discrepancy clearly.
+Final Answer
+Explicitly confirm or reject correctness in one line: Final Answer: correct or incorrect (with a one-phrase justification if incorrect).
+
+General rules
+Be precise and concise. Don't invent behavior not evidenced by the logs or code.
+When line numbers aren't available, reference the closest identifiable code block.
+Prefer minimal fixes over refactors; include just enough context to apply the patch.
+
+CONTENT TO ANALYZE:
+
+================================================================================
+PROBLEM 114 (LUA) - HumanEval_114_minSubArraySum
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Given a table of integers nums, find the minimum sum of any non-empty sub-table
+-- of nums.
+-- Example
+-- >>> minSubArraySum({2, 3, 4, 1, 2, 4})
+-- 1
+-- >>> minSubArraySum({-1, -2, -3})
+-- -6
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = minSubArraySum
+    lu.assertEquals(candidate({2, 3, 4, 1, 2, 4}), 1)
+    lu.assertEquals(candidate({-1, -2, -3}), -6)
+    lu.assertEquals(candidate({-1, -2, -3, 2, -10}), -14)
+    lu.assertEquals(candidate({-9999999999999999}), -9999999999999999)
+    lu.assertEquals(candidate({0, 10, 20, 1000000}), 0)
+    lu.assertEquals(candidate({-1, -2, -3, 10, -5}), -6)
+    lu.assertEquals(candidate({100, -1, -2, -3, 10, -5}), -6)
+    lu.assertEquals(candidate({10, 11, 13, 8, 3, 4}), 3)
+    lu.assertEquals(candidate({100, -33, 32, -1, 0, -2}), -33)
+    lu.assertEquals(candidate({-10}), -10)
+    lu.assertEquals(candidate({7}), 7)
+    lu.assertEquals(candidate({1, -1}), -1)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Given a table of integers nums, find the minimum sum of any non-empty sub-table
+-- of nums.
+-- Example
+-- >>> minSubArraySum({2, 3, 4, 1, 2, 4})
+-- 1
+-- >>> minSubArraySum({-1, -2, -3})
+-- -6
+-- Find the minimum sum of any non‑empty sub‑array of `nums`.
+-- This is the classic “minimum subarray sum” problem, solved with a
+-- Kadane‑style scan in O(n) time and O(1) extra space.
+--
+-- @param nums table of integers
+-- @return integer  the smallest possible sum of a contiguous sub‑array
+local function minSubArraySum(nums)
+    -- Guard against an empty input (not expected per the problem statement).
+    if #nums == 0 then
+        return nil
+    end
+
+    -- Initialize with the first element.
+    local current_min = nums[1]
+    local global_min  = nums[1]
+
+    -- Scan from the second element onward.
+    for i = 2, #nums do
+        local x = nums[i]
+        -- Either extend the current sub‑array or start a new one at x.
+        current_min = math.min(x, current_min + x)
+        -- Update the global minimum if needed.
+        global_min = math.min(global_min, current_min)
+    end
+
+    return global_min
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = minSubArraySum
+    lu.assertEquals(candidate({2, 3, 4, 1, 2, 4}), 1)
+    lu.assertEquals(candidate({-1, -2, -3}), -6)
+    lu.assertEquals(candidate({-1, -2, -3, 2, -10}), -14)
+    lu.assertEquals(candidate({-9999999999999999}), -9999999999999999)
+    lu.assertEquals(candidate({0, 10, 20, 1000000}), 0)
+    lu.assertEquals(candidate({-1, -2, -3, 10, -5}), -6)
+    lu.assertEquals(candidate({100, -1, -2, -3, 10, -5}), -6)
+    lu.assertEquals(candidate({10, 11, 13, 8, 3, 4}), 3)
+    lu.assertEquals(candidate({100, -33, 32, -1, 0, -2}), -33)
+    lu.assertEquals(candidate({-10}), -10)
+    lu.assertEquals(candidate({7}), 7)
+    lu.assertEquals(candidate({1, -1}), -1)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Given a table of integers nums, find the minimum sum of any non-empty sub-table
+-- of nums.
+-- Example
+-- >>> minSubArraySum({2, 3, 4, 1, 2, 4})
+-- 1
+-- >>> minSubArraySum({-1, -2, -3})
+-- -6
+local function minSubArraySum(nums)
+  -- Handle empty input just in case
+  if #nums == 0 then
+    return 0
+  end
+
+  local current_min = nums[1]
+  local global_min = nums[1]
+
+  for i = 2, #nums do
+    local val = nums[i]
+    -- Either start a new subarray at this element or extend the previous one
+    current_min = math.min(val, current_min + val)
+    -- Update the best (minimum) sum found so far
+    global_min = math.min(global_min, current_min)
+  end
+
+  return global_min
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = minSubArraySum
+    lu.assertEquals(candidate({2, 3, 4, 1, 2, 4}), 1)
+    lu.assertEquals(candidate({-1, -2, -3}), -6)
+    lu.assertEquals(candidate({-1, -2, -3, 2, -10}), -14)
+    lu.assertEquals(candidate({-9999999999999999}), -9999999999999999)
+    lu.assertEquals(candidate({0, 10, 20, 1000000}), 0)
+    lu.assertEquals(candidate({-1, -2, -3, 10, -5}), -6)
+    lu.assertEquals(candidate({100, -1, -2, -3, 10, -5}), -6)
+    lu.assertEquals(candidate({10, 11, 13, 8, 3, 4}), 3)
+    lu.assertEquals(candidate({100, -33, 32, -1, 0, -2}), -33)
+    lu.assertEquals(candidate({-10}), -10)
+    lu.assertEquals(candidate({7}), 7)
+    lu.assertEquals(candidate({1, -1}), -1)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Given a table of integers nums, find the minimum sum of any non-empty sub-table
+-- of nums.
+-- Example
+-- >>> minSubArraySum({2, 3, 4, 1, 2, 4})
+-- 1
+-- >>> minSubArraySum({-1, -2, -3})
+-- -6
+-- Find the minimum sum of any non‑empty contiguous sub‑array
+-- Uses a variant of Kadane's algorithm for minimum sub‑array sum
+local function minSubArraySum(nums)
+    if #nums == 0 then
+        return 0  -- or error if empty input is not allowed
+    end
+
+    local minEndingHere = nums[1]
+    local minSoFar = nums[1]
+
+    for i = 2, #nums do
+        local val = nums[i]
+        -- Either start a new subarray at i or extend the previous one
+        minEndingHere = math.min(val, minEndingHere + val)
+        -- Update the global minimum
+        minSoFar = math.min(minSoFar, minEndingHere)
+    end
+
+    return minSoFar
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = minSubArraySum
+    lu.assertEquals(candidate({2, 3, 4, 1, 2, 4}), 1)
+    lu.assertEquals(candidate({-1, -2, -3}), -6)
+    lu.assertEquals(candidate({-1, -2, -3, 2, -10}), -14)
+    lu.assertEquals(candidate({-9999999999999999}), -9999999999999999)
+    lu.assertEquals(candidate({0, 10, 20, 1000000}), 0)
+    lu.assertEquals(candidate({-1, -2, -3, 10, -5}), -6)
+    lu.assertEquals(candidate({100, -1, -2, -3, 10, -5}), -6)
+    lu.assertEquals(candidate({10, 11, 13, 8, 3, 4}), 3)
+    lu.assertEquals(candidate({100, -33, 32, -1, 0, -2}), -33)
+    lu.assertEquals(candidate({-10}), -10)
+    lu.assertEquals(candidate({7}), 7)
+    lu.assertEquals(candidate({1, -1}), -1)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Given a table of integers nums, find the minimum sum of any non-empty sub-table
+-- of nums.
+-- Example
+-- >>> minSubArraySum({2, 3, 4, 1, 2, 4})
+-- 1
+-- >>> minSubArraySum({-1, -2, -3})
+-- -6
+-- Find the minimum sum of any non‑empty subarray in `nums`.
+-- @param nums table of integers
+-- @return integer The minimum subarray sum
+local function minSubArraySum(nums)
+    -- Handle the trivial (empty) case – though the problem guarantees a non‑empty table.
+    if #nums == 0 then
+        return 0
+    end
+
+    -- Initialize with the first element.
+    local minEnding = nums[1]   -- Minimum sum of a subarray ending at the current position
+    local minSoFar  = nums[1]   -- Minimum sum found so far
+
+    -- Iterate over the rest of the array.
+    for i = 2, #nums do
+        local val = nums[i]
+        -- Either start a new subarray at `val` or extend the previous one.
+        minEnding = math.min(val, minEnding + val)
+        -- Update the global minimum.
+        minSoFar = math.min(minSoFar, minEnding)
+    end
+
+    return minSoFar
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = minSubArraySum
+    lu.assertEquals(candidate({2, 3, 4, 1, 2, 4}), 1)
+    lu.assertEquals(candidate({-1, -2, -3}), -6)
+    lu.assertEquals(candidate({-1, -2, -3, 2, -10}), -14)
+    lu.assertEquals(candidate({-9999999999999999}), -9999999999999999)
+    lu.assertEquals(candidate({0, 10, 20, 1000000}), 0)
+    lu.assertEquals(candidate({-1, -2, -3, 10, -5}), -6)
+    lu.assertEquals(candidate({100, -1, -2, -3, 10, -5}), -6)
+    lu.assertEquals(candidate({10, 11, 13, 8, 3, 4}), 3)
+    lu.assertEquals(candidate({100, -33, 32, -1, 0, -2}), -33)
+    lu.assertEquals(candidate({-10}), -10)
+    lu.assertEquals(candidate({7}), 7)
+    lu.assertEquals(candidate({1, -1}), -1)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 115 (LUA) - HumanEval_115_max_fill
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- You are given a rectangular grid of wells. Each row represents a single well,
+-- and each 1 in a row represents a single unit of water.
+-- Each well has a corresponding bucket that can be used to extract water from it, 
+-- and all buckets have the same capacity.
+-- Your task is to use the buckets to empty the wells.
+-- Output the number of times you need to lower the buckets.
+-- Example 1:
+-- >>> max_fill({{0, 0, 1, 0}, {0, 1, 0, 0}, {1, 1, 1, 1}}, 1)
+-- 6
+-- Example 2:
+-- >>> max_fill({{0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 1}}, 2)
+-- 5
+-- Example 3:
+-- >>> max_fill({{0, 0, 0}, {0, 0, 0}}, 5)
+-- 0
+-- Constraints:
+--     * all wells have the same length
+--     * 1 <= grid.length <= 10^2
+--     * 1 <= grid[:,1].length <= 10^2
+--     * grid[i][j] -> 0 | 1
+--     * 1 <= capacity <= 10
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = max_fill
+    lu.assertEquals(candidate({{0, 0, 1, 0}, {0, 1, 0, 0}, {1, 1, 1, 1}}, 1), 6)
+    lu.assertEquals(candidate({{0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 1}}, 2), 5)
+    lu.assertEquals(candidate({{0, 0, 0}, {0, 0, 0}}, 5), 0)
+    lu.assertEquals(candidate({{1, 1, 1, 1}, {1, 1, 1, 1}}, 2), 4)
+    lu.assertEquals(candidate({{1, 1, 1, 1}, {1, 1, 1, 1}}, 9), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- You are given a rectangular grid of wells. Each row represents a single well,
+-- and each 1 in a row represents a single unit of water.
+-- Each well has a corresponding bucket that can be used to extract water from it, 
+-- and all buckets have the same capacity.
+-- Your task is to use the buckets to empty the wells.
+-- Output the number of times you need to lower the buckets.
+-- Example 1:
+-- >>> max_fill({{0, 0, 1, 0}, {0, 1, 0, 0}, {1, 1, 1, 1}}, 1)
+-- 6
+-- Example 2:
+-- >>> max_fill({{0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 1}}, 2)
+-- 5
+-- Example 3:
+-- >>> max_fill({{0, 0, 0}, {0, 0, 0}}, 5)
+-- 0
+-- Constraints:
+--     * all wells have the same length
+--     * 1 <= grid.length <= 10^2
+--     * 1 <= grid[:,1].length <= 10^2
+--     * grid[i][j] -> 0 | 1
+--     * 1 <= capacity <= 10
+-- Function to compute the minimum number of bucket dips needed to empty all wells
+local function max_fill(grid, capacity)
+    local total = 0
+
+    for _, row in ipairs(grid) do
+        local water = 0
+        for _, cell in ipairs(row) do
+            if cell == 1 then
+                water = water + 1
+            end
+        end
+
+        if water > 0 then
+            -- Ceil division: number of bucket dips for this well
+            total = total + math.floor((water + capacity - 1) / capacity)
+        end
+    end
+
+    return total
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = max_fill
+    lu.assertEquals(candidate({{0, 0, 1, 0}, {0, 1, 0, 0}, {1, 1, 1, 1}}, 1), 6)
+    lu.assertEquals(candidate({{0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 1}}, 2), 5)
+    lu.assertEquals(candidate({{0, 0, 0}, {0, 0, 0}}, 5), 0)
+    lu.assertEquals(candidate({{1, 1, 1, 1}, {1, 1, 1, 1}}, 2), 4)
+    lu.assertEquals(candidate({{1, 1, 1, 1}, {1, 1, 1, 1}}, 9), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- You are given a rectangular grid of wells. Each row represents a single well,
+-- and each 1 in a row represents a single unit of water.
+-- Each well has a corresponding bucket that can be used to extract water from it, 
+-- and all buckets have the same capacity.
+-- Your task is to use the buckets to empty the wells.
+-- Output the number of times you need to lower the buckets.
+-- Example 1:
+-- >>> max_fill({{0, 0, 1, 0}, {0, 1, 0, 0}, {1, 1, 1, 1}}, 1)
+-- 6
+-- Example 2:
+-- >>> max_fill({{0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 1}}, 2)
+-- 5
+-- Example 3:
+-- >>> max_fill({{0, 0, 0}, {0, 0, 0}}, 5)
+-- 0
+-- Constraints:
+--     * all wells have the same length
+--     * 1 <= grid.length <= 10^2
+--     * 1 <= grid[:,1].length <= 10^2
+--     * grid[i][j] -> 0 | 1
+--     * 1 <= capacity <= 10
+-- Returns the minimal number of bucket lowers needed to empty all wells.
+-- Each row in `grid` represents a well; a value of 1 indicates one unit of water.
+-- The bucket can hold up to `capacity` units of water per lowering.
+local function max_fill(grid, capacity)
+  local total = 0
+
+  for _, row in ipairs(grid) do
+    local ones = 0
+    for _, val in ipairs(row) do
+      if val == 1 then
+        ones = ones + 1
+      end
+    end
+
+    if ones > 0 then
+      -- Number of lowers for this well is ceil(ones / capacity)
+      total = total + math.ceil(ones / capacity)
+    end
+  end
+
+  return total
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = max_fill
+    lu.assertEquals(candidate({{0, 0, 1, 0}, {0, 1, 0, 0}, {1, 1, 1, 1}}, 1), 6)
+    lu.assertEquals(candidate({{0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 1}}, 2), 5)
+    lu.assertEquals(candidate({{0, 0, 0}, {0, 0, 0}}, 5), 0)
+    lu.assertEquals(candidate({{1, 1, 1, 1}, {1, 1, 1, 1}}, 2), 4)
+    lu.assertEquals(candidate({{1, 1, 1, 1}, {1, 1, 1, 1}}, 9), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- You are given a rectangular grid of wells. Each row represents a single well,
+-- and each 1 in a row represents a single unit of water.
+-- Each well has a corresponding bucket that can be used to extract water from it, 
+-- and all buckets have the same capacity.
+-- Your task is to use the buckets to empty the wells.
+-- Output the number of times you need to lower the buckets.
+-- Example 1:
+-- >>> max_fill({{0, 0, 1, 0}, {0, 1, 0, 0}, {1, 1, 1, 1}}, 1)
+-- 6
+-- Example 2:
+-- >>> max_fill({{0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 1}}, 2)
+-- 5
+-- Example 3:
+-- >>> max_fill({{0, 0, 0}, {0, 0, 0}}, 5)
+-- 0
+-- Constraints:
+--     * all wells have the same length
+--     * 1 <= grid.length <= 10^2
+--     * 1 <= grid[:,1].length <= 10^2
+--     * grid[i][j] -> 0 | 1
+--     * 1 <= capacity <= 10
+-- Calculate the total number of times a bucket must be lowered
+-- to empty all wells in the grid.
+--
+-- Parameters
+--   grid      : a table of tables, each inner table represents a well
+--               and contains 0/1 values indicating the presence of water
+--   capacity  : the maximum number of water units a bucket can hold
+--
+-- Returns
+--   The minimal number of bucket dips required to empty every well.
+--
+local function max_fill(grid, capacity)
+    local total_dips = 0
+
+    for _, well in ipairs(grid) do
+        local water_units = 0
+        for _, cell in ipairs(well) do
+            if cell == 1 then
+                water_units = water_units + 1
+            end
+        end
+
+        if water_units > 0 then
+            -- Number of dips for this well = ceil(water_units / capacity)
+            local dips = math.floor((water_units + capacity - 1) / capacity)
+            total_dips = total_dips + dips
+        end
+    end
+
+    return total_dips
+end
+
+-- Example usage:
+-- print(max_fill({{0,0,1,0},{0,1,0,0},{1,1,1,1}}, 1))  -- 6
+-- print(max_fill({{0,0,1,1},{0,0,0,0},{1,1,1,1},{0,1,1,1}}, 2))  -- 5
+-- print(max_fill({{0,0,0},{0,0,0}}, 5))  -- 0
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = max_fill
+    lu.assertEquals(candidate({{0, 0, 1, 0}, {0, 1, 0, 0}, {1, 1, 1, 1}}, 1), 6)
+    lu.assertEquals(candidate({{0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 1}}, 2), 5)
+    lu.assertEquals(candidate({{0, 0, 0}, {0, 0, 0}}, 5), 0)
+    lu.assertEquals(candidate({{1, 1, 1, 1}, {1, 1, 1, 1}}, 2), 4)
+    lu.assertEquals(candidate({{1, 1, 1, 1}, {1, 1, 1, 1}}, 9), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- You are given a rectangular grid of wells. Each row represents a single well,
+-- and each 1 in a row represents a single unit of water.
+-- Each well has a corresponding bucket that can be used to extract water from it, 
+-- and all buckets have the same capacity.
+-- Your task is to use the buckets to empty the wells.
+-- Output the number of times you need to lower the buckets.
+-- Example 1:
+-- >>> max_fill({{0, 0, 1, 0}, {0, 1, 0, 0}, {1, 1, 1, 1}}, 1)
+-- 6
+-- Example 2:
+-- >>> max_fill({{0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 1}}, 2)
+-- 5
+-- Example 3:
+-- >>> max_fill({{0, 0, 0}, {0, 0, 0}}, 5)
+-- 0
+-- Constraints:
+--     * all wells have the same length
+--     * 1 <= grid.length <= 10^2
+--     * 1 <= grid[:,1].length <= 10^2
+--     * grid[i][j] -> 0 | 1
+--     * 1 <= capacity <= 10
+-- Calculates how many times a bucket of a given capacity must be lowered
+-- to empty all wells in a rectangular grid.
+--
+-- Each row of the grid represents a single well. A value of 1 denotes one
+-- unit of water, 0 denotes no water. A bucket can hold at most `capacity`
+-- units of water. Each time the bucket is lowered it fills up to its
+-- capacity or until the well runs out of water, whichever comes first.
+--
+-- The function returns the total number of bucket lowers required to empty
+-- all wells.
+--
+-- Parameters
+--   grid      : a table of tables, each inner table containing 0/1 values
+--   capacity  : integer, capacity of each bucket (>= 1)
+--
+-- Returns
+--   integer : total number of bucket lowers
+--
+local function max_fill(grid, capacity)
+    local total = 0
+    for _, row in ipairs(grid) do
+        local count = 0
+        for _, val in ipairs(row) do
+            if val == 1 then
+                count = count + 1
+            end
+        end
+        if count > 0 then
+            -- ceil(count / capacity) using integer math
+            total = total + math.floor((count + capacity - 1) / capacity)
+        end
+    end
+    return total
+end
+
+-- Example usage:
+-- print(max_fill({{0,0,1,0},{0,1,0,0},{1,1,1,1}}, 1))  -- 6
+-- print(max_fill({{0,0,1,1},{0,0,0,0},{1,1,1,1},{0,1,1,1}}, 2))  -- 5
+-- print(max_fill({{0,0,0},{0,0,0}}, 5))  -- 0
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = max_fill
+    lu.assertEquals(candidate({{0, 0, 1, 0}, {0, 1, 0, 0}, {1, 1, 1, 1}}, 1), 6)
+    lu.assertEquals(candidate({{0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 1}}, 2), 5)
+    lu.assertEquals(candidate({{0, 0, 0}, {0, 0, 0}}, 5), 0)
+    lu.assertEquals(candidate({{1, 1, 1, 1}, {1, 1, 1, 1}}, 2), 4)
+    lu.assertEquals(candidate({{1, 1, 1, 1}, {1, 1, 1, 1}}, 9), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 117 (LUA) - HumanEval_117_select_words
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Given a string s and a natural number n, you have been tasked to implement 
+-- a function that returns a table of all words from string s that contain exactly 
+-- n consonants, in order these words appear in the string s.
+-- If the string s is empty then the function should return an empty table.
+-- Note: you may assume the input string contains only letters and spaces.
+-- Examples:
+-- >>> select_words('Mary had a little lamb', 4)
+-- {'little'}
+-- >>> select_words('Mary had a little lamb', 3)
+-- {'Mary', 'lamb'}
+-- >>> select_words('simple white space', 2)
+-- {}
+-- >>> select_words('Hello world', 4)
+-- {'world'}
+-- >>> select_words('Uncle sam', 3)
+-- {'Uncle'}
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = select_words
+    lu.assertEquals(candidate('Mary had a little lamb', 4), {'little'})
+    lu.assertEquals(candidate('Mary had a little lamb', 3), {'Mary', 'lamb'})
+    lu.assertEquals(candidate('simple white space', 2), {})
+    lu.assertEquals(candidate('Hello world', 4), {'world'})
+    lu.assertEquals(candidate('Uncle sam', 3), {'Uncle'})
+    lu.assertEquals(candidate('', 4), {})
+    lu.assertEquals(candidate('a b c d e f', 1), {'b', 'c', 'd', 'f'})
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Given a string s and a natural number n, you have been tasked to implement 
+-- a function that returns a table of all words from string s that contain exactly 
+-- n consonants, in order these words appear in the string s.
+-- If the string s is empty then the function should return an empty table.
+-- Note: you may assume the input string contains only letters and spaces.
+-- Examples:
+-- >>> select_words('Mary had a little lamb', 4)
+-- {'little'}
+-- >>> select_words('Mary had a little lamb', 3)
+-- {'Mary', 'lamb'}
+-- >>> select_words('simple white space', 2)
+-- {}
+-- >>> select_words('Hello world', 4)
+-- {'world'}
+-- >>> select_words('Uncle sam', 3)
+-- {'Uncle'}
+-- Returns a table containing all words from the string `s` that have
+-- exactly `n` consonants, preserving the order in which they appear.
+-- An empty string returns an empty table.
+local function select_words(s, n)
+    -- Result table
+    local result = {}
+
+    -- If the input string is empty, return the empty table immediately
+    if s == "" then
+        return result
+    end
+
+    -- Iterate over each word in the string (words are sequences of non‑space characters)
+    for word in s:gmatch("%S+") do
+        local consonant_count = 0
+
+        -- Count consonants in the current word
+        for char in word:gmatch(".") do
+            -- Consider only alphabetic characters
+            if char:match("%a") then
+                -- A character is a consonant if it's not a vowel
+                if not char:match("[aeiouAEIOU]") then
+                    consonant_count = consonant_count + 1
+                end
+            end
+        end
+
+        -- If the count matches the requested number, add the word to the result
+        if consonant_count == n then
+            table.insert(result, word)
+        end
+    end
+
+    return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = select_words
+    lu.assertEquals(candidate('Mary had a little lamb', 4), {'little'})
+    lu.assertEquals(candidate('Mary had a little lamb', 3), {'Mary', 'lamb'})
+    lu.assertEquals(candidate('simple white space', 2), {})
+    lu.assertEquals(candidate('Hello world', 4), {'world'})
+    lu.assertEquals(candidate('Uncle sam', 3), {'Uncle'})
+    lu.assertEquals(candidate('', 4), {})
+    lu.assertEquals(candidate('a b c d e f', 1), {'b', 'c', 'd', 'f'})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.001 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Given a string s and a natural number n, you have been tasked to implement 
+-- a function that returns a table of all words from string s that contain exactly 
+-- n consonants, in order these words appear in the string s.
+-- If the string s is empty then the function should return an empty table.
+-- Note: you may assume the input string contains only letters and spaces.
+-- Examples:
+-- >>> select_words('Mary had a little lamb', 4)
+-- {'little'}
+-- >>> select_words('Mary had a little lamb', 3)
+-- {'Mary', 'lamb'}
+-- >>> select_words('simple white space', 2)
+-- {}
+-- >>> select_words('Hello world', 4)
+-- {'world'}
+-- >>> select_words('Uncle sam', 3)
+-- {'Uncle'}
+-- Returns a table of words from *s* that contain exactly *n* consonants.
+-- The words are returned in the order they appear in *s*.
+-- If *s* is an empty string an empty table is returned.
+--
+-- Example usage:
+--   select_words('Mary had a little lamb', 4)  --> {'little'}
+--   select_words('Hello world', 4)             --> {'world'}
+local function select_words(s, n)
+    local result = {}
+
+    -- Handle empty string early
+    if s == "" then
+        return result
+    end
+
+    -- Iterate over each word separated by whitespace
+    for word in string.gmatch(s, "%S+") do
+        local consonant_count = 0
+
+        -- Count consonants in the current word
+        for i = 1, #word do
+            local c = string.sub(word, i, i)
+            local lc = string.lower(c)
+
+            -- Check if the character is a letter and not a vowel
+            if lc:match("%a") and not lc:match("[aeiou]") then
+                consonant_count = consonant_count + 1
+            end
+        end
+
+        -- Add word to result if it has exactly n consonants
+        if consonant_count == n then
+            table.insert(result, word)
+        end
+    end
+
+    return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = select_words
+    lu.assertEquals(candidate('Mary had a little lamb', 4), {'little'})
+    lu.assertEquals(candidate('Mary had a little lamb', 3), {'Mary', 'lamb'})
+    lu.assertEquals(candidate('simple white space', 2), {})
+    lu.assertEquals(candidate('Hello world', 4), {'world'})
+    lu.assertEquals(candidate('Uncle sam', 3), {'Uncle'})
+    lu.assertEquals(candidate('', 4), {})
+    lu.assertEquals(candidate('a b c d e f', 1), {'b', 'c', 'd', 'f'})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.001 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Given a string s and a natural number n, you have been tasked to implement 
+-- a function that returns a table of all words from string s that contain exactly 
+-- n consonants, in order these words appear in the string s.
+-- If the string s is empty then the function should return an empty table.
+-- Note: you may assume the input string contains only letters and spaces.
+-- Examples:
+-- >>> select_words('Mary had a little lamb', 4)
+-- {'little'}
+-- >>> select_words('Mary had a little lamb', 3)
+-- {'Mary', 'lamb'}
+-- >>> select_words('simple white space', 2)
+-- {}
+-- >>> select_words('Hello world', 4)
+-- {'world'}
+-- >>> select_words('Uncle sam', 3)
+-- {'Uncle'}
+local function select_words(s, n)
+  -- Return an empty table if the input string is empty
+  if s == '' then
+    return {}
+  end
+
+  local result = {}
+  -- Iterate over each word separated by spaces
+  for word in string.gmatch(s, "%S+") do
+    local consonant_count = 0
+    -- Count consonants in the word
+    for c in string.gmatch(word, "%a") do
+      local lc = string.lower(c)
+      if lc ~= 'a' and lc ~= 'e' and lc ~= 'i' and lc ~= 'o' and lc ~= 'u' then
+        consonant_count = consonant_count + 1
+      end
+    end
+    -- If the count matches n, add the word to the result
+    if consonant_count == n then
+      table.insert(result, word)
+    end
+  end
+
+  return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = select_words
+    lu.assertEquals(candidate('Mary had a little lamb', 4), {'little'})
+    lu.assertEquals(candidate('Mary had a little lamb', 3), {'Mary', 'lamb'})
+    lu.assertEquals(candidate('simple white space', 2), {})
+    lu.assertEquals(candidate('Hello world', 4), {'world'})
+    lu.assertEquals(candidate('Uncle sam', 3), {'Uncle'})
+    lu.assertEquals(candidate('', 4), {})
+    lu.assertEquals(candidate('a b c d e f', 1), {'b', 'c', 'd', 'f'})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Given a string s and a natural number n, you have been tasked to implement 
+-- a function that returns a table of all words from string s that contain exactly 
+-- n consonants, in order these words appear in the string s.
+-- If the string s is empty then the function should return an empty table.
+-- Note: you may assume the input string contains only letters and spaces.
+-- Examples:
+-- >>> select_words('Mary had a little lamb', 4)
+-- {'little'}
+-- >>> select_words('Mary had a little lamb', 3)
+-- {'Mary', 'lamb'}
+-- >>> select_words('simple white space', 2)
+-- {}
+-- >>> select_words('Hello world', 4)
+-- {'world'}
+-- >>> select_words('Uncle sam', 3)
+-- {'Uncle'}
+-- Returns a table of words from `s` that contain exactly `n` consonants.
+-- Consonants are all letters that are not a, e, i, o, u (case‑insensitive).
+-- The words are returned in the order they appear in the string.
+-- If `s` is an empty string, an empty table is returned.
+
+local function select_words(s, n)
+    local result = {}
+
+    -- Handle the empty string case
+    if s == "" then
+        return result
+    end
+
+    -- Iterate over each word (non‑space sequence)
+    for word in s:gmatch("%S+") do
+        local consonant_count = 0
+
+        -- Count consonants in the current word
+        for i = 1, #word do
+            local ch = word:sub(i, i)
+            if ch:match("[A-Za-z]") and not ch:match("[aeiouAEIOU]") then
+                consonant_count = consonant_count + 1
+            end
+        end
+
+        -- If the count matches `n`, add the word to the result table
+        if consonant_count == n then
+            table.insert(result, word)
+        end
+    end
+
+    return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = select_words
+    lu.assertEquals(candidate('Mary had a little lamb', 4), {'little'})
+    lu.assertEquals(candidate('Mary had a little lamb', 3), {'Mary', 'lamb'})
+    lu.assertEquals(candidate('simple white space', 2), {})
+    lu.assertEquals(candidate('Hello world', 4), {'world'})
+    lu.assertEquals(candidate('Uncle sam', 3), {'Uncle'})
+    lu.assertEquals(candidate('', 4), {})
+    lu.assertEquals(candidate('a b c d e f', 1), {'b', 'c', 'd', 'f'})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154477
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 119 (LUA) - HumanEval_119_match_parens
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- You are given a table of two strings, both strings consist of open
+-- parentheses '(' or close parentheses ')' only.
+-- Your job is to check if it is possible to concatenate the two strings in
+-- some order, that the resulting string will be good.
+-- A string S is considered to be good if and only if all parentheses in S
+-- are balanced. For example: the string '(())()' is good, while the string
+-- '())' is not.
+-- Return 'Yes' if there's a way to make a good string, and return 'No' otherwise.
+-- Examples:
+-- >>> match_parens({'()(', ')'})
+-- 'Yes'
+-- >>> match_parens({')', ')'})
+-- 'No'
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = match_parens
+    lu.assertEquals(candidate({'()(', ')'}), 'Yes')
+    lu.assertEquals(candidate({')', ')'}), 'No')
+    lu.assertEquals(candidate({'(()(())', '())())'}), 'No')
+    lu.assertEquals(candidate({')())', '(()()('}), 'Yes')
+    lu.assertEquals(candidate({'(())))', '(()())(('}), 'Yes')
+    lu.assertEquals(candidate({'()', '())'}), 'No')
+    lu.assertEquals(candidate({'(()(', '()))()'}), 'Yes')
+    lu.assertEquals(candidate({'((((', '((())'}), 'No')
+    lu.assertEquals(candidate({')(()', '(()('}), 'No')
+    lu.assertEquals(candidate({')(', ')('}), 'No')
+    lu.assertEquals(candidate({'(', ')'}), 'Yes')
+    lu.assertEquals(candidate({')', '('}), 'Yes')
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- You are given a table of two strings, both strings consist of open
+-- parentheses '(' or close parentheses ')' only.
+-- Your job is to check if it is possible to concatenate the two strings in
+-- some order, that the resulting string will be good.
+-- A string S is considered to be good if and only if all parentheses in S
+-- are balanced. For example: the string '(())()' is good, while the string
+-- '())' is not.
+-- Return 'Yes' if there's a way to make a good string, and return 'No' otherwise.
+-- Examples:
+-- >>> match_parens({'()(', ')'})
+-- 'Yes'
+-- >>> match_parens({')', ')'})
+-- 'No'
+-- Checks whether a string of parentheses is balanced
+local function is_balanced(s)
+  local balance = 0
+  for i = 1, #s do
+    local c = s:sub(i, i)
+    if c == '(' then
+      balance = balance + 1
+    else  -- c == ')'
+      balance = balance - 1
+    end
+    if balance < 0 then
+      return false
+    end
+  end
+  return balance == 0
+end
+
+-- Main function
+local function match_parens(lst)
+  local a = lst[1]
+  local b = lst[2]
+
+  if is_balanced(a .. b) or is_balanced(b .. a) then
+    return 'Yes'
+  else
+    return 'No'
+  end
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = match_parens
+    lu.assertEquals(candidate({'()(', ')'}), 'Yes')
+    lu.assertEquals(candidate({')', ')'}), 'No')
+    lu.assertEquals(candidate({'(()(())', '())())'}), 'No')
+    lu.assertEquals(candidate({')())', '(()()('}), 'Yes')
+    lu.assertEquals(candidate({'(())))', '(()())(('}), 'Yes')
+    lu.assertEquals(candidate({'()', '())'}), 'No')
+    lu.assertEquals(candidate({'(()(', '()))()'}), 'Yes')
+    lu.assertEquals(candidate({'((((', '((())'}), 'No')
+    lu.assertEquals(candidate({')(()', '(()('}), 'No')
+    lu.assertEquals(candidate({')(', ')('}), 'No')
+    lu.assertEquals(candidate({'(', ')'}), 'Yes')
+    lu.assertEquals(candidate({')', '('}), 'Yes')
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- You are given a table of two strings, both strings consist of open
+-- parentheses '(' or close parentheses ')' only.
+-- Your job is to check if it is possible to concatenate the two strings in
+-- some order, that the resulting string will be good.
+-- A string S is considered to be good if and only if all parentheses in S
+-- are balanced. For example: the string '(())()' is good, while the string
+-- '())' is not.
+-- Return 'Yes' if there's a way to make a good string, and return 'No' otherwise.
+-- Examples:
+-- >>> match_parens({'()(', ')'})
+-- 'Yes'
+-- >>> match_parens({')', ')'})
+-- 'No'
+-- Check if a single string of parentheses is balanced
+local function is_balanced(s)
+    local balance = 0
+    for i = 1, #s do
+        local c = s:sub(i, i)
+        if c == '(' then
+            balance = balance + 1
+        elseif c == ')' then
+            balance = balance - 1
+        end
+        -- If we ever go negative, the string is unbalanced
+        if balance < 0 then
+            return false
+        end
+    end
+    -- At the end, all parentheses must be closed
+    return balance == 0
+end
+
+-- Main function
+local function match_parens(lst)
+    -- Expect exactly two strings in the table
+    local a, b = lst[1], lst[2]
+    -- Check both possible concatenations
+    if is_balanced(a .. b) or is_balanced(b .. a) then
+        return 'Yes'
+    else
+        return 'No'
+    end
+end
+
+-- Example usage:
+-- print(match_parens({'()(', ')'}))   --> 'Yes'
+-- print(match_parens({')', ')'}))     --> 'No'
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = match_parens
+    lu.assertEquals(candidate({'()(', ')'}), 'Yes')
+    lu.assertEquals(candidate({')', ')'}), 'No')
+    lu.assertEquals(candidate({'(()(())', '())())'}), 'No')
+    lu.assertEquals(candidate({')())', '(()()('}), 'Yes')
+    lu.assertEquals(candidate({'(())))', '(()())(('}), 'Yes')
+    lu.assertEquals(candidate({'()', '())'}), 'No')
+    lu.assertEquals(candidate({'(()(', '()))()'}), 'Yes')
+    lu.assertEquals(candidate({'((((', '((())'}), 'No')
+    lu.assertEquals(candidate({')(()', '(()('}), 'No')
+    lu.assertEquals(candidate({')(', ')('}), 'No')
+    lu.assertEquals(candidate({'(', ')'}), 'Yes')
+    lu.assertEquals(candidate({')', '('}), 'Yes')
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- You are given a table of two strings, both strings consist of open
+-- parentheses '(' or close parentheses ')' only.
+-- Your job is to check if it is possible to concatenate the two strings in
+-- some order, that the resulting string will be good.
+-- A string S is considered to be good if and only if all parentheses in S
+-- are balanced. For example: the string '(())()' is good, while the string
+-- '())' is not.
+-- Return 'Yes' if there's a way to make a good string, and return 'No' otherwise.
+-- Examples:
+-- >>> match_parens({'()(', ')'})
+-- 'Yes'
+-- >>> match_parens({')', ')'})
+-- 'No'
+-- Check if a given parentheses string is balanced
+local function is_balanced(s)
+    local balance = 0
+    for i = 1, #s do
+        local c = s:sub(i, i)
+        if c == '(' then
+            balance = balance + 1
+        else -- c == ')'
+            balance = balance - 1
+        end
+        if balance < 0 then
+            return false
+        end
+    end
+    return balance == 0
+end
+
+-- Main function that checks both concatenation orders
+local function match_parens(lst)
+    local a = lst[1]
+    local b = lst[2]
+
+    -- Try a + b
+    if is_balanced(a .. b) then
+        return 'Yes'
+    end
+
+    -- Try b + a
+    if is_balanced(b .. a) then
+        return 'Yes'
+    end
+
+    return 'No'
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = match_parens
+    lu.assertEquals(candidate({'()(', ')'}), 'Yes')
+    lu.assertEquals(candidate({')', ')'}), 'No')
+    lu.assertEquals(candidate({'(()(())', '())())'}), 'No')
+    lu.assertEquals(candidate({')())', '(()()('}), 'Yes')
+    lu.assertEquals(candidate({'(())))', '(()())(('}), 'Yes')
+    lu.assertEquals(candidate({'()', '())'}), 'No')
+    lu.assertEquals(candidate({'(()(', '()))()'}), 'Yes')
+    lu.assertEquals(candidate({'((((', '((())'}), 'No')
+    lu.assertEquals(candidate({')(()', '(()('}), 'No')
+    lu.assertEquals(candidate({')(', ')('}), 'No')
+    lu.assertEquals(candidate({'(', ')'}), 'Yes')
+    lu.assertEquals(candidate({')', '('}), 'Yes')
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- You are given a table of two strings, both strings consist of open
+-- parentheses '(' or close parentheses ')' only.
+-- Your job is to check if it is possible to concatenate the two strings in
+-- some order, that the resulting string will be good.
+-- A string S is considered to be good if and only if all parentheses in S
+-- are balanced. For example: the string '(())()' is good, while the string
+-- '())' is not.
+-- Return 'Yes' if there's a way to make a good string, and return 'No' otherwise.
+-- Examples:
+-- >>> match_parens({'()(', ')'})
+-- 'Yes'
+-- >>> match_parens({')', ')'})
+-- 'No'
+-- Function to compute the net balance and the minimum prefix balance
+local function analyze(str)
+    local net = 0
+    local minpref = 0
+    for i = 1, #str do
+        local c = str:sub(i, i)
+        if c == '(' then
+            net = net + 1
+        else
+            net = net - 1
+        end
+        if net < minpref then
+            minpref = net
+        end
+    end
+    return net, minpref
+end
+
+-- Main function
+local function match_parens(lst)
+    if #lst ~= 2 then
+        return 'No'  -- invalid input
+    end
+
+    local s1, s2 = lst[1], lst[2]
+    local net1, min1 = analyze(s1)
+    local net2, min2 = analyze(s2)
+
+    -- Helper to test a particular order
+    local function can_order(netA, minA, netB, minB)
+        if netA + netB ~= 0 then
+            return false
+        end
+        if minA < 0 then
+            return false
+        end
+        if minB + netA < 0 then
+            return false
+        end
+        return true
+    end
+
+    if can_order(net1, min1, net2, min2) or can_order(net2, min2, net1, min1) then
+        return 'Yes'
+    else
+        return 'No'
+    end
+end
+
+-- Example usage:
+-- print(match_parens({'()(', ')'}))  -- Yes
+-- print(match_parens({')', ')'}))    -- No
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = match_parens
+    lu.assertEquals(candidate({'()(', ')'}), 'Yes')
+    lu.assertEquals(candidate({')', ')'}), 'No')
+    lu.assertEquals(candidate({'(()(())', '())())'}), 'No')
+    lu.assertEquals(candidate({')())', '(()()('}), 'Yes')
+    lu.assertEquals(candidate({'(())))', '(()())(('}), 'Yes')
+    lu.assertEquals(candidate({'()', '())'}), 'No')
+    lu.assertEquals(candidate({'(()(', '()))()'}), 'Yes')
+    lu.assertEquals(candidate({'((((', '((())'}), 'No')
+    lu.assertEquals(candidate({')(()', '(()('}), 'No')
+    lu.assertEquals(candidate({')(', ')('}), 'No')
+    lu.assertEquals(candidate({'(', ')'}), 'Yes')
+    lu.assertEquals(candidate({')', '('}), 'Yes')
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 123 (LUA) - HumanEval_123_get_odd_collatz
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Given a positive integer n, return a sorted table that has the odd numbers in collatz sequence.
+-- The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+-- as follows: start with any positive integer n. Then each term is obtained from the 
+-- previous term as follows: if the previous term is even, the next term is one half of 
+-- the previous term. If the previous term is odd, the next term is 3 times the previous
+-- term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+-- Note: 
+--     1. Collatz(1) is [1].
+--     2. returned table sorted in increasing order.
+-- For example:
+-- get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+-- >>> get_odd_collatz(5)
+-- {1, 5}
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = get_odd_collatz
+    lu.assertEquals(candidate(14), {1, 5, 7, 11, 13, 17})
+    lu.assertEquals(candidate(5), {1, 5})
+    lu.assertEquals(candidate(12), {1, 3, 5})
+    lu.assertEquals(candidate(1), {1})
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Given a positive integer n, return a sorted table that has the odd numbers in collatz sequence.
+-- The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+-- as follows: start with any positive integer n. Then each term is obtained from the 
+-- previous term as follows: if the previous term is even, the next term is one half of 
+-- the previous term. If the previous term is odd, the next term is 3 times the previous
+-- term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+-- Note: 
+--     1. Collatz(1) is [1].
+--     2. returned table sorted in increasing order.
+-- For example:
+-- get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+-- >>> get_odd_collatz(5)
+-- {1, 5}
+-- Returns a sorted array containing all odd numbers that appear in the Collatz
+-- sequence starting from the positive integer `n`. The sequence stops when it
+-- reaches 1.
+--
+-- Example:
+--   get_odd_collatz(5)  --> {1, 5}
+--
+-- Parameters:
+--   n - positive integer (n >= 1)
+--
+-- Returns:
+--   A Lua table (array) of odd numbers sorted in ascending order.
+local function get_odd_collatz(n)
+  assert(type(n) == "number" and n >= 1 and math.floor(n) == n,
+         "n must be a positive integer")
+
+  local odd_set = {}   -- use keys to avoid duplicates
+  local current = n
+
+  while true do
+    if current % 2 == 1 then
+      odd_set[current] = true
+    end
+
+    if current == 1 then
+      break
+    end
+
+    if current % 2 == 0 then
+      current = current / 2
+    else
+      current = current * 3 + 1
+    end
+  end
+
+  -- Convert the set to an array
+  local result = {}
+  for k, _ in pairs(odd_set) do
+    table.insert(result, k)
+  end
+
+  -- Sort in ascending order
+  table.sort(result)
+
+  return result
+end
+
+-- Example usage
+-- print(table.concat(get_odd_collatz(5), ", "))   --> 1, 5
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = get_odd_collatz
+    lu.assertEquals(candidate(14), {1, 5, 7, 11, 13, 17})
+    lu.assertEquals(candidate(5), {1, 5})
+    lu.assertEquals(candidate(12), {1, 3, 5})
+    lu.assertEquals(candidate(1), {1})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Given a positive integer n, return a sorted table that has the odd numbers in collatz sequence.
+-- The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+-- as follows: start with any positive integer n. Then each term is obtained from the 
+-- previous term as follows: if the previous term is even, the next term is one half of 
+-- the previous term. If the previous term is odd, the next term is 3 times the previous
+-- term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+-- Note: 
+--     1. Collatz(1) is [1].
+--     2. returned table sorted in increasing order.
+-- For example:
+-- get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+-- >>> get_odd_collatz(5)
+-- {1, 5}
+-- Return a sorted table containing the odd numbers in the Collatz sequence for n
+local function get_odd_collatz(n)
+    local odds = {}
+    local current = n
+
+    while true do
+        if current % 2 == 1 then
+            table.insert(odds, current)
+        end
+
+        if current == 1 then
+            break
+        end
+
+        if current % 2 == 0 then
+            current = current / 2
+        else
+            current = 3 * current + 1
+        end
+    end
+
+    table.sort(odds)
+    return odds
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = get_odd_collatz
+    lu.assertEquals(candidate(14), {1, 5, 7, 11, 13, 17})
+    lu.assertEquals(candidate(5), {1, 5})
+    lu.assertEquals(candidate(12), {1, 3, 5})
+    lu.assertEquals(candidate(1), {1})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Given a positive integer n, return a sorted table that has the odd numbers in collatz sequence.
+-- The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+-- as follows: start with any positive integer n. Then each term is obtained from the 
+-- previous term as follows: if the previous term is even, the next term is one half of 
+-- the previous term. If the previous term is odd, the next term is 3 times the previous
+-- term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+-- Note: 
+--     1. Collatz(1) is [1].
+--     2. returned table sorted in increasing order.
+-- For example:
+-- get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+-- >>> get_odd_collatz(5)
+-- {1, 5}
+-- Returns a sorted table of the odd numbers that appear in the Collatz
+-- sequence starting from the given positive integer `n`.
+--
+-- Example:
+--   get_odd_collatz(5) --> {1, 5}
+--
+local function get_odd_collatz(n)
+    assert(n > 0 and math.floor(n) == n, "n must be a positive integer")
+
+    local odds = {}
+
+    -- Traverse the Collatz sequence until we reach 1
+    while n > 1 do
+        if n % 2 == 1 then
+            table.insert(odds, n)
+        end
+
+        if n % 2 == 0 then
+            -- Lua 5.3+ integer division
+            n = n // 2
+        else
+            n = 3 * n + 1
+        end
+    end
+
+    -- 1 is always part of the sequence and is odd
+    table.insert(odds, 1)
+
+    -- Sort the collected odd numbers in ascending order
+    table.sort(odds)
+
+    return odds
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = get_odd_collatz
+    lu.assertEquals(candidate(14), {1, 5, 7, 11, 13, 17})
+    lu.assertEquals(candidate(5), {1, 5})
+    lu.assertEquals(candidate(12), {1, 3, 5})
+    lu.assertEquals(candidate(1), {1})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Given a positive integer n, return a sorted table that has the odd numbers in collatz sequence.
+-- The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+-- as follows: start with any positive integer n. Then each term is obtained from the 
+-- previous term as follows: if the previous term is even, the next term is one half of 
+-- the previous term. If the previous term is odd, the next term is 3 times the previous
+-- term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+-- Note: 
+--     1. Collatz(1) is [1].
+--     2. returned table sorted in increasing order.
+-- For example:
+-- get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+-- >>> get_odd_collatz(5)
+-- {1, 5}
+-- Returns a sorted table of the odd numbers that appear in the Collatz
+-- sequence starting from the positive integer `n`.  
+-- The table is sorted in ascending order and contains each odd number only once.
+local function get_odd_collatz(n)
+  local odds   = {}   -- table that will hold the odd numbers
+  local seen   = {}   -- lookup table to avoid duplicates
+
+  while true do
+    if n % 2 == 1 then          -- odd number
+      if not seen[n] then
+        table.insert(odds, n)
+        seen[n] = true
+      end
+    end
+
+    if n == 1 then break end    -- end of the Collatz sequence
+
+    if n % 2 == 0 then
+      n = n / 2
+    else
+      n = 3 * n + 1
+    end
+  end
+
+  table.sort(odds)             -- sort in ascending order
+  return odds
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = get_odd_collatz
+    lu.assertEquals(candidate(14), {1, 5, 7, 11, 13, 17})
+    lu.assertEquals(candidate(5), {1, 5})
+    lu.assertEquals(candidate(12), {1, 3, 5})
+    lu.assertEquals(candidate(1), {1})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 125 (LUA) - HumanEval_125_split_words
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Given a string of words, return a table of words split on whitespace, if no whitespaces exists in the text you
+-- should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+-- alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+-- Examples
+-- >>> split_words('Hello world!')
+-- {'Hello', 'world!'}
+-- >>> split_words('Hello,world!')
+-- {'Hello', 'world!'}
+-- >>> split_words('abcdef')
+-- 3
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = split_words
+    lu.assertEquals(candidate('Hello world!'), {'Hello', 'world!'})
+    lu.assertEquals(candidate('Hello,world!'), {'Hello', 'world!'})
+    lu.assertEquals(candidate('Hello world,!'), {'Hello', 'world,!'})
+    lu.assertEquals(candidate('Hello,Hello,world !'), {'Hello,Hello,world', '!'})
+    lu.assertEquals(candidate('abcdef'), 3)
+    lu.assertEquals(candidate('aaabb'), 2)
+    lu.assertEquals(candidate('aaaBb'), 1)
+    lu.assertEquals(candidate(''), 0)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Given a string of words, return a table of words split on whitespace, if no whitespaces exists in the text you
+-- should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+-- alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+-- Examples
+-- >>> split_words('Hello world!')
+-- {'Hello', 'world!'}
+-- >>> split_words('Hello,world!')
+-- {'Hello', 'world!'}
+-- >>> split_words('abcdef')
+-- 3
+-- Split a string into words or return a special count.
+--   * If the string contains whitespace, split on any whitespace.
+--   * If no whitespace but contains commas, split on commas.
+--   * Otherwise count the lowercase letters whose alphabet index is odd.
+--
+-- Examples:
+--   split_words('Hello world!')  --> {'Hello', 'world!'}
+--   split_words('Hello,world!')  --> {'Hello', 'world!'}
+--   split_words('abcdef')        --> 3
+local function split_words(txt)
+    -- Helper to split using a pattern
+    local function split(pattern)
+        local result = {}
+        for word in string.gmatch(txt, pattern) do
+            table.insert(result, word)
+        end
+        return result
+    end
+
+    -- 1. Split on whitespace if any exists
+    if string.find(txt, "%s") then
+        return split("%S+")
+    end
+
+    -- 2. Split on commas if any exists
+    if string.find(txt, ",") then
+        return split("[^,]+")
+    end
+
+    -- 3. Count lowercase letters with odd alphabet index
+    local count = 0
+    for i = 1, #txt do
+        local c = string.byte(txt, i)
+        if c >= string.byte('a') and c <= string.byte('z') then
+            local idx = c - string.byte('a')  -- 0‑based
+            if idx % 2 == 1 then
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = split_words
+    lu.assertEquals(candidate('Hello world!'), {'Hello', 'world!'})
+    lu.assertEquals(candidate('Hello,world!'), {'Hello', 'world!'})
+    lu.assertEquals(candidate('Hello world,!'), {'Hello', 'world,!'})
+    lu.assertEquals(candidate('Hello,Hello,world !'), {'Hello,Hello,world', '!'})
+    lu.assertEquals(candidate('abcdef'), 3)
+    lu.assertEquals(candidate('aaabb'), 2)
+    lu.assertEquals(candidate('aaaBb'), 1)
+    lu.assertEquals(candidate(''), 0)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Given a string of words, return a table of words split on whitespace, if no whitespaces exists in the text you
+-- should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+-- alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+-- Examples
+-- >>> split_words('Hello world!')
+-- {'Hello', 'world!'}
+-- >>> split_words('Hello,world!')
+-- {'Hello', 'world!'}
+-- >>> split_words('abcdef')
+-- 3
+-- Split a string into words or count odd‑ordered lower‑case letters
+-- according to the rules described in the problem statement.
+--
+-- Rules:
+-- 1. If the string contains any whitespace, split on whitespace.
+-- 2. Else if it contains any commas, split on commas.
+-- 3. Else return the count of lower‑case letters whose position in the
+--    alphabet (a=0, b=1, …, z=25) is odd.
+--
+-- Example usage:
+--   split_words('Hello world!')   --> {'Hello', 'world!'}
+--   split_words('Hello,world!')   --> {'Hello', 'world!'}
+--   split_words('abcdef')         --> 3
+--
+local function split_words(txt)
+  -- 1. Whitespace split
+  if txt:find("%s") then
+    local words = {}
+    for w in txt:gmatch("%S+") do
+      table.insert(words, w)
+    end
+    return words
+  end
+
+  -- 2. Comma split
+  if txt:find(",") then
+    local words = {}
+    for w in txt:gmatch("[^,]+") do
+      table.insert(words, w)
+    end
+    return words
+  end
+
+  -- 3. Count odd‑ordered lower‑case letters
+  local count = 0
+  for c in txt:gmatch("[a-z]") do
+    local idx = c:byte() - string.byte('a')
+    if idx % 2 == 1 then
+      count = count + 1
+    end
+  end
+  return count
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = split_words
+    lu.assertEquals(candidate('Hello world!'), {'Hello', 'world!'})
+    lu.assertEquals(candidate('Hello,world!'), {'Hello', 'world!'})
+    lu.assertEquals(candidate('Hello world,!'), {'Hello', 'world,!'})
+    lu.assertEquals(candidate('Hello,Hello,world !'), {'Hello,Hello,world', '!'})
+    lu.assertEquals(candidate('abcdef'), 3)
+    lu.assertEquals(candidate('aaabb'), 2)
+    lu.assertEquals(candidate('aaaBb'), 1)
+    lu.assertEquals(candidate(''), 0)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Given a string of words, return a table of words split on whitespace, if no whitespaces exists in the text you
+-- should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+-- alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+-- Examples
+-- >>> split_words('Hello world!')
+-- {'Hello', 'world!'}
+-- >>> split_words('Hello,world!')
+-- {'Hello', 'world!'}
+-- >>> split_words('abcdef')
+-- 3
+local function split_words(txt)
+    -- 1️⃣ Split on whitespace if any exists
+    if string.find(txt, "%s") then
+        local words = {}
+        for w in string.gmatch(txt, "%S+") do
+            table.insert(words, w)
+        end
+        return words
+    end
+
+    -- 2️⃣ Split on commas if no whitespace
+    if string.find(txt, ",") then
+        local words = {}
+        for w in string.gmatch(txt, "([^,]+)") do
+            table.insert(words, w)
+        end
+        return words
+    end
+
+    -- 3️⃣ Count lower‑case letters with odd alphabet index
+    local oddCount = 0
+    for i = 1, #txt do
+        local ch = txt:sub(i, i)
+        if ch:match("%l") then          -- only lower‑case letters
+            local idx = string.byte(ch) - string.byte('a')  -- 0‑based
+            if idx % 2 == 1 then        -- odd index
+                oddCount = oddCount + 1
+            end
+        end
+    end
+    return oddCount
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = split_words
+    lu.assertEquals(candidate('Hello world!'), {'Hello', 'world!'})
+    lu.assertEquals(candidate('Hello,world!'), {'Hello', 'world!'})
+    lu.assertEquals(candidate('Hello world,!'), {'Hello', 'world,!'})
+    lu.assertEquals(candidate('Hello,Hello,world !'), {'Hello,Hello,world', '!'})
+    lu.assertEquals(candidate('abcdef'), 3)
+    lu.assertEquals(candidate('aaabb'), 2)
+    lu.assertEquals(candidate('aaaBb'), 1)
+    lu.assertEquals(candidate(''), 0)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Given a string of words, return a table of words split on whitespace, if no whitespaces exists in the text you
+-- should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+-- alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+-- Examples
+-- >>> split_words('Hello world!')
+-- {'Hello', 'world!'}
+-- >>> split_words('Hello,world!')
+-- {'Hello', 'world!'}
+-- >>> split_words('abcdef')
+-- 3
+-- Split a string into words or count odd‑indexed lowercase letters
+local function split_words(txt)
+    -- Helper: split a string by a pattern and return a table
+    local function split_by_pattern(str, pat)
+        local t = {}
+        for word in string.gmatch(str, pat) do
+            table.insert(t, word)
+        end
+        return t
+    end
+
+    -- 1. If there is any whitespace, split on whitespace
+    if string.find(txt, "%s") then
+        return split_by_pattern(txt, "%S+")
+    end
+
+    -- 2. If there is a comma, split on commas
+    if string.find(txt, ",") then
+        return split_by_pattern(txt, "[^,]+")
+    end
+
+    -- 3. No whitespace or commas – count lower‑case letters with odd alphabet index
+    local count = 0
+    for i = 1, #txt do
+        local c = txt:sub(i, i)
+        local byte = string.byte(c)
+        if byte >= string.byte('a') and byte <= string.byte('z') then
+            local idx = byte - string.byte('a')  -- 0‑based index
+            if idx % 2 == 1 then  -- odd index
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = split_words
+    lu.assertEquals(candidate('Hello world!'), {'Hello', 'world!'})
+    lu.assertEquals(candidate('Hello,world!'), {'Hello', 'world!'})
+    lu.assertEquals(candidate('Hello world,!'), {'Hello', 'world,!'})
+    lu.assertEquals(candidate('Hello,Hello,world !'), {'Hello,Hello,world', '!'})
+    lu.assertEquals(candidate('abcdef'), 3)
+    lu.assertEquals(candidate('aaabb'), 2)
+    lu.assertEquals(candidate('aaaBb'), 1)
+    lu.assertEquals(candidate(''), 0)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 126 (LUA) - HumanEval_126_is_sorted
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Given a table of numbers, return whether or not they are sorted
+-- in ascending order. If table has more than 1 duplicate of the same
+-- number, return false. Assume no negative numbers and only integers.
+-- Examples
+-- >>> is_sorted({5})
+-- true
+-- >>> is_sorted({1, 2, 3, 4, 5})
+-- true
+-- >>> is_sorted({1, 3, 2, 4, 5})
+-- false
+-- >>> is_sorted({1, 2, 3, 4, 5, 6})
+-- true
+-- >>> is_sorted({1, 2, 3, 4, 5, 6, 7})
+-- true
+-- >>> is_sorted({1, 3, 2, 4, 5, 6, 7})
+-- false
+-- >>> is_sorted({1, 2, 2, 3, 3, 4})
+-- true
+-- >>> is_sorted({1, 2, 2, 2, 3, 4})
+-- false
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = is_sorted
+    lu.assertEquals(candidate({5}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5}), true)
+    lu.assertEquals(candidate({1, 3, 2, 4, 5}), false)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5, 6}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5, 6, 7}), true)
+    lu.assertEquals(candidate({1, 3, 2, 4, 5, 6, 7}), false)
+    lu.assertEquals(candidate({}), true)
+    lu.assertEquals(candidate({1}), true)
+    lu.assertEquals(candidate({3, 2, 1}), false)
+    lu.assertEquals(candidate({1, 2, 2, 2, 3, 4}), false)
+    lu.assertEquals(candidate({1, 2, 3, 3, 3, 4}), false)
+    lu.assertEquals(candidate({1, 2, 2, 3, 3, 4}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4}), true)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Given a table of numbers, return whether or not they are sorted
+-- in ascending order. If table has more than 1 duplicate of the same
+-- number, return false. Assume no negative numbers and only integers.
+-- Examples
+-- >>> is_sorted({5})
+-- true
+-- >>> is_sorted({1, 2, 3, 4, 5})
+-- true
+-- >>> is_sorted({1, 3, 2, 4, 5})
+-- false
+-- >>> is_sorted({1, 2, 3, 4, 5, 6})
+-- true
+-- >>> is_sorted({1, 2, 3, 4, 5, 6, 7})
+-- true
+-- >>> is_sorted({1, 3, 2, 4, 5, 6, 7})
+-- false
+-- >>> is_sorted({1, 2, 2, 3, 3, 4})
+-- true
+-- >>> is_sorted({1, 2, 2, 2, 3, 4})
+-- false
+local function is_sorted(lst)
+    -- Frequency table to keep track of how many times each number appears
+    local freq = {}
+
+    for i = 1, #lst do
+        local val = lst[i]
+
+        -- Check ascending order (non‑decreasing)
+        if i > 1 and val < lst[i - 1] then
+            return false
+        end
+
+        -- Update frequency count and enforce the "at most two occurrences" rule
+        freq[val] = (freq[val] or 0) + 1
+        if freq[val] > 2 then
+            return false
+        end
+    end
+
+    return true
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = is_sorted
+    lu.assertEquals(candidate({5}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5}), true)
+    lu.assertEquals(candidate({1, 3, 2, 4, 5}), false)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5, 6}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5, 6, 7}), true)
+    lu.assertEquals(candidate({1, 3, 2, 4, 5, 6, 7}), false)
+    lu.assertEquals(candidate({}), true)
+    lu.assertEquals(candidate({1}), true)
+    lu.assertEquals(candidate({3, 2, 1}), false)
+    lu.assertEquals(candidate({1, 2, 2, 2, 3, 4}), false)
+    lu.assertEquals(candidate({1, 2, 3, 3, 3, 4}), false)
+    lu.assertEquals(candidate({1, 2, 2, 3, 3, 4}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4}), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Given a table of numbers, return whether or not they are sorted
+-- in ascending order. If table has more than 1 duplicate of the same
+-- number, return false. Assume no negative numbers and only integers.
+-- Examples
+-- >>> is_sorted({5})
+-- true
+-- >>> is_sorted({1, 2, 3, 4, 5})
+-- true
+-- >>> is_sorted({1, 3, 2, 4, 5})
+-- false
+-- >>> is_sorted({1, 2, 3, 4, 5, 6})
+-- true
+-- >>> is_sorted({1, 2, 3, 4, 5, 6, 7})
+-- true
+-- >>> is_sorted({1, 3, 2, 4, 5, 6, 7})
+-- false
+-- >>> is_sorted({1, 2, 2, 3, 3, 4})
+-- true
+-- >>> is_sorted({1, 2, 2, 2, 3, 4})
+-- false
+local function is_sorted(lst)
+    local freq = {}
+    local prev = nil
+
+    for i = 1, #lst do
+        local val = lst[i]
+
+        -- Check ascending order
+        if prev ~= nil and val < prev then
+            return false
+        end
+        prev = val
+
+        -- Count occurrences
+        freq[val] = (freq[val] or 0) + 1
+        if freq[val] > 2 then
+            return false
+        end
+    end
+
+    return true
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = is_sorted
+    lu.assertEquals(candidate({5}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5}), true)
+    lu.assertEquals(candidate({1, 3, 2, 4, 5}), false)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5, 6}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5, 6, 7}), true)
+    lu.assertEquals(candidate({1, 3, 2, 4, 5, 6, 7}), false)
+    lu.assertEquals(candidate({}), true)
+    lu.assertEquals(candidate({1}), true)
+    lu.assertEquals(candidate({3, 2, 1}), false)
+    lu.assertEquals(candidate({1, 2, 2, 2, 3, 4}), false)
+    lu.assertEquals(candidate({1, 2, 3, 3, 3, 4}), false)
+    lu.assertEquals(candidate({1, 2, 2, 3, 3, 4}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4}), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Given a table of numbers, return whether or not they are sorted
+-- in ascending order. If table has more than 1 duplicate of the same
+-- number, return false. Assume no negative numbers and only integers.
+-- Examples
+-- >>> is_sorted({5})
+-- true
+-- >>> is_sorted({1, 2, 3, 4, 5})
+-- true
+-- >>> is_sorted({1, 3, 2, 4, 5})
+-- false
+-- >>> is_sorted({1, 2, 3, 4, 5, 6})
+-- true
+-- >>> is_sorted({1, 2, 3, 4, 5, 6, 7})
+-- true
+-- >>> is_sorted({1, 3, 2, 4, 5, 6, 7})
+-- false
+-- >>> is_sorted({1, 2, 2, 3, 3, 4})
+-- true
+-- >>> is_sorted({1, 2, 2, 2, 3, 4})
+-- false
+-- Checks whether a table of non‑negative integers is sorted in ascending order
+-- and that no number appears more than twice.
+local function is_sorted(lst)
+    local counts = {}
+
+    for i = 1, #lst do
+        local val = lst[i]
+
+        -- Count occurrences and reject if any number appears more than twice
+        counts[val] = (counts[val] or 0) + 1
+        if counts[val] > 2 then
+            return false
+        end
+
+        -- Check non‑decreasing order (skip comparison for the first element)
+        if i > 1 and val < lst[i - 1] then
+            return false
+        end
+    end
+
+    return true
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = is_sorted
+    lu.assertEquals(candidate({5}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5}), true)
+    lu.assertEquals(candidate({1, 3, 2, 4, 5}), false)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5, 6}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5, 6, 7}), true)
+    lu.assertEquals(candidate({1, 3, 2, 4, 5, 6, 7}), false)
+    lu.assertEquals(candidate({}), true)
+    lu.assertEquals(candidate({1}), true)
+    lu.assertEquals(candidate({3, 2, 1}), false)
+    lu.assertEquals(candidate({1, 2, 2, 2, 3, 4}), false)
+    lu.assertEquals(candidate({1, 2, 3, 3, 3, 4}), false)
+    lu.assertEquals(candidate({1, 2, 2, 3, 3, 4}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4}), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Given a table of numbers, return whether or not they are sorted
+-- in ascending order. If table has more than 1 duplicate of the same
+-- number, return false. Assume no negative numbers and only integers.
+-- Examples
+-- >>> is_sorted({5})
+-- true
+-- >>> is_sorted({1, 2, 3, 4, 5})
+-- true
+-- >>> is_sorted({1, 3, 2, 4, 5})
+-- false
+-- >>> is_sorted({1, 2, 3, 4, 5, 6})
+-- true
+-- >>> is_sorted({1, 2, 3, 4, 5, 6, 7})
+-- true
+-- >>> is_sorted({1, 3, 2, 4, 5, 6, 7})
+-- false
+-- >>> is_sorted({1, 2, 2, 3, 3, 4})
+-- true
+-- >>> is_sorted({1, 2, 2, 2, 3, 4})
+-- false
+-- Return true if `lst` is sorted in ascending order and no number appears
+-- more than twice.  Assumes all elements are non‑negative integers.
+local function is_sorted(lst)
+    if not lst or #lst <= 1 then
+        return true
+    end
+
+    local counts = {}
+    local prev = lst[1]
+    counts[prev] = 1
+
+    for i = 2, #lst do
+        local cur = lst[i]
+
+        -- Check ordering
+        if cur < prev then
+            return false
+        end
+
+        -- Count occurrences
+        counts[cur] = (counts[cur] or 0) + 1
+        if counts[cur] > 2 then
+            return false
+        end
+
+        prev = cur
+    end
+
+    return true
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = is_sorted
+    lu.assertEquals(candidate({5}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5}), true)
+    lu.assertEquals(candidate({1, 3, 2, 4, 5}), false)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5, 6}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4, 5, 6, 7}), true)
+    lu.assertEquals(candidate({1, 3, 2, 4, 5, 6, 7}), false)
+    lu.assertEquals(candidate({}), true)
+    lu.assertEquals(candidate({1}), true)
+    lu.assertEquals(candidate({3, 2, 1}), false)
+    lu.assertEquals(candidate({1, 2, 2, 2, 3, 4}), false)
+    lu.assertEquals(candidate({1, 2, 3, 3, 3, 4}), false)
+    lu.assertEquals(candidate({1, 2, 2, 3, 3, 4}), true)
+    lu.assertEquals(candidate({1, 2, 3, 4}), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154478
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 131 (LUA) - HumanEval_131_digits
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Given a positive integer n, return the product of the odd digits.
+-- Return 0 if all digits are even.
+-- For example:
+-- >>> digits(1)
+-- 1
+-- >>> digits(4)
+-- 0
+-- >>> digits(235)
+-- 15
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = digits
+    lu.assertEquals(candidate(5), 5)
+    lu.assertEquals(candidate(54), 5)
+    lu.assertEquals(candidate(120), 1)
+    lu.assertEquals(candidate(5014), 5)
+    lu.assertEquals(candidate(98765), 315)
+    lu.assertEquals(candidate(5576543), 2625)
+    lu.assertEquals(candidate(2468), 0)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Given a positive integer n, return the product of the odd digits.
+-- Return 0 if all digits are even.
+-- For example:
+-- >>> digits(1)
+-- 1
+-- >>> digits(4)
+-- 0
+-- >>> digits(235)
+-- 15
+-- Return the product of the odd digits of a positive integer `n`.
+-- If all digits are even, return 0.
+local function digits(n)
+    local product = 1
+    local hasOdd = false
+
+    while n > 0 do
+        local digit = n % 10
+        if digit % 2 == 1 then          -- odd digit
+            product = product * digit
+            hasOdd = true
+        end
+        n = math.floor(n / 10)
+    end
+
+    return hasOdd and product or 0
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = digits
+    lu.assertEquals(candidate(5), 5)
+    lu.assertEquals(candidate(54), 5)
+    lu.assertEquals(candidate(120), 1)
+    lu.assertEquals(candidate(5014), 5)
+    lu.assertEquals(candidate(98765), 315)
+    lu.assertEquals(candidate(5576543), 2625)
+    lu.assertEquals(candidate(2468), 0)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Given a positive integer n, return the product of the odd digits.
+-- Return 0 if all digits are even.
+-- For example:
+-- >>> digits(1)
+-- 1
+-- >>> digits(4)
+-- 0
+-- >>> digits(235)
+-- 15
+-- Return the product of all odd digits in n.
+-- If there are no odd digits, return 0.
+local function digits(n)
+    local product = 1
+    local hasOdd = false
+
+    -- Handle the special case where n is 0
+    if n == 0 then
+        return 0
+    end
+
+    while n > 0 do
+        local d = n % 10
+        if d % 2 == 1 then        -- odd digit
+            product = product * d
+            hasOdd = true
+        end
+        n = math.floor(n / 10)
+    end
+
+    return hasOdd and product or 0
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = digits
+    lu.assertEquals(candidate(5), 5)
+    lu.assertEquals(candidate(54), 5)
+    lu.assertEquals(candidate(120), 1)
+    lu.assertEquals(candidate(5014), 5)
+    lu.assertEquals(candidate(98765), 315)
+    lu.assertEquals(candidate(5576543), 2625)
+    lu.assertEquals(candidate(2468), 0)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Given a positive integer n, return the product of the odd digits.
+-- Return 0 if all digits are even.
+-- For example:
+-- >>> digits(1)
+-- 1
+-- >>> digits(4)
+-- 0
+-- >>> digits(235)
+-- 15
+-- Return the product of the odd digits of a positive integer `n`.
+-- If all digits are even, return 0.
+--
+-- Examples:
+--   digits(1)   -> 1
+--   digits(4)   -> 0
+--   digits(235) -> 15
+
+local function digits(n)
+  local product = 1
+  local hasOdd  = false
+
+  while n > 0 do
+    local d = n % 10          -- current least‑significant digit
+    if d % 2 == 1 then        -- odd digit
+      product = product * d
+      hasOdd = true
+    end
+    n = math.floor(n / 10)    -- drop the processed digit
+  end
+
+  return hasOdd and product or 0
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = digits
+    lu.assertEquals(candidate(5), 5)
+    lu.assertEquals(candidate(54), 5)
+    lu.assertEquals(candidate(120), 1)
+    lu.assertEquals(candidate(5014), 5)
+    lu.assertEquals(candidate(98765), 315)
+    lu.assertEquals(candidate(5576543), 2625)
+    lu.assertEquals(candidate(2468), 0)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Given a positive integer n, return the product of the odd digits.
+-- Return 0 if all digits are even.
+-- For example:
+-- >>> digits(1)
+-- 1
+-- >>> digits(4)
+-- 0
+-- >>> digits(235)
+-- 15
+-- Return the product of the odd digits of a positive integer.
+-- If all digits are even, return 0.
+local function digits(n)
+  -- In case a negative number is passed, work with its absolute value.
+  n = math.abs(n)
+
+  local prod   = 1   -- product of odd digits
+  local hasOdd = false
+
+  while n > 0 do
+    local d = n % 10          -- last digit
+    if d % 2 == 1 then        -- odd digit?
+      prod   = prod * d
+      hasOdd = true
+    end
+    n = math.floor(n / 10)    -- remove last digit
+  end
+
+  return hasOdd and prod or 0
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = digits
+    lu.assertEquals(candidate(5), 5)
+    lu.assertEquals(candidate(54), 5)
+    lu.assertEquals(candidate(120), 1)
+    lu.assertEquals(candidate(5014), 5)
+    lu.assertEquals(candidate(98765), 315)
+    lu.assertEquals(candidate(5576543), 2625)
+    lu.assertEquals(candidate(2468), 0)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 133 (LUA) - HumanEval_133_sum_squares
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- You are given a table of numbers.
+-- You need to return the sum of squared numbers in the given table,
+-- round each element in the table to the upper int(Ceiling) first.
+-- Examples:
+-- >>> lst({1.0, 2.0, 3.0})
+-- 14
+-- >>> lst({1.0, 4.0, 9.0})
+-- 98
+-- >>> lst({1.0, 3.0, 5.0, 7.0})
+-- 84
+-- >>> lst({1.4, 4.2, 0.0})
+-- 29
+-- >>> lst({-2.4, 1.0, 1.0})
+-- 6
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = sum_squares
+    lu.assertEquals(candidate({1.0, 2.0, 3.0}), 14)
+    lu.assertEquals(candidate({1.0, 2.0, 3.0}), 14)
+    lu.assertEquals(candidate({1.0, 3.0, 5.0, 7.0}), 84)
+    lu.assertEquals(candidate({1.4, 4.2, 0.0}), 29)
+    lu.assertEquals(candidate({-2.4, 1.0, 1.0}), 6)
+    lu.assertEquals(candidate({100.0, 1.0, 15.0, 2.0}), 10230)
+    lu.assertEquals(candidate({10000.0, 10000.0}), 200000000)
+    lu.assertEquals(candidate({-1.4, 4.6, 6.3}), 75)
+    lu.assertEquals(candidate({-1.4, 17.9, 18.9, 19.9}), 1086)
+    lu.assertEquals(candidate({0.0}), 0)
+    lu.assertEquals(candidate({-1.0}), 1)
+    lu.assertEquals(candidate({-1.0, 1.0, 0.0}), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- You are given a table of numbers.
+-- You need to return the sum of squared numbers in the given table,
+-- round each element in the table to the upper int(Ceiling) first.
+-- Examples:
+-- >>> lst({1.0, 2.0, 3.0})
+-- 14
+-- >>> lst({1.0, 4.0, 9.0})
+-- 98
+-- >>> lst({1.0, 3.0, 5.0, 7.0})
+-- 84
+-- >>> lst({1.4, 4.2, 0.0})
+-- 29
+-- >>> lst({-2.4, 1.0, 1.0})
+-- 6
+local function sum_squares(lst)
+  local sum = 0
+  for _, v in ipairs(lst) do
+    local c = math.ceil(v)
+    sum = sum + c * c
+  end
+  return sum
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = sum_squares
+    lu.assertEquals(candidate({1.0, 2.0, 3.0}), 14)
+    lu.assertEquals(candidate({1.0, 2.0, 3.0}), 14)
+    lu.assertEquals(candidate({1.0, 3.0, 5.0, 7.0}), 84)
+    lu.assertEquals(candidate({1.4, 4.2, 0.0}), 29)
+    lu.assertEquals(candidate({-2.4, 1.0, 1.0}), 6)
+    lu.assertEquals(candidate({100.0, 1.0, 15.0, 2.0}), 10230)
+    lu.assertEquals(candidate({10000.0, 10000.0}), 200000000)
+    lu.assertEquals(candidate({-1.4, 4.6, 6.3}), 75)
+    lu.assertEquals(candidate({-1.4, 17.9, 18.9, 19.9}), 1086)
+    lu.assertEquals(candidate({0.0}), 0)
+    lu.assertEquals(candidate({-1.0}), 1)
+    lu.assertEquals(candidate({-1.0, 1.0, 0.0}), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- You are given a table of numbers.
+-- You need to return the sum of squared numbers in the given table,
+-- round each element in the table to the upper int(Ceiling) first.
+-- Examples:
+-- >>> lst({1.0, 2.0, 3.0})
+-- 14
+-- >>> lst({1.0, 4.0, 9.0})
+-- 98
+-- >>> lst({1.0, 3.0, 5.0, 7.0})
+-- 84
+-- >>> lst({1.4, 4.2, 0.0})
+-- 29
+-- >>> lst({-2.4, 1.0, 1.0})
+-- 6
+local function sum_squares(lst)
+    local sum = 0
+    for _, v in ipairs(lst) do
+        local c = math.ceil(v)
+        sum = sum + c * c
+    end
+    return sum
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = sum_squares
+    lu.assertEquals(candidate({1.0, 2.0, 3.0}), 14)
+    lu.assertEquals(candidate({1.0, 2.0, 3.0}), 14)
+    lu.assertEquals(candidate({1.0, 3.0, 5.0, 7.0}), 84)
+    lu.assertEquals(candidate({1.4, 4.2, 0.0}), 29)
+    lu.assertEquals(candidate({-2.4, 1.0, 1.0}), 6)
+    lu.assertEquals(candidate({100.0, 1.0, 15.0, 2.0}), 10230)
+    lu.assertEquals(candidate({10000.0, 10000.0}), 200000000)
+    lu.assertEquals(candidate({-1.4, 4.6, 6.3}), 75)
+    lu.assertEquals(candidate({-1.4, 17.9, 18.9, 19.9}), 1086)
+    lu.assertEquals(candidate({0.0}), 0)
+    lu.assertEquals(candidate({-1.0}), 1)
+    lu.assertEquals(candidate({-1.0, 1.0, 0.0}), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- You are given a table of numbers.
+-- You need to return the sum of squared numbers in the given table,
+-- round each element in the table to the upper int(Ceiling) first.
+-- Examples:
+-- >>> lst({1.0, 2.0, 3.0})
+-- 14
+-- >>> lst({1.0, 4.0, 9.0})
+-- 98
+-- >>> lst({1.0, 3.0, 5.0, 7.0})
+-- 84
+-- >>> lst({1.4, 4.2, 0.0})
+-- 29
+-- >>> lst({-2.4, 1.0, 1.0})
+-- 6
+local function sum_squares(lst)
+    local sum = 0
+    for _, v in ipairs(lst) do
+        local c = math.ceil(v)
+        sum = sum + c * c
+    end
+    return sum
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = sum_squares
+    lu.assertEquals(candidate({1.0, 2.0, 3.0}), 14)
+    lu.assertEquals(candidate({1.0, 2.0, 3.0}), 14)
+    lu.assertEquals(candidate({1.0, 3.0, 5.0, 7.0}), 84)
+    lu.assertEquals(candidate({1.4, 4.2, 0.0}), 29)
+    lu.assertEquals(candidate({-2.4, 1.0, 1.0}), 6)
+    lu.assertEquals(candidate({100.0, 1.0, 15.0, 2.0}), 10230)
+    lu.assertEquals(candidate({10000.0, 10000.0}), 200000000)
+    lu.assertEquals(candidate({-1.4, 4.6, 6.3}), 75)
+    lu.assertEquals(candidate({-1.4, 17.9, 18.9, 19.9}), 1086)
+    lu.assertEquals(candidate({0.0}), 0)
+    lu.assertEquals(candidate({-1.0}), 1)
+    lu.assertEquals(candidate({-1.0, 1.0, 0.0}), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- You are given a table of numbers.
+-- You need to return the sum of squared numbers in the given table,
+-- round each element in the table to the upper int(Ceiling) first.
+-- Examples:
+-- >>> lst({1.0, 2.0, 3.0})
+-- 14
+-- >>> lst({1.0, 4.0, 9.0})
+-- 98
+-- >>> lst({1.0, 3.0, 5.0, 7.0})
+-- 84
+-- >>> lst({1.4, 4.2, 0.0})
+-- 29
+-- >>> lst({-2.4, 1.0, 1.0})
+-- 6
+-- Sum of squared numbers with each element rounded up (ceiling)
+local function sum_squares(lst)
+  local total = 0
+  for _, v in ipairs(lst) do
+    local c = math.ceil(v)          -- round up to the nearest integer
+    total = total + c * c           -- add the square
+  end
+  return total
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = sum_squares
+    lu.assertEquals(candidate({1.0, 2.0, 3.0}), 14)
+    lu.assertEquals(candidate({1.0, 2.0, 3.0}), 14)
+    lu.assertEquals(candidate({1.0, 3.0, 5.0, 7.0}), 84)
+    lu.assertEquals(candidate({1.4, 4.2, 0.0}), 29)
+    lu.assertEquals(candidate({-2.4, 1.0, 1.0}), 6)
+    lu.assertEquals(candidate({100.0, 1.0, 15.0, 2.0}), 10230)
+    lu.assertEquals(candidate({10000.0, 10000.0}), 200000000)
+    lu.assertEquals(candidate({-1.4, 4.6, 6.3}), 75)
+    lu.assertEquals(candidate({-1.4, 17.9, 18.9, 19.9}), 1086)
+    lu.assertEquals(candidate({0.0}), 0)
+    lu.assertEquals(candidate({-1.0}), 1)
+    lu.assertEquals(candidate({-1.0, 1.0, 0.0}), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 134 (LUA) - HumanEval_134_check_if_last_char_is_a_letter
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Create a function that returns true if the last character
+-- of a given string is an alphabetical character and is not
+-- a part of a word, and false otherwise.
+-- Note: "word" is a group of characters separated by space.
+-- Examples:
+-- >>> check_if_last_char_is_a_letter('apple pie')
+-- false
+-- >>> check_if_last_char_is_a_letter('apple pi e')
+-- true
+-- >>> check_if_last_char_is_a_letter('apple pi e ')
+-- false
+-- >>> check_if_last_char_is_a_letter('')
+-- false
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = check_if_last_char_is_a_letter
+    lu.assertEquals(candidate('apple'), false)
+    lu.assertEquals(candidate('apple pi e'), true)
+    lu.assertEquals(candidate('eeeee'), false)
+    lu.assertEquals(candidate('A'), true)
+    lu.assertEquals(candidate('Pumpkin pie '), false)
+    lu.assertEquals(candidate('Pumpkin pie 1'), false)
+    lu.assertEquals(candidate(''), false)
+    lu.assertEquals(candidate('eeeee e '), false)
+    lu.assertEquals(candidate('apple pie'), false)
+    lu.assertEquals(candidate('apple pi e '), false)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Create a function that returns true if the last character
+-- of a given string is an alphabetical character and is not
+-- a part of a word, and false otherwise.
+-- Note: "word" is a group of characters separated by space.
+-- Examples:
+-- >>> check_if_last_char_is_a_letter('apple pie')
+-- false
+-- >>> check_if_last_char_is_a_letter('apple pi e')
+-- true
+-- >>> check_if_last_char_is_a_letter('apple pi e ')
+-- false
+-- >>> check_if_last_char_is_a_letter('')
+-- false
+-- Returns true if the last character of `txt` is a letter and it is not part of a word
+-- (i.e. it is a single‑letter word or the only character in the string).
+-- Otherwise returns false.
+local function check_if_last_char_is_a_letter(txt)
+    -- Empty string or trailing space → false
+    if txt == "" or txt:sub(-1) == " " then
+        return false
+    end
+
+    -- Get the last character
+    local last = txt:sub(-1)
+
+    -- Check if it is an alphabetical letter
+    if not last:match("%a") then
+        return false
+    end
+
+    -- If the string is only one character long, it is a single‑letter word
+    if #txt == 1 then
+        return true
+    end
+
+    -- Check the character preceding the last one
+    local prev = txt:sub(-2, -2)
+    return prev == " "
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = check_if_last_char_is_a_letter
+    lu.assertEquals(candidate('apple'), false)
+    lu.assertEquals(candidate('apple pi e'), true)
+    lu.assertEquals(candidate('eeeee'), false)
+    lu.assertEquals(candidate('A'), true)
+    lu.assertEquals(candidate('Pumpkin pie '), false)
+    lu.assertEquals(candidate('Pumpkin pie 1'), false)
+    lu.assertEquals(candidate(''), false)
+    lu.assertEquals(candidate('eeeee e '), false)
+    lu.assertEquals(candidate('apple pie'), false)
+    lu.assertEquals(candidate('apple pi e '), false)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Create a function that returns true if the last character
+-- of a given string is an alphabetical character and is not
+-- a part of a word, and false otherwise.
+-- Note: "word" is a group of characters separated by space.
+-- Examples:
+-- >>> check_if_last_char_is_a_letter('apple pie')
+-- false
+-- >>> check_if_last_char_is_a_letter('apple pi e')
+-- true
+-- >>> check_if_last_char_is_a_letter('apple pi e ')
+-- false
+-- >>> check_if_last_char_is_a_letter('')
+-- false
+-- Returns true if the last character of `txt` is an alphabetical
+-- character that stands alone (i.e., not part of a word), otherwise false.
+local function check_if_last_char_is_a_letter(txt)
+    -- Empty string – no last character.
+    if txt == "" then
+        return false
+    end
+
+    local len = #txt
+    local last_char = txt:sub(len, len)
+
+    -- If the last character is not alphabetic, immediately false.
+    if not last_char:match("%a") then
+        return false
+    end
+
+    -- If the string has only one character, it's a standalone letter.
+    if len == 1 then
+        return true
+    end
+
+    -- Check the character preceding the last one.
+    local prev_char = txt:sub(len - 1, len - 1)
+    return prev_char == " "
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = check_if_last_char_is_a_letter
+    lu.assertEquals(candidate('apple'), false)
+    lu.assertEquals(candidate('apple pi e'), true)
+    lu.assertEquals(candidate('eeeee'), false)
+    lu.assertEquals(candidate('A'), true)
+    lu.assertEquals(candidate('Pumpkin pie '), false)
+    lu.assertEquals(candidate('Pumpkin pie 1'), false)
+    lu.assertEquals(candidate(''), false)
+    lu.assertEquals(candidate('eeeee e '), false)
+    lu.assertEquals(candidate('apple pie'), false)
+    lu.assertEquals(candidate('apple pi e '), false)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Create a function that returns true if the last character
+-- of a given string is an alphabetical character and is not
+-- a part of a word, and false otherwise.
+-- Note: "word" is a group of characters separated by space.
+-- Examples:
+-- >>> check_if_last_char_is_a_letter('apple pie')
+-- false
+-- >>> check_if_last_char_is_a_letter('apple pi e')
+-- true
+-- >>> check_if_last_char_is_a_letter('apple pi e ')
+-- false
+-- >>> check_if_last_char_is_a_letter('')
+-- false
+-- Returns true if the last character of `txt` is an alphabetical
+-- character and that character is not part of a word (i.e. it is
+-- either the sole character in the string or it is preceded by a
+-- space).  Otherwise returns false.
+local function check_if_last_char_is_a_letter(txt)
+    -- Empty string → false
+    if txt == "" then
+        return false
+    end
+
+    -- Grab the last character
+    local last_char = txt:sub(-1)
+
+    -- Must be an alphabetic character
+    if not last_char:match("%a") then
+        return false
+    end
+
+    -- If it's the only character, it's not part of a word
+    if #txt == 1 then
+        return true
+    end
+
+    -- Check the character immediately before the last one
+    local prev_char = txt:sub(-2, -2)
+    return prev_char == " "
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = check_if_last_char_is_a_letter
+    lu.assertEquals(candidate('apple'), false)
+    lu.assertEquals(candidate('apple pi e'), true)
+    lu.assertEquals(candidate('eeeee'), false)
+    lu.assertEquals(candidate('A'), true)
+    lu.assertEquals(candidate('Pumpkin pie '), false)
+    lu.assertEquals(candidate('Pumpkin pie 1'), false)
+    lu.assertEquals(candidate(''), false)
+    lu.assertEquals(candidate('eeeee e '), false)
+    lu.assertEquals(candidate('apple pie'), false)
+    lu.assertEquals(candidate('apple pi e '), false)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Create a function that returns true if the last character
+-- of a given string is an alphabetical character and is not
+-- a part of a word, and false otherwise.
+-- Note: "word" is a group of characters separated by space.
+-- Examples:
+-- >>> check_if_last_char_is_a_letter('apple pie')
+-- false
+-- >>> check_if_last_char_is_a_letter('apple pi e')
+-- true
+-- >>> check_if_last_char_is_a_letter('apple pi e ')
+-- false
+-- >>> check_if_last_char_is_a_letter('')
+-- false
+-- Create a function that returns true if the last character
+-- of a given string is an alphabetical character and is not
+-- a part of a word, and false otherwise.
+-- Note: "word" is a group of characters separated by space.
+-- Examples:
+-- >>> check_if_last_char_is_a_letter('apple pie')
+-- false
+-- >>> check_if_last_char_is_a_letter('apple pi e')
+-- true
+-- >>> check_if_last_char_is_a_letter('apple pi e ')
+-- false
+-- >>> check_if_last_char_is_a_letter('')
+-- false
+local function check_if_last_char_is_a_letter(txt)
+  -- Empty string or nil → false
+  if not txt or txt == '' then
+    return false
+  end
+
+  -- Get the last character
+  local last = txt:sub(-1)
+
+  -- Must be an alphabetical character
+  if not last:match('%a') then
+    return false
+  end
+
+  -- If the string is only one character, it's not part of a word
+  if #txt == 1 then
+    return true
+  end
+
+  -- Check the character immediately before the last one
+  local prev = txt:sub(-2, -2)
+
+  -- If the previous character is also a letter, then the last
+  -- character is part of a word → false
+  if prev:match('%a') then
+    return false
+  end
+
+  -- Otherwise the last character is a standalone letter
+  return true
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = check_if_last_char_is_a_letter
+    lu.assertEquals(candidate('apple'), false)
+    lu.assertEquals(candidate('apple pi e'), true)
+    lu.assertEquals(candidate('eeeee'), false)
+    lu.assertEquals(candidate('A'), true)
+    lu.assertEquals(candidate('Pumpkin pie '), false)
+    lu.assertEquals(candidate('Pumpkin pie 1'), false)
+    lu.assertEquals(candidate(''), false)
+    lu.assertEquals(candidate('eeeee e '), false)
+    lu.assertEquals(candidate('apple pie'), false)
+    lu.assertEquals(candidate('apple pi e '), false)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------

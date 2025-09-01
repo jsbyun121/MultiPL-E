@@ -1,0 +1,2564 @@
+As per my standing instructions, analyze each code-execution result provided. For every item, produce a structured report as follows.
+
+1) Status
+Status: "OK" (Success) or else (Failure)
+Evidence: include exit code, error status, and whether stderr is empty/non-empty (quote the first relevant line).
+
+If Failure (non-zero exit code, error status, or non-empty stderr)
+Root Cause Analysis
+Explain why it failed, grounded in the logs/trace.
+Point to the exact faulty locations (file and line numbers if available). Quote the minimal offending snippets.
+Recommended Fix (Minimal Patch)
+Provide brief code segments (3–7 lines each) that would correct the issue.
+If multiple faults exist, list fixes in order of impact.
+Final Answer
+Classify the ultimate source of failure as one of: faulty problem setting / wrong test case / incorrect code implementation.
+State it on a single line: Final Answer: <chosen category>.
+
+If Success (exit code 0 and empty stderr)
+Critical Correctness Review
+Do not assume success means correctness.
+Check if the code's logic truly matches the intended problem requirements, including edge cases and corner conditions.
+Identify any silent errors, logical flaws, or incompleteness that would still pass execution but fail semantically.
+If the implementation is sound, explain why it is correct. If not, explain the discrepancy clearly.
+Final Answer
+Explicitly confirm or reject correctness in one line: Final Answer: correct or incorrect (with a one-phrase justification if incorrect).
+
+General rules
+Be precise and concise. Don't invent behavior not evidenced by the logs or code.
+When line numbers aren't available, reference the closest identifiable code block.
+Prefer minimal fixes over refactors; include just enough context to apply the patch.
+
+CONTENT TO ANALYZE:
+
+================================================================================
+PROBLEM 139 (R) - HumanEval_139_special_factorial
+================================================================================
+
+PROMPT:
+----------------------------------------
+# The Brazilian factorial is defined as:
+# brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+# where n > 0
+# For example:
+# >>> special_factorial(4)
+# 288
+# The function will receive an integer as input and should return the special
+# factorial of this integer.
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+test_humaneval <- function() {
+    candidate <- special_factorial
+    stopifnot(isTRUE(all.equal(candidate(4), 288)))
+    stopifnot(isTRUE(all.equal(candidate(5), 34560)))
+    stopifnot(isTRUE(all.equal(candidate(7), 125411328000)))
+    stopifnot(isTRUE(all.equal(candidate(1), 1)))
+}
+test_humaneval()
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+# The Brazilian factorial is defined as:
+# brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+# where n > 0
+# For example:
+# >>> special_factorial(4)
+# 288
+# The function will receive an integer as input and should return the special
+# factorial of this integer.
+# The Brazilian factorial is defined as:
+# brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+# where n > 0
+# For example:
+# >>> special_factorial(4)
+# 288
+# The function will receive an integer as input and should return the special
+# factorial of this integer.
+
+special_factorial <- function(n) {
+  # Validate input
+  if (!is.numeric(n) || length(n) != 1 || n <= 0 || floor(n) != n) {
+    stop("Input must be a positive integer.")
+  }
+  
+  # Compute the product of factorials from 1 to n
+  # We can use factorial() which returns the factorial of each integer
+  # and then take the product.
+  prod(sapply(1:n, factorial))
+}
+test_humaneval <- function() {
+    candidate <- special_factorial
+    stopifnot(isTRUE(all.equal(candidate(4), 288)))
+    stopifnot(isTRUE(all.equal(candidate(5), 34560)))
+    stopifnot(isTRUE(all.equal(candidate(7), 125411328000)))
+    stopifnot(isTRUE(all.equal(candidate(1), 1)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183801
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+# The Brazilian factorial is defined as:
+# brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+# where n > 0
+# For example:
+# >>> special_factorial(4)
+# 288
+# The function will receive an integer as input and should return the special
+# factorial of this integer.
+# The Brazilian factorial is defined as:
+# brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+# where n > 0
+# For example:
+# >>> special_factorial(4)
+# 288
+# The function will receive an integer as input and should return the special
+# factorial of this integer.
+
+special_factorial <- function(n) {
+  # Validate input
+  if (!is.numeric(n) || length(n) != 1 || n <= 0 || n != floor(n)) {
+    stop("Input must be a positive integer.")
+  }
+  
+  # Compute the product of factorials from 1 to n
+  result <- 1
+  for (i in seq_len(n)) {
+    result <- result * factorial(i)
+  }
+  return(result)
+}
+test_humaneval <- function() {
+    candidate <- special_factorial
+    stopifnot(isTRUE(all.equal(candidate(4), 288)))
+    stopifnot(isTRUE(all.equal(candidate(5), 34560)))
+    stopifnot(isTRUE(all.equal(candidate(7), 125411328000)))
+    stopifnot(isTRUE(all.equal(candidate(1), 1)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183801
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+# The Brazilian factorial is defined as:
+# brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+# where n > 0
+# For example:
+# >>> special_factorial(4)
+# 288
+# The function will receive an integer as input and should return the special
+# factorial of this integer.
+# Brazilian factorial (special factorial) implementation
+special_factorial <- function(n) {
+  # Validate input
+  if (!is.numeric(n) || length(n) != 1 || n <= 0 || floor(n) != n) {
+    stop("n must be a positive integer")
+  }
+  
+  # Compute the product of factorials from 1! up to n!
+  result <- 1
+  for (k in 1:n) {
+    result <- result * factorial(k)
+  }
+  
+  return(result)
+}
+test_humaneval <- function() {
+    candidate <- special_factorial
+    stopifnot(isTRUE(all.equal(candidate(4), 288)))
+    stopifnot(isTRUE(all.equal(candidate(5), 34560)))
+    stopifnot(isTRUE(all.equal(candidate(7), 125411328000)))
+    stopifnot(isTRUE(all.equal(candidate(1), 1)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183801
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+# The Brazilian factorial is defined as:
+# brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+# where n > 0
+# For example:
+# >>> special_factorial(4)
+# 288
+# The function will receive an integer as input and should return the special
+# factorial of this integer.
+# The Brazilian factorial is defined as:
+# brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+# where n > 0
+# For example:
+# >>> special_factorial(4)
+# 288
+# The function will receive an integer as input and should return the special
+# factorial of this integer.
+
+special_factorial <- function(n) {
+  if (!is.numeric(n) || length(n) != 1 || n <= 0 || floor(n) != n) {
+    stop("Input must be a positive integer.")
+  }
+  
+  # Compute factorials for 1:n and take the product
+  prod(sapply(1:n, factorial))
+}
+test_humaneval <- function() {
+    candidate <- special_factorial
+    stopifnot(isTRUE(all.equal(candidate(4), 288)))
+    stopifnot(isTRUE(all.equal(candidate(5), 34560)))
+    stopifnot(isTRUE(all.equal(candidate(7), 125411328000)))
+    stopifnot(isTRUE(all.equal(candidate(1), 1)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183801
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 144 (R) - HumanEval_144_simplify
+================================================================================
+
+PROMPT:
+----------------------------------------
+# Your task is to implement a function that will simplify the expression
+# x * n. The function returns TRUE if x * n evaluates to a whole number and FALSE
+# otherwise. Both x and n, are string representation of a fraction, and have the following format,
+# <numerator>/<denominator> where both numerator and denominator are positive whole numbers.
+# You can assume that x, and n are valid fractions, and do not have zero as denominator.
+# >>> simplify('1/5', '5/1')
+# TRUE
+# >>> simplify('1/6', '2/1')
+# FALSE
+# >>> simplify('7/10', '10/2')
+# FALSE
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+test_humaneval <- function() {
+    candidate <- simplify
+    stopifnot(isTRUE(all.equal(candidate('1/5', '5/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/6', '2/1'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('5/1', '3/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('7/10', '10/2'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('2/10', '50/10'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('7/2', '4/2'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('11/6', '6/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('2/3', '5/2'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('5/2', '3/5'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('2/4', '8/4'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('2/4', '4/2'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/5', '5/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/5', '1/5'), FALSE)))
+}
+test_humaneval()
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+# Your task is to implement a function that will simplify the expression
+# x * n. The function returns TRUE if x * n evaluates to a whole number and FALSE
+# otherwise. Both x and n, are string representation of a fraction, and have the following format,
+# <numerator>/<denominator> where both numerator and denominator are positive whole numbers.
+# You can assume that x, and n are valid fractions, and do not have zero as denominator.
+# >>> simplify('1/5', '5/1')
+# TRUE
+# >>> simplify('1/6', '2/1')
+# FALSE
+# >>> simplify('7/10', '10/2')
+# FALSE
+simplify <- function(x, n) {
+  # Helper to split a fraction string into numerator and denominator
+  parse_fraction <- function(frac) {
+    parts <- strsplit(frac, "/")[[1]]
+    as.numeric(parts)  # returns c(numerator, denominator)
+  }
+  
+  # Parse both fractions
+  x_parts <- parse_fraction(x)
+  n_parts <- parse_fraction(n)
+  
+  # Compute numerator and denominator of the product
+  num <- x_parts[1] * n_parts[1]
+  den <- x_parts[2] * n_parts[2]
+  
+  # Return TRUE if the product is a whole number
+  num %% den == 0
+}
+test_humaneval <- function() {
+    candidate <- simplify
+    stopifnot(isTRUE(all.equal(candidate('1/5', '5/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/6', '2/1'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('5/1', '3/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('7/10', '10/2'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('2/10', '50/10'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('7/2', '4/2'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('11/6', '6/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('2/3', '5/2'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('5/2', '3/5'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('2/4', '8/4'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('2/4', '4/2'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/5', '5/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/5', '1/5'), FALSE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183804
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+# Your task is to implement a function that will simplify the expression
+# x * n. The function returns TRUE if x * n evaluates to a whole number and FALSE
+# otherwise. Both x and n, are string representation of a fraction, and have the following format,
+# <numerator>/<denominator> where both numerator and denominator are positive whole numbers.
+# You can assume that x, and n are valid fractions, and do not have zero as denominator.
+# >>> simplify('1/5', '5/1')
+# TRUE
+# >>> simplify('1/6', '2/1')
+# FALSE
+# >>> simplify('7/10', '10/2')
+# FALSE
+simplify <- function(x, n) {
+  # Helper to split a fraction string into numerator and denominator
+  parse_frac <- function(frac) {
+    parts <- as.integer(strsplit(frac, "/")[[1]])
+    list(num = parts[1], den = parts[2])
+  }
+  
+  fx <- parse_frac(x)
+  fn <- parse_frac(n)
+  
+  num <- fx$num * fn$num
+  den <- fx$den * fn$den
+  
+  # The product is an integer iff the denominator divides the numerator
+  return(num %% den == 0)
+}
+test_humaneval <- function() {
+    candidate <- simplify
+    stopifnot(isTRUE(all.equal(candidate('1/5', '5/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/6', '2/1'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('5/1', '3/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('7/10', '10/2'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('2/10', '50/10'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('7/2', '4/2'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('11/6', '6/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('2/3', '5/2'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('5/2', '3/5'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('2/4', '8/4'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('2/4', '4/2'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/5', '5/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/5', '1/5'), FALSE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183804
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+# Your task is to implement a function that will simplify the expression
+# x * n. The function returns TRUE if x * n evaluates to a whole number and FALSE
+# otherwise. Both x and n, are string representation of a fraction, and have the following format,
+# <numerator>/<denominator> where both numerator and denominator are positive whole numbers.
+# You can assume that x, and n are valid fractions, and do not have zero as denominator.
+# >>> simplify('1/5', '5/1')
+# TRUE
+# >>> simplify('1/6', '2/1')
+# FALSE
+# >>> simplify('7/10', '10/2')
+# FALSE
+simplify <- function(x, n) {
+  # Helper to split a fraction string into numerator and denominator
+  parse_frac <- function(frac) {
+    parts <- strsplit(frac, "/", fixed = TRUE)[[1]]
+    as.integer(parts)
+  }
+  
+  # Parse both fractions
+  a_b <- parse_frac(x)
+  c_d <- parse_frac(n)
+  
+  # Compute the product
+  num <- a_b[1] * c_d[1]   # numerator of the product
+  den <- a_b[2] * c_d[2]   # denominator of the product
+  
+  # Check if the product is a whole number
+  num %% den == 0
+}
+test_humaneval <- function() {
+    candidate <- simplify
+    stopifnot(isTRUE(all.equal(candidate('1/5', '5/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/6', '2/1'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('5/1', '3/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('7/10', '10/2'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('2/10', '50/10'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('7/2', '4/2'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('11/6', '6/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('2/3', '5/2'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('5/2', '3/5'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('2/4', '8/4'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('2/4', '4/2'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/5', '5/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/5', '1/5'), FALSE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183804
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+# Your task is to implement a function that will simplify the expression
+# x * n. The function returns TRUE if x * n evaluates to a whole number and FALSE
+# otherwise. Both x and n, are string representation of a fraction, and have the following format,
+# <numerator>/<denominator> where both numerator and denominator are positive whole numbers.
+# You can assume that x, and n are valid fractions, and do not have zero as denominator.
+# >>> simplify('1/5', '5/1')
+# TRUE
+# >>> simplify('1/6', '2/1')
+# FALSE
+# >>> simplify('7/10', '10/2')
+# FALSE
+simplify <- function(x, n) {
+  # Helper to parse a fraction string "a/b" into numeric components
+  parse_frac <- function(frac_str) {
+    parts <- strsplit(frac_str, "/", fixed = TRUE)[[1]]
+    as.integer(parts)
+  }
+  
+  # Parse both fractions
+  num_x <- parse_frac(x)[1]
+  den_x <- parse_frac(x)[2]
+  num_n <- parse_frac(n)[1]
+  den_n <- parse_frac(n)[2]
+  
+  # Compute product numerator and denominator
+  prod_num <- num_x * num_n
+  prod_den <- den_x * den_n
+  
+  # Check if product is an integer
+  prod_num %% prod_den == 0
+}
+test_humaneval <- function() {
+    candidate <- simplify
+    stopifnot(isTRUE(all.equal(candidate('1/5', '5/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/6', '2/1'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('5/1', '3/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('7/10', '10/2'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('2/10', '50/10'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('7/2', '4/2'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('11/6', '6/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('2/3', '5/2'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('5/2', '3/5'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('2/4', '8/4'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('2/4', '4/2'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/5', '5/1'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('1/5', '1/5'), FALSE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183804
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 151 (R) - HumanEval_151_double_the_difference
+================================================================================
+
+PROMPT:
+----------------------------------------
+# Given a list of numbers, return the sum of squares of the numbers
+# in the list that are odd. Ignore numbers that are negative or not integers.
+# >>> double_the_difference(c(1, 3, 2, 0))
+# 10
+# >>> double_the_difference(c(-1, -2, 0))
+# 0
+# >>> double_the_difference(c(9, -2))
+# 81
+# >>> double_the_difference(c(0))
+# 0
+# If the input list is empty, return 0.
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+test_humaneval <- function() {
+    candidate <- double_the_difference
+    stopifnot(isTRUE(all.equal(candidate(c()), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(5.0, 4.0)), 25)))
+    stopifnot(isTRUE(all.equal(candidate(c(0.1, 0.2, 0.3)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(-10.0, -20.0, -30.0)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(-1.0, -2.0, 8.0)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(0.2, 3.0, 5.0)), 34)))
+    stopifnot(isTRUE(all.equal(candidate(c(-9.0, -7.0, -5.0, -3.0, -1.0, 1.0, 3.0, 5.0, 7.0, 9.0)), 165)))
+}
+test_humaneval()
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+# Given a list of numbers, return the sum of squares of the numbers
+# in the list that are odd. Ignore numbers that are negative or not integers.
+# >>> double_the_difference(c(1, 3, 2, 0))
+# 10
+# >>> double_the_difference(c(-1, -2, 0))
+# 0
+# >>> double_the_difference(c(9, -2))
+# 81
+# >>> double_the_difference(c(0))
+# 0
+# If the input list is empty, return 0.
+double_the_difference <- function(lst) {
+  # Return 0 immediately for an empty input
+  if (length(lst) == 0) return(0)
+
+  # Keep only non‑negative integers (ignoring NAs and non‑finite values)
+  is_int  <- !is.na(lst) & is.finite(lst) & floor(lst) == lst
+  is_pos  <- lst >= 0
+  valid   <- is_int & is_pos
+
+  # From those, keep only the odd numbers
+  odd <- valid & (lst %% 2 != 0)
+
+  # Sum the squares of the remaining values
+  sum(lst[odd]^2, na.rm = TRUE)
+}
+test_humaneval <- function() {
+    candidate <- double_the_difference
+    stopifnot(isTRUE(all.equal(candidate(c()), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(5.0, 4.0)), 25)))
+    stopifnot(isTRUE(all.equal(candidate(c(0.1, 0.2, 0.3)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(-10.0, -20.0, -30.0)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(-1.0, -2.0, 8.0)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(0.2, 3.0, 5.0)), 34)))
+    stopifnot(isTRUE(all.equal(candidate(c(-9.0, -7.0, -5.0, -3.0, -1.0, 1.0, 3.0, 5.0, 7.0, 9.0)), 165)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183807
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+# Given a list of numbers, return the sum of squares of the numbers
+# in the list that are odd. Ignore numbers that are negative or not integers.
+# >>> double_the_difference(c(1, 3, 2, 0))
+# 10
+# >>> double_the_difference(c(-1, -2, 0))
+# 0
+# >>> double_the_difference(c(9, -2))
+# 81
+# >>> double_the_difference(c(0))
+# 0
+# If the input list is empty, return 0.
+# Given a list of numbers, return the sum of squares of the numbers
+# that are odd. Ignore numbers that are negative or not integers.
+# >>> double_the_difference(c(1, 3, 2, 0))
+# 10
+# >>> double_the_difference(c(-1, -2, 0))
+# 0
+# >>> double_the_difference(c(9, -2))
+# 81
+# >>> double_the_difference(c(0))
+# 0
+# If the input list is empty, return 0.
+double_the_difference <- function(lst) {
+  # Ensure input is a numeric vector; if not, coerce to numeric
+  nums <- as.numeric(lst)
+  
+  # Identify valid numbers:
+  # 1. Positive (non‑negative but odd numbers are always >0)
+  # 2. Integer values
+  # 3. Odd numbers
+  valid <- nums > 0 &
+           nums == floor(nums) &
+           nums %% 2 != 0
+  
+  # Compute the sum of squares of the valid numbers
+  sum(nums[valid]^2, na.rm = TRUE)
+}
+test_humaneval <- function() {
+    candidate <- double_the_difference
+    stopifnot(isTRUE(all.equal(candidate(c()), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(5.0, 4.0)), 25)))
+    stopifnot(isTRUE(all.equal(candidate(c(0.1, 0.2, 0.3)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(-10.0, -20.0, -30.0)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(-1.0, -2.0, 8.0)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(0.2, 3.0, 5.0)), 34)))
+    stopifnot(isTRUE(all.equal(candidate(c(-9.0, -7.0, -5.0, -3.0, -1.0, 1.0, 3.0, 5.0, 7.0, 9.0)), 165)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183807
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+# Given a list of numbers, return the sum of squares of the numbers
+# in the list that are odd. Ignore numbers that are negative or not integers.
+# >>> double_the_difference(c(1, 3, 2, 0))
+# 10
+# >>> double_the_difference(c(-1, -2, 0))
+# 0
+# >>> double_the_difference(c(9, -2))
+# 81
+# >>> double_the_difference(c(0))
+# 0
+# If the input list is empty, return 0.
+# Given a list of numbers, return the sum of squares of the numbers
+# that are odd. Ignore numbers that are negative or not integers.
+# >>> double_the_difference(c(1, 3, 2, 0))
+# 10
+# >>> double_the_difference(c(-1, -2, 0))
+# 0
+# >>> double_the_difference(c(9, -2))
+# 81
+# >>> double_the_difference(c(0))
+# 0
+# If the input list is empty, return 0.
+double_the_difference <- function(lst) {
+  # Handle empty input
+  if (length(lst) == 0) {
+    return(0)
+  }
+  
+  # Ensure we only consider numeric values
+  # (the examples use numeric vectors, so we can safely treat `lst` as numeric)
+  # Filter for positive, integer, odd numbers
+  valid <- lst > 0 & lst == floor(lst) & lst %% 2 == 1
+  
+  # Extract the valid elements
+  odd_integers <- lst[valid]
+  
+  # Compute the sum of squares
+  result <- sum(odd_integers^2)
+  
+  return(result)
+}
+test_humaneval <- function() {
+    candidate <- double_the_difference
+    stopifnot(isTRUE(all.equal(candidate(c()), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(5.0, 4.0)), 25)))
+    stopifnot(isTRUE(all.equal(candidate(c(0.1, 0.2, 0.3)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(-10.0, -20.0, -30.0)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(-1.0, -2.0, 8.0)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(0.2, 3.0, 5.0)), 34)))
+    stopifnot(isTRUE(all.equal(candidate(c(-9.0, -7.0, -5.0, -3.0, -1.0, 1.0, 3.0, 5.0, 7.0, 9.0)), 165)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183807
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+# Given a list of numbers, return the sum of squares of the numbers
+# in the list that are odd. Ignore numbers that are negative or not integers.
+# >>> double_the_difference(c(1, 3, 2, 0))
+# 10
+# >>> double_the_difference(c(-1, -2, 0))
+# 0
+# >>> double_the_difference(c(9, -2))
+# 81
+# >>> double_the_difference(c(0))
+# 0
+# If the input list is empty, return 0.
+# Given a list of numbers, return the sum of squares of the numbers
+# that are odd. Ignore numbers that are negative or not integers.
+# >>> double_the_difference(c(1, 3, 2, 0))
+# 10
+# >>> double_the_difference(c(-1, -2, 0))
+# 0
+# >>> double_the_difference(c(9, -2))
+# 81
+# >>> double_the_difference(c(0))
+# 0
+# If the input list is empty, return 0.
+double_the_difference <- function(lst) {
+  # Handle empty input explicitly
+  if (length(lst) == 0) return(0)
+  
+  # Keep only non‑negative integers that are odd
+  is_valid <- lst >= 0 & lst == floor(lst) & (lst %% 2 == 1)
+  
+  # Sum the squares of the valid numbers
+  sum(lst[is_valid]^2)
+}
+test_humaneval <- function() {
+    candidate <- double_the_difference
+    stopifnot(isTRUE(all.equal(candidate(c()), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(5.0, 4.0)), 25)))
+    stopifnot(isTRUE(all.equal(candidate(c(0.1, 0.2, 0.3)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(-10.0, -20.0, -30.0)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(-1.0, -2.0, 8.0)), 0)))
+    stopifnot(isTRUE(all.equal(candidate(c(0.2, 3.0, 5.0)), 34)))
+    stopifnot(isTRUE(all.equal(candidate(c(-9.0, -7.0, -5.0, -3.0, -1.0, 1.0, 3.0, 5.0, 7.0, 9.0)), 165)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183807
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 152 (R) - HumanEval_152_compare
+================================================================================
+
+PROMPT:
+----------------------------------------
+# I think we all remember that feeling when the result of some long-awaited
+# event is finally known. The feelings and thoughts you have at that moment are
+# definitely worth noting down and comparing.
+# Your task is to determine if a person correctly guessed the results of a number of matches.
+# You are given two vectors of scores and guesses of equal length, where each index shows a match. 
+# Return a vector of the same length denoting how far off each guess was. If they have guessed correctly,
+# the value is 0, and if not, the value is the absolute difference between the guess and the score.
+# example:
+# >>> compare(c(1, 2, 3, 4, 5, 1), c(1, 2, 3, 4, 2, -2))
+# c(0, 0, 0, 0, 3, 3)
+# >>> compare(c(0, 5, 0, 0, 0, 4), c(4, 1, 1, 0, 0, -2))
+# c(4, 4, 1, 0, 0, 6)
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+test_humaneval <- function() {
+    candidate <- compare
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3, 4, 5, 1), c(1, 2, 3, 4, 2, -2)), c(0, 0, 0, 0, 3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(c(0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0)), c(0, 0, 0, 0, 0, 0))))
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3), c(-1, -2, -3)), c(2, 4, 6))))
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3, 5), c(-1, 2, 3, 4)), c(2, 0, 0, 1))))
+}
+test_humaneval()
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+# I think we all remember that feeling when the result of some long-awaited
+# event is finally known. The feelings and thoughts you have at that moment are
+# definitely worth noting down and comparing.
+# Your task is to determine if a person correctly guessed the results of a number of matches.
+# You are given two vectors of scores and guesses of equal length, where each index shows a match. 
+# Return a vector of the same length denoting how far off each guess was. If they have guessed correctly,
+# the value is 0, and if not, the value is the absolute difference between the guess and the score.
+# example:
+# >>> compare(c(1, 2, 3, 4, 5, 1), c(1, 2, 3, 4, 2, -2))
+# c(0, 0, 0, 0, 3, 3)
+# >>> compare(c(0, 5, 0, 0, 0, 4), c(4, 1, 1, 0, 0, -2))
+# c(4, 4, 1, 0, 0, 6)
+compare <- function(game, guess) {
+  # Ensure the inputs are of the same length
+  if (length(game) != length(guess)) {
+    stop("Vectors must be the same length")
+  }
+  
+  # Compute absolute differences – this naturally gives 0 for correct guesses
+  abs(game - guess)
+}
+test_humaneval <- function() {
+    candidate <- compare
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3, 4, 5, 1), c(1, 2, 3, 4, 2, -2)), c(0, 0, 0, 0, 3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(c(0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0)), c(0, 0, 0, 0, 0, 0))))
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3), c(-1, -2, -3)), c(2, 4, 6))))
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3, 5), c(-1, 2, 3, 4)), c(2, 0, 0, 1))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183808
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+# I think we all remember that feeling when the result of some long-awaited
+# event is finally known. The feelings and thoughts you have at that moment are
+# definitely worth noting down and comparing.
+# Your task is to determine if a person correctly guessed the results of a number of matches.
+# You are given two vectors of scores and guesses of equal length, where each index shows a match. 
+# Return a vector of the same length denoting how far off each guess was. If they have guessed correctly,
+# the value is 0, and if not, the value is the absolute difference between the guess and the score.
+# example:
+# >>> compare(c(1, 2, 3, 4, 5, 1), c(1, 2, 3, 4, 2, -2))
+# c(0, 0, 0, 0, 3, 3)
+# >>> compare(c(0, 5, 0, 0, 0, 4), c(4, 1, 1, 0, 0, -2))
+# c(4, 4, 1, 0, 0, 6)
+compare <- function(game, guess) {
+  # Ensure the inputs are numeric vectors of the same length
+  if (length(game) != length(guess)) {
+    stop("Vectors 'game' and 'guess' must be of the same length.")
+  }
+  # Compute absolute difference; if the guess matches the score, the result will be 0
+  abs(game - guess)
+}
+test_humaneval <- function() {
+    candidate <- compare
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3, 4, 5, 1), c(1, 2, 3, 4, 2, -2)), c(0, 0, 0, 0, 3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(c(0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0)), c(0, 0, 0, 0, 0, 0))))
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3), c(-1, -2, -3)), c(2, 4, 6))))
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3, 5), c(-1, 2, 3, 4)), c(2, 0, 0, 1))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183808
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+# I think we all remember that feeling when the result of some long-awaited
+# event is finally known. The feelings and thoughts you have at that moment are
+# definitely worth noting down and comparing.
+# Your task is to determine if a person correctly guessed the results of a number of matches.
+# You are given two vectors of scores and guesses of equal length, where each index shows a match. 
+# Return a vector of the same length denoting how far off each guess was. If they have guessed correctly,
+# the value is 0, and if not, the value is the absolute difference between the guess and the score.
+# example:
+# >>> compare(c(1, 2, 3, 4, 5, 1), c(1, 2, 3, 4, 2, -2))
+# c(0, 0, 0, 0, 3, 3)
+# >>> compare(c(0, 5, 0, 0, 0, 4), c(4, 1, 1, 0, 0, -2))
+# c(4, 4, 1, 0, 0, 6)
+compare <- function(game, guess) {
+  # Ensure inputs are numeric vectors of the same length
+  if (!is.numeric(game) || !is.numeric(guess)) {
+    stop("Both 'game' and 'guess' must be numeric vectors.")
+  }
+  if (length(game) != length(guess)) {
+    stop("'game' and 'guess' must have the same length.")
+  }
+  
+  # Return the absolute difference for each match
+  abs(game - guess)
+}
+test_humaneval <- function() {
+    candidate <- compare
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3, 4, 5, 1), c(1, 2, 3, 4, 2, -2)), c(0, 0, 0, 0, 3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(c(0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0)), c(0, 0, 0, 0, 0, 0))))
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3), c(-1, -2, -3)), c(2, 4, 6))))
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3, 5), c(-1, 2, 3, 4)), c(2, 0, 0, 1))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183808
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+# I think we all remember that feeling when the result of some long-awaited
+# event is finally known. The feelings and thoughts you have at that moment are
+# definitely worth noting down and comparing.
+# Your task is to determine if a person correctly guessed the results of a number of matches.
+# You are given two vectors of scores and guesses of equal length, where each index shows a match. 
+# Return a vector of the same length denoting how far off each guess was. If they have guessed correctly,
+# the value is 0, and if not, the value is the absolute difference between the guess and the score.
+# example:
+# >>> compare(c(1, 2, 3, 4, 5, 1), c(1, 2, 3, 4, 2, -2))
+# c(0, 0, 0, 0, 3, 3)
+# >>> compare(c(0, 5, 0, 0, 0, 4), c(4, 1, 1, 0, 0, -2))
+# c(4, 4, 1, 0, 0, 6)
+compare <- function(game, guess) {
+  # Ensure the input vectors are of equal length
+  if (length(game) != length(guess)) {
+    stop("Vectors 'game' and 'guess' must be of the same length.")
+  }
+  
+  # Calculate the absolute difference for each match
+  abs_diff <- abs(game - guess)
+  
+  return(abs_diff)
+}
+test_humaneval <- function() {
+    candidate <- compare
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3, 4, 5, 1), c(1, 2, 3, 4, 2, -2)), c(0, 0, 0, 0, 3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(c(0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0)), c(0, 0, 0, 0, 0, 0))))
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3), c(-1, -2, -3)), c(2, 4, 6))))
+    stopifnot(isTRUE(all.equal(candidate(c(1, 2, 3, 5), c(-1, 2, 3, 4)), c(2, 0, 0, 1))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183808
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 154 (R) - HumanEval_154_cycpattern_check
+================================================================================
+
+PROMPT:
+----------------------------------------
+# You are given 2 words. You need to return TRUE if the second word or any of its rotations is a substring in the first word
+# >>> cycpattern_check('abcd', 'abd')
+# FALSE
+# >>> cycpattern_check('hello', 'ell')
+# TRUE
+# >>> cycpattern_check('whassup', 'psus')
+# FALSE
+# >>> cycpattern_check('abab', 'baa')
+# TRUE
+# >>> cycpattern_check('efef', 'eeff')
+# FALSE
+# >>> cycpattern_check('himenss', 'simen')
+# TRUE
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+test_humaneval <- function() {
+    candidate <- cycpattern_check
+    stopifnot(isTRUE(all.equal(candidate('xyzw', 'xyw'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('yello', 'ell'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('whattup', 'ptut'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('efef', 'fee'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('abab', 'aabb'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('winemtt', 'tinem'), TRUE)))
+}
+test_humaneval()
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+# You are given 2 words. You need to return TRUE if the second word or any of its rotations is a substring in the first word
+# >>> cycpattern_check('abcd', 'abd')
+# FALSE
+# >>> cycpattern_check('hello', 'ell')
+# TRUE
+# >>> cycpattern_check('whassup', 'psus')
+# FALSE
+# >>> cycpattern_check('abab', 'baa')
+# TRUE
+# >>> cycpattern_check('efef', 'eeff')
+# FALSE
+# >>> cycpattern_check('himenss', 'simen')
+# TRUE
+# Return TRUE if any rotation of `b` appears as a substring of `a`
+cycpattern_check <- function(a, b) {
+  # If `b` is empty, it can't match anything
+  if (nchar(b) == 0) return(FALSE)
+  
+  n <- nchar(b)
+  
+  # Check each rotation of `b`
+  for (i in 0:(n-1)) {
+    # Rotate left by `i` positions
+    rot <- paste0(substr(b, i + 1, n), substr(b, 1, i))
+    
+    # Look for the rotation in `a` (fixed string matching)
+    if (grepl(rot, a, fixed = TRUE)) {
+      return(TRUE)
+    }
+  }
+  
+  # No rotation matched
+  return(FALSE)
+}
+test_humaneval <- function() {
+    candidate <- cycpattern_check
+    stopifnot(isTRUE(all.equal(candidate('xyzw', 'xyw'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('yello', 'ell'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('whattup', 'ptut'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('efef', 'fee'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('abab', 'aabb'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('winemtt', 'tinem'), TRUE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183809
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+# You are given 2 words. You need to return TRUE if the second word or any of its rotations is a substring in the first word
+# >>> cycpattern_check('abcd', 'abd')
+# FALSE
+# >>> cycpattern_check('hello', 'ell')
+# TRUE
+# >>> cycpattern_check('whassup', 'psus')
+# FALSE
+# >>> cycpattern_check('abab', 'baa')
+# TRUE
+# >>> cycpattern_check('efef', 'eeff')
+# FALSE
+# >>> cycpattern_check('himenss', 'simen')
+# TRUE
+# You are given 2 words. You need to return TRUE if the second word or any of its rotations is a substring in the first word
+# >>> cycpattern_check('abcd', 'abd')
+# FALSE
+# >>> cycpattern_check('hello', 'ell')
+# TRUE
+# >>> cycpattern_check('whassup', 'psus')
+# FALSE
+# >>> cycpattern_check('abab', 'baa')
+# TRUE
+# >>> cycpattern_check('efef', 'eeff')
+# FALSE
+# >>> cycpattern_check('himenss', 'simen')
+# TRUE
+
+cycpattern_check <- function(a, b) {
+  # Quick exit if the pattern is longer than the text
+  if (nchar(b) > nchar(a)) return(FALSE)
+  
+  # Generate all cyclic rotations of b
+  len <- nchar(b)
+  rotations <- sapply(0:(len - 1), function(i) {
+    if (i == 0) {
+      b
+    } else {
+      paste0(substr(b, i + 1, len), substr(b, 1, i))
+    }
+  })
+  
+  # Check whether any rotation appears as a substring in a
+  any(sapply(rotations, function(r) grepl(r, a, fixed = TRUE)))
+}
+test_humaneval <- function() {
+    candidate <- cycpattern_check
+    stopifnot(isTRUE(all.equal(candidate('xyzw', 'xyw'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('yello', 'ell'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('whattup', 'ptut'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('efef', 'fee'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('abab', 'aabb'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('winemtt', 'tinem'), TRUE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183809
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+# You are given 2 words. You need to return TRUE if the second word or any of its rotations is a substring in the first word
+# >>> cycpattern_check('abcd', 'abd')
+# FALSE
+# >>> cycpattern_check('hello', 'ell')
+# TRUE
+# >>> cycpattern_check('whassup', 'psus')
+# FALSE
+# >>> cycpattern_check('abab', 'baa')
+# TRUE
+# >>> cycpattern_check('efef', 'eeff')
+# FALSE
+# >>> cycpattern_check('himenss', 'simen')
+# TRUE
+# You are given 2 words. You need to return TRUE if the second word or any of its rotations is a substring in the first word
+# >>> cycpattern_check('abcd', 'abd')
+# FALSE
+# >>> cycpattern_check('hello', 'ell')
+# TRUE
+# >>> cycpattern_check('whassup', 'psus')
+# FALSE
+# >>> cycpattern_check('abab', 'baa')
+# TRUE
+# >>> cycpattern_check('efef', 'eeff')
+# FALSE
+# >>> cycpattern_check('himenss', 'simen')
+# TRUE
+
+cycpattern_check <- function(a, b) {
+  # If b is empty, it's trivially a substring
+  if (nchar(b) == 0) return(TRUE)
+  
+  # If a is shorter than b, impossible
+  if (nchar(a) < nchar(b)) return(FALSE)
+  
+  # Generate all rotations of b
+  n <- nchar(b)
+  rotations <- sapply(0:(n-1), function(i) {
+    paste0(substr(b, i + 1, n), substr(b, 1, i))
+  })
+  
+  # Check if any rotation is a substring of a
+  any(sapply(rotations, function(r) grepl(r, a, fixed = TRUE)))
+}
+test_humaneval <- function() {
+    candidate <- cycpattern_check
+    stopifnot(isTRUE(all.equal(candidate('xyzw', 'xyw'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('yello', 'ell'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('whattup', 'ptut'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('efef', 'fee'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('abab', 'aabb'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('winemtt', 'tinem'), TRUE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183809
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+# You are given 2 words. You need to return TRUE if the second word or any of its rotations is a substring in the first word
+# >>> cycpattern_check('abcd', 'abd')
+# FALSE
+# >>> cycpattern_check('hello', 'ell')
+# TRUE
+# >>> cycpattern_check('whassup', 'psus')
+# FALSE
+# >>> cycpattern_check('abab', 'baa')
+# TRUE
+# >>> cycpattern_check('efef', 'eeff')
+# FALSE
+# >>> cycpattern_check('himenss', 'simen')
+# TRUE
+# You are given 2 words. You need to return TRUE if the second word or any of its rotations is a substring in the first word
+# >>> cycpattern_check('abcd', 'abd')
+# FALSE
+# >>> cycpattern_check('hello', 'ell')
+# TRUE
+# >>> cycpattern_check('whassup', 'psus')
+# FALSE
+# >>> cycpattern_check('abab', 'baa')
+# TRUE
+# >>> cycpattern_check('efef', 'eeff')
+# FALSE
+# >>> cycpattern_check('himenss', 'simen')
+# TRUE
+cycpattern_check <- function(a, b) {
+  # If the pattern is longer than the text, it can never be a substring
+  if (nchar(b) > nchar(a)) {
+    return(FALSE)
+  }
+
+  # Length of the pattern
+  m <- nchar(b)
+
+  # Concatenate the pattern with itself so that every rotation
+  # appears as a contiguous substring of length m.
+  doubled <- paste0(b, b)
+
+  # Check each rotation
+  for (i in seq_len(m)) {          # i goes from 1 to m
+    # Extract rotation starting at position i
+    rot <- substr(doubled, i, i + m - 1)
+    # Look for the rotation inside the text
+    if (grepl(rot, a, fixed = TRUE)) {
+      return(TRUE)
+    }
+  }
+
+  # No rotation matched
+  return(FALSE)
+}
+test_humaneval <- function() {
+    candidate <- cycpattern_check
+    stopifnot(isTRUE(all.equal(candidate('xyzw', 'xyw'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('yello', 'ell'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('whattup', 'ptut'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('efef', 'fee'), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate('abab', 'aabb'), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate('winemtt', 'tinem'), TRUE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183809
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 155 (R) - HumanEval_155_even_odd_count
+================================================================================
+
+PROMPT:
+----------------------------------------
+# Given an integer. return a list that has the number of even and odd digits respectively.
+# Example:
+#     >>> even_odd_count(-12)
+#     c(1, 1)
+#     >>> even_odd_count(123)
+#     c(1, 2)
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+test_humaneval <- function() {
+    candidate <- even_odd_count
+    stopifnot(isTRUE(all.equal(candidate(7), c(0, 1))))
+    stopifnot(isTRUE(all.equal(candidate(-78), c(1, 1))))
+    stopifnot(isTRUE(all.equal(candidate(3452), c(2, 2))))
+    stopifnot(isTRUE(all.equal(candidate(346211), c(3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(-345821), c(3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(-2), c(1, 0))))
+    stopifnot(isTRUE(all.equal(candidate(-45347), c(2, 3))))
+    stopifnot(isTRUE(all.equal(candidate(0), c(1, 0))))
+}
+test_humaneval()
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+# Given an integer. return a list that has the number of even and odd digits respectively.
+# Example:
+#     >>> even_odd_count(-12)
+#     c(1, 1)
+#     >>> even_odd_count(123)
+#     c(1, 2)
+even_odd_count <- function(num) {
+  # Work with the absolute value so that negative signs are ignored
+  abs_num <- abs(num)
+
+  # Split the number into its individual digits
+  digits <- as.integer(strsplit(as.character(abs_num), "")[[1]])
+
+  # Count even and odd digits
+  even_count <- sum(digits %% 2 == 0)
+  odd_count  <- sum(digits %% 2 != 0)
+
+  # Return a vector with even count first, then odd count
+  c(even_count, odd_count)
+}
+test_humaneval <- function() {
+    candidate <- even_odd_count
+    stopifnot(isTRUE(all.equal(candidate(7), c(0, 1))))
+    stopifnot(isTRUE(all.equal(candidate(-78), c(1, 1))))
+    stopifnot(isTRUE(all.equal(candidate(3452), c(2, 2))))
+    stopifnot(isTRUE(all.equal(candidate(346211), c(3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(-345821), c(3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(-2), c(1, 0))))
+    stopifnot(isTRUE(all.equal(candidate(-45347), c(2, 3))))
+    stopifnot(isTRUE(all.equal(candidate(0), c(1, 0))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183809
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+# Given an integer. return a list that has the number of even and odd digits respectively.
+# Example:
+#     >>> even_odd_count(-12)
+#     c(1, 1)
+#     >>> even_odd_count(123)
+#     c(1, 2)
+even_odd_count <- function(num) {
+  # Work with absolute value to ignore sign
+  digits <- unlist(strsplit(as.character(abs(num)), split = ""))
+  # Convert to numeric
+  digits <- as.integer(digits)
+  # Count evens and odds
+  even <- sum(digits %% 2 == 0)
+  odd  <- sum(digits %% 2 == 1)
+  # Return as a vector: first even, then odd
+  c(even, odd)
+}
+test_humaneval <- function() {
+    candidate <- even_odd_count
+    stopifnot(isTRUE(all.equal(candidate(7), c(0, 1))))
+    stopifnot(isTRUE(all.equal(candidate(-78), c(1, 1))))
+    stopifnot(isTRUE(all.equal(candidate(3452), c(2, 2))))
+    stopifnot(isTRUE(all.equal(candidate(346211), c(3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(-345821), c(3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(-2), c(1, 0))))
+    stopifnot(isTRUE(all.equal(candidate(-45347), c(2, 3))))
+    stopifnot(isTRUE(all.equal(candidate(0), c(1, 0))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183809
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+# Given an integer. return a list that has the number of even and odd digits respectively.
+# Example:
+#     >>> even_odd_count(-12)
+#     c(1, 1)
+#     >>> even_odd_count(123)
+#     c(1, 2)
+even_odd_count <- function(num) {
+  # Work with the absolute value so that negative signs are ignored
+  abs_num <- abs(num)
+  
+  # Split the number into its individual digits
+  digits <- as.integer(strsplit(as.character(abs_num), "")[[1]])
+  
+  # Count even and odd digits
+  even_count <- sum(digits %% 2 == 0)
+  odd_count  <- sum(digits %% 2 == 1)
+  
+  # Return the counts as a vector (even first, odd second)
+  c(even_count, odd_count)
+}
+test_humaneval <- function() {
+    candidate <- even_odd_count
+    stopifnot(isTRUE(all.equal(candidate(7), c(0, 1))))
+    stopifnot(isTRUE(all.equal(candidate(-78), c(1, 1))))
+    stopifnot(isTRUE(all.equal(candidate(3452), c(2, 2))))
+    stopifnot(isTRUE(all.equal(candidate(346211), c(3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(-345821), c(3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(-2), c(1, 0))))
+    stopifnot(isTRUE(all.equal(candidate(-45347), c(2, 3))))
+    stopifnot(isTRUE(all.equal(candidate(0), c(1, 0))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183809
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+# Given an integer. return a list that has the number of even and odd digits respectively.
+# Example:
+#     >>> even_odd_count(-12)
+#     c(1, 1)
+#     >>> even_odd_count(123)
+#     c(1, 2)
+even_odd_count <- function(num) {
+  # Handle missing values
+  if (is.na(num)) {
+    return(c(NA, NA))
+  }
+  
+  # Work with the absolute value and ensure integer conversion
+  abs_num <- abs(as.integer(num))
+  
+  # Split the number into its individual digits
+  digits <- strsplit(as.character(abs_num), "")[[1]]
+  digits_int <- as.integer(digits)
+  
+  # Count even and odd digits
+  even_count <- sum(digits_int %% 2 == 0)
+  odd_count  <- sum(digits_int %% 2 == 1)
+  
+  # Return the counts as a vector
+  c(even_count, odd_count)
+}
+test_humaneval <- function() {
+    candidate <- even_odd_count
+    stopifnot(isTRUE(all.equal(candidate(7), c(0, 1))))
+    stopifnot(isTRUE(all.equal(candidate(-78), c(1, 1))))
+    stopifnot(isTRUE(all.equal(candidate(3452), c(2, 2))))
+    stopifnot(isTRUE(all.equal(candidate(346211), c(3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(-345821), c(3, 3))))
+    stopifnot(isTRUE(all.equal(candidate(-2), c(1, 0))))
+    stopifnot(isTRUE(all.equal(candidate(-45347), c(2, 3))))
+    stopifnot(isTRUE(all.equal(candidate(0), c(1, 0))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183809
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 156 (R) - HumanEval_156_int_to_mini_roman
+================================================================================
+
+PROMPT:
+----------------------------------------
+# Given a positive integer, obtain its roman numeral equivalent as a string,
+# and return it in lowercase.
+# Restrictions: 1 <= num <= 1000
+# Examples:
+# >>> int_to_mini_roman(19)
+# 'xix'
+# >>> int_to_mini_roman(152)
+# 'clii'
+# >>> int_to_mini_roman(426)
+# 'cdxxvi'
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+test_humaneval <- function() {
+    candidate <- int_to_mini_roman
+    stopifnot(isTRUE(all.equal(candidate(19), 'xix')))
+    stopifnot(isTRUE(all.equal(candidate(152), 'clii')))
+    stopifnot(isTRUE(all.equal(candidate(251), 'ccli')))
+    stopifnot(isTRUE(all.equal(candidate(426), 'cdxxvi')))
+    stopifnot(isTRUE(all.equal(candidate(500), 'd')))
+    stopifnot(isTRUE(all.equal(candidate(1), 'i')))
+    stopifnot(isTRUE(all.equal(candidate(4), 'iv')))
+    stopifnot(isTRUE(all.equal(candidate(43), 'xliii')))
+    stopifnot(isTRUE(all.equal(candidate(90), 'xc')))
+    stopifnot(isTRUE(all.equal(candidate(94), 'xciv')))
+    stopifnot(isTRUE(all.equal(candidate(532), 'dxxxii')))
+    stopifnot(isTRUE(all.equal(candidate(900), 'cm')))
+    stopifnot(isTRUE(all.equal(candidate(994), 'cmxciv')))
+    stopifnot(isTRUE(all.equal(candidate(1000), 'm')))
+}
+test_humaneval()
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+# Given a positive integer, obtain its roman numeral equivalent as a string,
+# and return it in lowercase.
+# Restrictions: 1 <= num <= 1000
+# Examples:
+# >>> int_to_mini_roman(19)
+# 'xix'
+# >>> int_to_mini_roman(152)
+# 'clii'
+# >>> int_to_mini_roman(426)
+# 'cdxxvi'
+int_to_mini_roman <- function(number) {
+  if (!is.numeric(number) || number < 1 || number > 1000) {
+    stop("Number must be an integer between 1 and 1000")
+  }
+  values  <- c(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+  symbols <- c("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I")
+  result  <- ""
+  n <- number
+  for (i in seq_along(values)) {
+    while (n >= values[i]) {
+      n <- n - values[i]
+      result <- paste0(result, symbols[i])
+    }
+  }
+  tolower(result)
+}
+test_humaneval <- function() {
+    candidate <- int_to_mini_roman
+    stopifnot(isTRUE(all.equal(candidate(19), 'xix')))
+    stopifnot(isTRUE(all.equal(candidate(152), 'clii')))
+    stopifnot(isTRUE(all.equal(candidate(251), 'ccli')))
+    stopifnot(isTRUE(all.equal(candidate(426), 'cdxxvi')))
+    stopifnot(isTRUE(all.equal(candidate(500), 'd')))
+    stopifnot(isTRUE(all.equal(candidate(1), 'i')))
+    stopifnot(isTRUE(all.equal(candidate(4), 'iv')))
+    stopifnot(isTRUE(all.equal(candidate(43), 'xliii')))
+    stopifnot(isTRUE(all.equal(candidate(90), 'xc')))
+    stopifnot(isTRUE(all.equal(candidate(94), 'xciv')))
+    stopifnot(isTRUE(all.equal(candidate(532), 'dxxxii')))
+    stopifnot(isTRUE(all.equal(candidate(900), 'cm')))
+    stopifnot(isTRUE(all.equal(candidate(994), 'cmxciv')))
+    stopifnot(isTRUE(all.equal(candidate(1000), 'm')))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183810
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+# Given a positive integer, obtain its roman numeral equivalent as a string,
+# and return it in lowercase.
+# Restrictions: 1 <= num <= 1000
+# Examples:
+# >>> int_to_mini_roman(19)
+# 'xix'
+# >>> int_to_mini_roman(152)
+# 'clii'
+# >>> int_to_mini_roman(426)
+# 'cdxxvi'
+int_to_mini_roman <- function(number) {
+  # Validate input
+  if (!is.numeric(number) || length(number) != 1 || number < 1 || number > 1000) {
+    stop("number must be an integer between 1 and 1000")
+  }
+  number <- as.integer(number)
+  
+  # Roman numeral mapping (descending order)
+  values <- c(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+  symbols <- c("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I")
+  
+  result <- character(0)
+  
+  for (i in seq_along(values)) {
+    while (number >= values[i]) {
+      number <- number - values[i]
+      result <- c(result, symbols[i])
+    }
+  }
+  
+  # Combine and convert to lowercase
+  paste0(tolower(result), collapse = "")
+}
+test_humaneval <- function() {
+    candidate <- int_to_mini_roman
+    stopifnot(isTRUE(all.equal(candidate(19), 'xix')))
+    stopifnot(isTRUE(all.equal(candidate(152), 'clii')))
+    stopifnot(isTRUE(all.equal(candidate(251), 'ccli')))
+    stopifnot(isTRUE(all.equal(candidate(426), 'cdxxvi')))
+    stopifnot(isTRUE(all.equal(candidate(500), 'd')))
+    stopifnot(isTRUE(all.equal(candidate(1), 'i')))
+    stopifnot(isTRUE(all.equal(candidate(4), 'iv')))
+    stopifnot(isTRUE(all.equal(candidate(43), 'xliii')))
+    stopifnot(isTRUE(all.equal(candidate(90), 'xc')))
+    stopifnot(isTRUE(all.equal(candidate(94), 'xciv')))
+    stopifnot(isTRUE(all.equal(candidate(532), 'dxxxii')))
+    stopifnot(isTRUE(all.equal(candidate(900), 'cm')))
+    stopifnot(isTRUE(all.equal(candidate(994), 'cmxciv')))
+    stopifnot(isTRUE(all.equal(candidate(1000), 'm')))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183810
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+# Given a positive integer, obtain its roman numeral equivalent as a string,
+# and return it in lowercase.
+# Restrictions: 1 <= num <= 1000
+# Examples:
+# >>> int_to_mini_roman(19)
+# 'xix'
+# >>> int_to_mini_roman(152)
+# 'clii'
+# >>> int_to_mini_roman(426)
+# 'cdxxvi'
+int_to_mini_roman <- function(number) {
+  # Mapping of integer values to Roman numeral symbols
+  values    <- c(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+  numerals  <- c("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I")
+  
+  result <- ""
+  
+  # Build the Roman numeral string by subtracting the largest possible value
+  for (i in seq_along(values)) {
+    while (number >= values[i]) {
+      result <- paste0(result, numerals[i])
+      number <- number - values[i]
+    }
+  }
+  
+  # Return lowercase representation
+  tolower(result)
+}
+test_humaneval <- function() {
+    candidate <- int_to_mini_roman
+    stopifnot(isTRUE(all.equal(candidate(19), 'xix')))
+    stopifnot(isTRUE(all.equal(candidate(152), 'clii')))
+    stopifnot(isTRUE(all.equal(candidate(251), 'ccli')))
+    stopifnot(isTRUE(all.equal(candidate(426), 'cdxxvi')))
+    stopifnot(isTRUE(all.equal(candidate(500), 'd')))
+    stopifnot(isTRUE(all.equal(candidate(1), 'i')))
+    stopifnot(isTRUE(all.equal(candidate(4), 'iv')))
+    stopifnot(isTRUE(all.equal(candidate(43), 'xliii')))
+    stopifnot(isTRUE(all.equal(candidate(90), 'xc')))
+    stopifnot(isTRUE(all.equal(candidate(94), 'xciv')))
+    stopifnot(isTRUE(all.equal(candidate(532), 'dxxxii')))
+    stopifnot(isTRUE(all.equal(candidate(900), 'cm')))
+    stopifnot(isTRUE(all.equal(candidate(994), 'cmxciv')))
+    stopifnot(isTRUE(all.equal(candidate(1000), 'm')))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183810
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+# Given a positive integer, obtain its roman numeral equivalent as a string,
+# and return it in lowercase.
+# Restrictions: 1 <= num <= 1000
+# Examples:
+# >>> int_to_mini_roman(19)
+# 'xix'
+# >>> int_to_mini_roman(152)
+# 'clii'
+# >>> int_to_mini_roman(426)
+# 'cdxxvi'
+int_to_mini_roman <- function(number) {
+  # Validate the input
+  if (!is.numeric(number) || number < 1 || number > 1000 || number != floor(number)) {
+    stop("number must be an integer between 1 and 1000")
+  }
+
+  # Roman numeral values and their corresponding symbols (lowercase)
+  values  <- c(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+  symbols <- c("m",  "cm", "d",  "cd", "c",  "xc", "l", "xl", "x", "ix", "v", "iv", "i")
+
+  result <- ""
+  for (i in seq_along(values)) {
+    while (number >= values[i]) {
+      result  <- paste0(result, symbols[i])
+      number  <- number - values[i]
+    }
+  }
+
+  result
+}
+test_humaneval <- function() {
+    candidate <- int_to_mini_roman
+    stopifnot(isTRUE(all.equal(candidate(19), 'xix')))
+    stopifnot(isTRUE(all.equal(candidate(152), 'clii')))
+    stopifnot(isTRUE(all.equal(candidate(251), 'ccli')))
+    stopifnot(isTRUE(all.equal(candidate(426), 'cdxxvi')))
+    stopifnot(isTRUE(all.equal(candidate(500), 'd')))
+    stopifnot(isTRUE(all.equal(candidate(1), 'i')))
+    stopifnot(isTRUE(all.equal(candidate(4), 'iv')))
+    stopifnot(isTRUE(all.equal(candidate(43), 'xliii')))
+    stopifnot(isTRUE(all.equal(candidate(90), 'xc')))
+    stopifnot(isTRUE(all.equal(candidate(94), 'xciv')))
+    stopifnot(isTRUE(all.equal(candidate(532), 'dxxxii')))
+    stopifnot(isTRUE(all.equal(candidate(900), 'cm')))
+    stopifnot(isTRUE(all.equal(candidate(994), 'cmxciv')))
+    stopifnot(isTRUE(all.equal(candidate(1000), 'm')))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183810
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 157 (R) - HumanEval_157_right_angle_triangle
+================================================================================
+
+PROMPT:
+----------------------------------------
+# Given the lengths of the three sides of a triangle. Return TRUE if the three
+# sides form a right-angled triangle, FALSE otherwise.
+# A right-angled triangle is a triangle in which one angle is right angle or 
+# 90 degree.
+# Example:
+# >>> right_angle_triangle(3, 4, 5)
+# TRUE
+# >>> right_angle_triangle(1, 2, 3)
+# FALSE
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+test_humaneval <- function() {
+    candidate <- right_angle_triangle
+    stopifnot(isTRUE(all.equal(candidate(3, 4, 5), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(1, 2, 3), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(10, 6, 8), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(2, 2, 2), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(7, 24, 25), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(10, 5, 7), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(5, 12, 13), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(15, 8, 17), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(48, 55, 73), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(1, 1, 1), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(2, 2, 10), FALSE)))
+}
+test_humaneval()
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+# Given the lengths of the three sides of a triangle. Return TRUE if the three
+# sides form a right-angled triangle, FALSE otherwise.
+# A right-angled triangle is a triangle in which one angle is right angle or 
+# 90 degree.
+# Example:
+# >>> right_angle_triangle(3, 4, 5)
+# TRUE
+# >>> right_angle_triangle(1, 2, 3)
+# FALSE
+right_angle_triangle <- function(a, b, c) {
+  # Ensure the inputs are numeric
+  if (!is.numeric(a) || !is.numeric(b) || !is.numeric(c)) {
+    stop("All arguments must be numeric.")
+  }
+  
+  # Sort the sides so that the largest is treated as the hypotenuse
+  sides <- sort(c(a, b, c))
+  
+  # Quick check: all sides must be positive
+  if (any(sides <= 0)) {
+    return(FALSE)
+  }
+  
+  # Triangle inequality (optional but safe)
+  if (sides[1] + sides[2] <= sides[3]) {
+    return(FALSE)
+  }
+  
+  # Check the Pythagorean theorem with a tolerance for floating‑point arithmetic
+  lhs <- sides[1]^2 + sides[2]^2
+  rhs <- sides[3]^2
+  tolerance <- .Machine$double.eps^0.5
+  
+  return(abs(lhs - rhs) < tolerance)
+}
+test_humaneval <- function() {
+    candidate <- right_angle_triangle
+    stopifnot(isTRUE(all.equal(candidate(3, 4, 5), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(1, 2, 3), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(10, 6, 8), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(2, 2, 2), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(7, 24, 25), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(10, 5, 7), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(5, 12, 13), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(15, 8, 17), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(48, 55, 73), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(1, 1, 1), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(2, 2, 10), FALSE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183810
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+# Given the lengths of the three sides of a triangle. Return TRUE if the three
+# sides form a right-angled triangle, FALSE otherwise.
+# A right-angled triangle is a triangle in which one angle is right angle or 
+# 90 degree.
+# Example:
+# >>> right_angle_triangle(3, 4, 5)
+# TRUE
+# >>> right_angle_triangle(1, 2, 3)
+# FALSE
+right_angle_triangle <- function(a, b, c) {
+  # All sides must be positive
+  if (any(c(a, b, c) <= 0)) return(FALSE)
+  
+  # Sort sides so that the largest is last
+  sides <- sort(c(a, b, c))
+  
+  # Check triangle inequality
+  if (sides[1] + sides[2] <= sides[3]) return(FALSE)
+  
+  # Check the Pythagorean theorem (allowing for floating‑point tolerance)
+  pythag <- all.equal(sides[1]^2 + sides[2]^2, sides[3]^2, tolerance = 1e-8)
+  return(isTRUE(pythag))
+}
+test_humaneval <- function() {
+    candidate <- right_angle_triangle
+    stopifnot(isTRUE(all.equal(candidate(3, 4, 5), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(1, 2, 3), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(10, 6, 8), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(2, 2, 2), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(7, 24, 25), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(10, 5, 7), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(5, 12, 13), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(15, 8, 17), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(48, 55, 73), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(1, 1, 1), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(2, 2, 10), FALSE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183810
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+# Given the lengths of the three sides of a triangle. Return TRUE if the three
+# sides form a right-angled triangle, FALSE otherwise.
+# A right-angled triangle is a triangle in which one angle is right angle or 
+# 90 degree.
+# Example:
+# >>> right_angle_triangle(3, 4, 5)
+# TRUE
+# >>> right_angle_triangle(1, 2, 3)
+# FALSE
+right_angle_triangle <- function(a, b, c) {
+  # Ensure all sides are positive numbers
+  if (any(c(a, b, c) <= 0)) return(FALSE)
+  
+  # Sort the sides so that x <= y <= z
+  sides <- sort(c(a, b, c))
+  x <- sides[1]
+  y <- sides[2]
+  z <- sides[3]
+  
+  # Check triangle inequality
+  if (x + y <= z) return(FALSE)
+  
+  # Check Pythagorean theorem
+  return(x^2 + y^2 == z^2)
+}
+test_humaneval <- function() {
+    candidate <- right_angle_triangle
+    stopifnot(isTRUE(all.equal(candidate(3, 4, 5), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(1, 2, 3), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(10, 6, 8), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(2, 2, 2), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(7, 24, 25), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(10, 5, 7), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(5, 12, 13), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(15, 8, 17), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(48, 55, 73), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(1, 1, 1), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(2, 2, 10), FALSE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183810
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+# Given the lengths of the three sides of a triangle. Return TRUE if the three
+# sides form a right-angled triangle, FALSE otherwise.
+# A right-angled triangle is a triangle in which one angle is right angle or 
+# 90 degree.
+# Example:
+# >>> right_angle_triangle(3, 4, 5)
+# TRUE
+# >>> right_angle_triangle(1, 2, 3)
+# FALSE
+right_angle_triangle <- function(a, b, c) {
+  # Check for positive side lengths
+  if (a <= 0 || b <= 0 || c <= 0) {
+    return(FALSE)
+  }
+  
+  # Triangle inequality
+  if (!(a + b > c && a + c > b && b + c > a)) {
+    return(FALSE)
+  }
+  
+  # Check Pythagorean theorem (allow any side to be the hypotenuse)
+  a2 <- a^2
+  b2 <- b^2
+  c2 <- c^2
+  
+  if (a2 + b2 == c2 || a2 + c2 == b2 || b2 + c2 == a2) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
+test_humaneval <- function() {
+    candidate <- right_angle_triangle
+    stopifnot(isTRUE(all.equal(candidate(3, 4, 5), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(1, 2, 3), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(10, 6, 8), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(2, 2, 2), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(7, 24, 25), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(10, 5, 7), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(5, 12, 13), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(15, 8, 17), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(48, 55, 73), TRUE)))
+    stopifnot(isTRUE(all.equal(candidate(1, 1, 1), FALSE)))
+    stopifnot(isTRUE(all.equal(candidate(2, 2, 10), FALSE)))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183810
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 158 (R) - HumanEval_158_find_max
+================================================================================
+
+PROMPT:
+----------------------------------------
+# Write a function that accepts a list of strings.
+# The list contains different words. Return the word with maximum number
+# of unique characters. If multiple strings have maximum number of unique
+# characters, return the one which comes first in lexicographical order.
+# >>> find_max(c('name', 'of', 'string'))
+# 'string'
+# >>> find_max(c('name', 'enam', 'game'))
+# 'enam'
+# >>> find_max(c('aaaaaaa', 'bb', 'cc'))
+# 'aaaaaaa'
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+test_humaneval <- function() {
+    candidate <- find_max
+    stopifnot(isTRUE(all.equal(candidate(c('name', 'of', 'string')), 'string')))
+    stopifnot(isTRUE(all.equal(candidate(c('name', 'enam', 'game')), 'enam')))
+    stopifnot(isTRUE(all.equal(candidate(c('aaaaaaa', 'bb', 'cc')), 'aaaaaaa')))
+    stopifnot(isTRUE(all.equal(candidate(c('abc', 'cba')), 'abc')))
+    stopifnot(isTRUE(all.equal(candidate(c('play', 'this', 'game', 'of', 'footbott')), 'footbott')))
+    stopifnot(isTRUE(all.equal(candidate(c('we', 'are', 'gonna', 'rock')), 'gonna')))
+    stopifnot(isTRUE(all.equal(candidate(c('we', 'are', 'a', 'mad', 'nation')), 'nation')))
+    stopifnot(isTRUE(all.equal(candidate(c('this', 'is', 'a', 'prrk')), 'this')))
+    stopifnot(isTRUE(all.equal(candidate(c('b')), 'b')))
+    stopifnot(isTRUE(all.equal(candidate(c('play', 'play', 'play')), 'play')))
+}
+test_humaneval()
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+# Write a function that accepts a list of strings.
+# The list contains different words. Return the word with maximum number
+# of unique characters. If multiple strings have maximum number of unique
+# characters, return the one which comes first in lexicographical order.
+# >>> find_max(c('name', 'of', 'string'))
+# 'string'
+# >>> find_max(c('name', 'enam', 'game'))
+# 'enam'
+# >>> find_max(c('aaaaaaa', 'bb', 'cc'))
+# 'aaaaaaa'
+find_max <- function(words) {
+  # Compute the number of unique characters for each word
+  unique_counts <- sapply(words, function(word) {
+    length(unique(strsplit(word, NULL)[[1]]))
+  })
+  
+  # Find the maximum unique‑character count
+  max_count <- max(unique_counts)
+  
+  # Select all words that achieve this maximum
+  candidates <- words[unique_counts == max_count]
+  
+  # Return the lexicographically first candidate
+  sort(candidates)[1]
+}
+test_humaneval <- function() {
+    candidate <- find_max
+    stopifnot(isTRUE(all.equal(candidate(c('name', 'of', 'string')), 'string')))
+    stopifnot(isTRUE(all.equal(candidate(c('name', 'enam', 'game')), 'enam')))
+    stopifnot(isTRUE(all.equal(candidate(c('aaaaaaa', 'bb', 'cc')), 'aaaaaaa')))
+    stopifnot(isTRUE(all.equal(candidate(c('abc', 'cba')), 'abc')))
+    stopifnot(isTRUE(all.equal(candidate(c('play', 'this', 'game', 'of', 'footbott')), 'footbott')))
+    stopifnot(isTRUE(all.equal(candidate(c('we', 'are', 'gonna', 'rock')), 'gonna')))
+    stopifnot(isTRUE(all.equal(candidate(c('we', 'are', 'a', 'mad', 'nation')), 'nation')))
+    stopifnot(isTRUE(all.equal(candidate(c('this', 'is', 'a', 'prrk')), 'this')))
+    stopifnot(isTRUE(all.equal(candidate(c('b')), 'b')))
+    stopifnot(isTRUE(all.equal(candidate(c('play', 'play', 'play')), 'play')))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183811
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+# Write a function that accepts a list of strings.
+# The list contains different words. Return the word with maximum number
+# of unique characters. If multiple strings have maximum number of unique
+# characters, return the one which comes first in lexicographical order.
+# >>> find_max(c('name', 'of', 'string'))
+# 'string'
+# >>> find_max(c('name', 'enam', 'game'))
+# 'enam'
+# >>> find_max(c('aaaaaaa', 'bb', 'cc'))
+# 'aaaaaaa'
+find_max <- function(words) {
+  # Handle empty input
+  if (length(words) == 0) {
+    return(NA_character_)
+  }
+  
+  # Count unique characters for each word
+  uniq_counts <- sapply(words, function(w) {
+    # Split into individual characters and count unique ones
+    length(unique(strsplit(w, "")[[1]]))
+  })
+  
+  # Find the maximum count
+  max_count <- max(uniq_counts)
+  
+  # Select all words that achieve this maximum
+  candidates <- words[uniq_counts == max_count]
+  
+  # Return the lexicographically smallest among the candidates
+  return(sort(candidates)[1])
+}
+test_humaneval <- function() {
+    candidate <- find_max
+    stopifnot(isTRUE(all.equal(candidate(c('name', 'of', 'string')), 'string')))
+    stopifnot(isTRUE(all.equal(candidate(c('name', 'enam', 'game')), 'enam')))
+    stopifnot(isTRUE(all.equal(candidate(c('aaaaaaa', 'bb', 'cc')), 'aaaaaaa')))
+    stopifnot(isTRUE(all.equal(candidate(c('abc', 'cba')), 'abc')))
+    stopifnot(isTRUE(all.equal(candidate(c('play', 'this', 'game', 'of', 'footbott')), 'footbott')))
+    stopifnot(isTRUE(all.equal(candidate(c('we', 'are', 'gonna', 'rock')), 'gonna')))
+    stopifnot(isTRUE(all.equal(candidate(c('we', 'are', 'a', 'mad', 'nation')), 'nation')))
+    stopifnot(isTRUE(all.equal(candidate(c('this', 'is', 'a', 'prrk')), 'this')))
+    stopifnot(isTRUE(all.equal(candidate(c('b')), 'b')))
+    stopifnot(isTRUE(all.equal(candidate(c('play', 'play', 'play')), 'play')))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183811
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+# Write a function that accepts a list of strings.
+# The list contains different words. Return the word with maximum number
+# of unique characters. If multiple strings have maximum number of unique
+# characters, return the one which comes first in lexicographical order.
+# >>> find_max(c('name', 'of', 'string'))
+# 'string'
+# >>> find_max(c('name', 'enam', 'game'))
+# 'enam'
+# >>> find_max(c('aaaaaaa', 'bb', 'cc'))
+# 'aaaaaaa'
+find_max <- function(words) {
+  # Compute the number of unique characters for each word
+  uniq_counts <- sapply(words, function(w) length(unique(strsplit(w, "")[[1]])))
+  
+  # Find the maximum unique character count
+  max_count <- max(uniq_counts)
+  
+  # Select words that have the maximum count
+  candidates <- words[uniq_counts == max_count]
+  
+  # Return the lexicographically smallest word among the candidates
+  return(min(candidates))
+}
+test_humaneval <- function() {
+    candidate <- find_max
+    stopifnot(isTRUE(all.equal(candidate(c('name', 'of', 'string')), 'string')))
+    stopifnot(isTRUE(all.equal(candidate(c('name', 'enam', 'game')), 'enam')))
+    stopifnot(isTRUE(all.equal(candidate(c('aaaaaaa', 'bb', 'cc')), 'aaaaaaa')))
+    stopifnot(isTRUE(all.equal(candidate(c('abc', 'cba')), 'abc')))
+    stopifnot(isTRUE(all.equal(candidate(c('play', 'this', 'game', 'of', 'footbott')), 'footbott')))
+    stopifnot(isTRUE(all.equal(candidate(c('we', 'are', 'gonna', 'rock')), 'gonna')))
+    stopifnot(isTRUE(all.equal(candidate(c('we', 'are', 'a', 'mad', 'nation')), 'nation')))
+    stopifnot(isTRUE(all.equal(candidate(c('this', 'is', 'a', 'prrk')), 'this')))
+    stopifnot(isTRUE(all.equal(candidate(c('b')), 'b')))
+    stopifnot(isTRUE(all.equal(candidate(c('play', 'play', 'play')), 'play')))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183811
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+# Write a function that accepts a list of strings.
+# The list contains different words. Return the word with maximum number
+# of unique characters. If multiple strings have maximum number of unique
+# characters, return the one which comes first in lexicographical order.
+# >>> find_max(c('name', 'of', 'string'))
+# 'string'
+# >>> find_max(c('name', 'enam', 'game'))
+# 'enam'
+# >>> find_max(c('aaaaaaa', 'bb', 'cc'))
+# 'aaaaaaa'
+find_max <- function(words) {
+  # Compute the number of unique characters for each word
+  uniq_counts <- sapply(words, function(w) {
+    # Split the word into individual characters
+    chars <- strsplit(w, NULL)[[1]]
+    # Count distinct characters
+    length(unique(chars))
+  })
+  
+  # Identify the maximum count
+  max_count <- max(uniq_counts)
+  
+  # Select all words that achieve this maximum
+  candidates <- words[uniq_counts == max_count]
+  
+  # Return the lexicographically first word among the candidates
+  sort(candidates)[1]
+}
+test_humaneval <- function() {
+    candidate <- find_max
+    stopifnot(isTRUE(all.equal(candidate(c('name', 'of', 'string')), 'string')))
+    stopifnot(isTRUE(all.equal(candidate(c('name', 'enam', 'game')), 'enam')))
+    stopifnot(isTRUE(all.equal(candidate(c('aaaaaaa', 'bb', 'cc')), 'aaaaaaa')))
+    stopifnot(isTRUE(all.equal(candidate(c('abc', 'cba')), 'abc')))
+    stopifnot(isTRUE(all.equal(candidate(c('play', 'this', 'game', 'of', 'footbott')), 'footbott')))
+    stopifnot(isTRUE(all.equal(candidate(c('we', 'are', 'gonna', 'rock')), 'gonna')))
+    stopifnot(isTRUE(all.equal(candidate(c('we', 'are', 'a', 'mad', 'nation')), 'nation')))
+    stopifnot(isTRUE(all.equal(candidate(c('this', 'is', 'a', 'prrk')), 'this')))
+    stopifnot(isTRUE(all.equal(candidate(c('b')), 'b')))
+    stopifnot(isTRUE(all.equal(candidate(c('play', 'play', 'play')), 'play')))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183811
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 159 (R) - HumanEval_159_eat
+================================================================================
+
+PROMPT:
+----------------------------------------
+# You're a hungry rabbit, and you already have eaten a certain number of carrots,
+# but now you need to eat more carrots to complete the day's meals.
+# you should return a vector of [ total number of eaten carrots after your meals,
+#                                 the number of carrots left after your meals ]
+# if there are not enough remaining carrots, you will eat all remaining carrots, but will still be hungry.
+# Example:
+# >>> eat(5, 6, 10)
+# c(11, 4)
+# >>> eat(4, 8, 9)
+# c(12, 1)
+# >>> eat(1, 10, 10)
+# c(11, 0)
+# >>> eat(2, 11, 5)
+# c(7, 0)
+# Variables:
+# @number : integer
+#     the number of carrots that you have eaten.
+# @need : integer
+#     the number of carrots that you need to eat.
+# @remaining : integer
+#     the number of remaining carrots thet exist in stock
+# Constrain:
+# * 0 <= number <= 1000
+# * 0 <= need <= 1000
+# * 0 <= remaining <= 1000
+# Have fun :)
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+test_humaneval <- function() {
+    candidate <- eat
+    stopifnot(isTRUE(all.equal(candidate(5, 6, 10), c(11, 4))))
+    stopifnot(isTRUE(all.equal(candidate(4, 8, 9), c(12, 1))))
+    stopifnot(isTRUE(all.equal(candidate(1, 10, 10), c(11, 0))))
+    stopifnot(isTRUE(all.equal(candidate(2, 11, 5), c(7, 0))))
+    stopifnot(isTRUE(all.equal(candidate(4, 5, 7), c(9, 2))))
+    stopifnot(isTRUE(all.equal(candidate(4, 5, 1), c(5, 0))))
+}
+test_humaneval()
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+# You're a hungry rabbit, and you already have eaten a certain number of carrots,
+# but now you need to eat more carrots to complete the day's meals.
+# you should return a vector of [ total number of eaten carrots after your meals,
+#                                 the number of carrots left after your meals ]
+# if there are not enough remaining carrots, you will eat all remaining carrots, but will still be hungry.
+# Example:
+# >>> eat(5, 6, 10)
+# c(11, 4)
+# >>> eat(4, 8, 9)
+# c(12, 1)
+# >>> eat(1, 10, 10)
+# c(11, 0)
+# >>> eat(2, 11, 5)
+# c(7, 0)
+# Variables:
+# @number : integer
+#     the number of carrots that you have eaten.
+# @need : integer
+#     the number of carrots that you need to eat.
+# @remaining : integer
+#     the number of remaining carrots thet exist in stock
+# Constrain:
+# * 0 <= number <= 1000
+# * 0 <= need <= 1000
+# * 0 <= remaining <= 1000
+# Have fun :)
+eat <- function(number, need, remaining) {
+  # How many carrots the rabbit can actually eat
+  eaten <- min(need, remaining)
+  
+  # Total carrots eaten after the meals
+  total <- number + eaten
+  
+  # Carrots left after the rabbit has eaten
+  left <- remaining - eaten
+  
+  # Return the result as a vector
+  c(total, left)
+}
+test_humaneval <- function() {
+    candidate <- eat
+    stopifnot(isTRUE(all.equal(candidate(5, 6, 10), c(11, 4))))
+    stopifnot(isTRUE(all.equal(candidate(4, 8, 9), c(12, 1))))
+    stopifnot(isTRUE(all.equal(candidate(1, 10, 10), c(11, 0))))
+    stopifnot(isTRUE(all.equal(candidate(2, 11, 5), c(7, 0))))
+    stopifnot(isTRUE(all.equal(candidate(4, 5, 7), c(9, 2))))
+    stopifnot(isTRUE(all.equal(candidate(4, 5, 1), c(5, 0))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183811
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+# You're a hungry rabbit, and you already have eaten a certain number of carrots,
+# but now you need to eat more carrots to complete the day's meals.
+# you should return a vector of [ total number of eaten carrots after your meals,
+#                                 the number of carrots left after your meals ]
+# if there are not enough remaining carrots, you will eat all remaining carrots, but will still be hungry.
+# Example:
+# >>> eat(5, 6, 10)
+# c(11, 4)
+# >>> eat(4, 8, 9)
+# c(12, 1)
+# >>> eat(1, 10, 10)
+# c(11, 0)
+# >>> eat(2, 11, 5)
+# c(7, 0)
+# Variables:
+# @number : integer
+#     the number of carrots that you have eaten.
+# @need : integer
+#     the number of carrots that you need to eat.
+# @remaining : integer
+#     the number of remaining carrots thet exist in stock
+# Constrain:
+# * 0 <= number <= 1000
+# * 0 <= need <= 1000
+# * 0 <= remaining <= 1000
+# Have fun :)
+eat <- function(number, need, remaining) {
+  # How many carrots can the rabbit actually eat?
+  eaten_now <- min(need, remaining)
+  
+  # Total carrots eaten after the meal
+  total_eaten <- number + eaten_now
+  
+  # Carrots left in stock
+  carrots_left <- remaining - eaten_now
+  
+  # Return as a vector
+  c(total_eaten, carrots_left)
+}
+test_humaneval <- function() {
+    candidate <- eat
+    stopifnot(isTRUE(all.equal(candidate(5, 6, 10), c(11, 4))))
+    stopifnot(isTRUE(all.equal(candidate(4, 8, 9), c(12, 1))))
+    stopifnot(isTRUE(all.equal(candidate(1, 10, 10), c(11, 0))))
+    stopifnot(isTRUE(all.equal(candidate(2, 11, 5), c(7, 0))))
+    stopifnot(isTRUE(all.equal(candidate(4, 5, 7), c(9, 2))))
+    stopifnot(isTRUE(all.equal(candidate(4, 5, 1), c(5, 0))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183811
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+# You're a hungry rabbit, and you already have eaten a certain number of carrots,
+# but now you need to eat more carrots to complete the day's meals.
+# you should return a vector of [ total number of eaten carrots after your meals,
+#                                 the number of carrots left after your meals ]
+# if there are not enough remaining carrots, you will eat all remaining carrots, but will still be hungry.
+# Example:
+# >>> eat(5, 6, 10)
+# c(11, 4)
+# >>> eat(4, 8, 9)
+# c(12, 1)
+# >>> eat(1, 10, 10)
+# c(11, 0)
+# >>> eat(2, 11, 5)
+# c(7, 0)
+# Variables:
+# @number : integer
+#     the number of carrots that you have eaten.
+# @need : integer
+#     the number of carrots that you need to eat.
+# @remaining : integer
+#     the number of remaining carrots thet exist in stock
+# Constrain:
+# * 0 <= number <= 1000
+# * 0 <= need <= 1000
+# * 0 <= remaining <= 1000
+# Have fun :)
+eat <- function(number, need, remaining) {
+  # Determine how many carrots we can actually eat
+  eaten_now <- min(need, remaining)
+  
+  # Update totals
+  total_eaten <- number + eaten_now
+  carrots_left <- remaining - eaten_now
+  
+  # Return as a vector
+  c(total_eaten, carrots_left)
+}
+test_humaneval <- function() {
+    candidate <- eat
+    stopifnot(isTRUE(all.equal(candidate(5, 6, 10), c(11, 4))))
+    stopifnot(isTRUE(all.equal(candidate(4, 8, 9), c(12, 1))))
+    stopifnot(isTRUE(all.equal(candidate(1, 10, 10), c(11, 0))))
+    stopifnot(isTRUE(all.equal(candidate(2, 11, 5), c(7, 0))))
+    stopifnot(isTRUE(all.equal(candidate(4, 5, 7), c(9, 2))))
+    stopifnot(isTRUE(all.equal(candidate(4, 5, 1), c(5, 0))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183811
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+# You're a hungry rabbit, and you already have eaten a certain number of carrots,
+# but now you need to eat more carrots to complete the day's meals.
+# you should return a vector of [ total number of eaten carrots after your meals,
+#                                 the number of carrots left after your meals ]
+# if there are not enough remaining carrots, you will eat all remaining carrots, but will still be hungry.
+# Example:
+# >>> eat(5, 6, 10)
+# c(11, 4)
+# >>> eat(4, 8, 9)
+# c(12, 1)
+# >>> eat(1, 10, 10)
+# c(11, 0)
+# >>> eat(2, 11, 5)
+# c(7, 0)
+# Variables:
+# @number : integer
+#     the number of carrots that you have eaten.
+# @need : integer
+#     the number of carrots that you need to eat.
+# @remaining : integer
+#     the number of remaining carrots thet exist in stock
+# Constrain:
+# * 0 <= number <= 1000
+# * 0 <= need <= 1000
+# * 0 <= remaining <= 1000
+# Have fun :)
+eat <- function(number, need, remaining) {
+  if (remaining >= need) {
+    total     <- number + need
+    rem_after <- remaining - need
+  } else {
+    total     <- number + remaining
+    rem_after <- 0
+  }
+  c(total, rem_after)
+}
+test_humaneval <- function() {
+    candidate <- eat
+    stopifnot(isTRUE(all.equal(candidate(5, 6, 10), c(11, 4))))
+    stopifnot(isTRUE(all.equal(candidate(4, 8, 9), c(12, 1))))
+    stopifnot(isTRUE(all.equal(candidate(1, 10, 10), c(11, 0))))
+    stopifnot(isTRUE(all.equal(candidate(2, 11, 5), c(7, 0))))
+    stopifnot(isTRUE(all.equal(candidate(4, 5, 7), c(9, 2))))
+    stopifnot(isTRUE(all.equal(candidate(4, 5, 1), c(5, 0))))
+}
+test_humaneval()
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183811
+STDOUT: (empty)
+STDERR: (empty)
+--------------------

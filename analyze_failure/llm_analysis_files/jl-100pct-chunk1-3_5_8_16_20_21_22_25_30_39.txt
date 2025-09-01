@@ -1,0 +1,2278 @@
+As per my standing instructions, analyze each code-execution result provided. For every item, produce a structured report as follows.
+
+1) Status
+Status: "OK" (Success) or else (Failure)
+Evidence: include exit code, error status, and whether stderr is empty/non-empty (quote the first relevant line).
+
+If Failure (non-zero exit code, error status, or non-empty stderr)
+Root Cause Analysis
+Explain why it failed, grounded in the logs/trace.
+Point to the exact faulty locations (file and line numbers if available). Quote the minimal offending snippets.
+Recommended Fix (Minimal Patch)
+Provide brief code segments (3–7 lines each) that would correct the issue.
+If multiple faults exist, list fixes in order of impact.
+Final Answer
+Classify the ultimate source of failure as one of: faulty problem setting / wrong test case / incorrect code implementation.
+State it on a single line: Final Answer: <chosen category>.
+
+If Success (exit code 0 and empty stderr)
+Critical Correctness Review
+Do not assume success means correctness.
+Check if the code's logic truly matches the intended problem requirements, including edge cases and corner conditions.
+Identify any silent errors, logical flaws, or incompleteness that would still pass execution but fail semantically.
+If the implementation is sound, explain why it is correct. If not, explain the discrepancy clearly.
+Final Answer
+Explicitly confirm or reject correctness in one line: Final Answer: correct or incorrect (with a one-phrase justification if incorrect).
+
+General rules
+Be precise and concise. Don't invent behavior not evidenced by the logs or code.
+When line numbers aren't available, reference the closest identifiable code block.
+Prefer minimal fixes over refactors; include just enough context to apply the patch.
+
+CONTENT TO ANALYZE:
+
+================================================================================
+PROBLEM 3 (JL) - HumanEval_3_below_zero
+================================================================================
+
+PROMPT:
+----------------------------------------
+""" You're given a vector of deposit and withdrawal operations on a bank account that starts with
+zero balance. Your task is to detect if at any point the balance of account fallls below zero, and
+at that point function should return true. Otherwise it should return false.
+>>> below_zero([1, 2, 3])
+false
+>>> below_zero([1, 2, -4, 5])
+true"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = below_zero;
+	@test(candidate(Vector{Int64}([])) == false)
+	@test(candidate([1, 2, -3, 1, 2, -3]) == false)
+	@test(candidate([1, 2, -4, 5, 6]) == true)
+	@test(candidate([1, -1, 2, -2, 5, -5, 4, -4]) == false)
+	@test(candidate([1, -1, 2, -2, 5, -5, 4, -5]) == true)
+	@test(candidate([1, -2, 2, -2, 5, -5, 4, -4]) == true)
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+""" You're given a vector of deposit and withdrawal operations on a bank account that starts with
+zero balance. Your task is to detect if at any point the balance of account fallls below zero, and
+at that point function should return true. Otherwise it should return false.
+>>> below_zero([1, 2, 3])
+false
+>>> below_zero([1, 2, -4, 5])
+true"""
+function below_zero(operations::Vector{Int64})::Bool
+    balance = 0
+    for op in operations
+        balance += op
+        if balance < 0
+            return true
+        end
+    end
+    return false
+end
+using Test
+
+@testset begin
+
+candidate = below_zero;
+	@test(candidate(Vector{Int64}([])) == false)
+	@test(candidate([1, 2, -3, 1, 2, -3]) == false)
+	@test(candidate([1, 2, -4, 5, 6]) == true)
+	@test(candidate([1, -1, 2, -2, 5, -5, 4, -4]) == false)
+	@test(candidate([1, -1, 2, -2, 5, -5, 4, -5]) == true)
+	@test(candidate([1, -2, 2, -2, 5, -5, 4, -4]) == true)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154443
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    6      6  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+""" You're given a vector of deposit and withdrawal operations on a bank account that starts with
+zero balance. Your task is to detect if at any point the balance of account fallls below zero, and
+at that point function should return true. Otherwise it should return false.
+>>> below_zero([1, 2, 3])
+false
+>>> below_zero([1, 2, -4, 5])
+true"""
+function below_zero(operations::Vector{Int64})::Bool
+    balance = 0
+    for op in operations
+        balance += op
+        if balance < 0
+            return true
+        end
+    end
+    return false
+end
+using Test
+
+@testset begin
+
+candidate = below_zero;
+	@test(candidate(Vector{Int64}([])) == false)
+	@test(candidate([1, 2, -3, 1, 2, -3]) == false)
+	@test(candidate([1, 2, -4, 5, 6]) == true)
+	@test(candidate([1, -1, 2, -2, 5, -5, 4, -4]) == false)
+	@test(candidate([1, -1, 2, -2, 5, -5, 4, -5]) == true)
+	@test(candidate([1, -2, 2, -2, 5, -5, 4, -4]) == true)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154443
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    6      6  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+""" You're given a vector of deposit and withdrawal operations on a bank account that starts with
+zero balance. Your task is to detect if at any point the balance of account fallls below zero, and
+at that point function should return true. Otherwise it should return false.
+>>> below_zero([1, 2, 3])
+false
+>>> below_zero([1, 2, -4, 5])
+true"""
+function below_zero(operations::Vector{Int64})::Bool
+    balance = 0
+    for op in operations
+        balance += op
+        if balance < 0
+            return true
+        end
+    end
+    return false
+end
+using Test
+
+@testset begin
+
+candidate = below_zero;
+	@test(candidate(Vector{Int64}([])) == false)
+	@test(candidate([1, 2, -3, 1, 2, -3]) == false)
+	@test(candidate([1, 2, -4, 5, 6]) == true)
+	@test(candidate([1, -1, 2, -2, 5, -5, 4, -4]) == false)
+	@test(candidate([1, -1, 2, -2, 5, -5, 4, -5]) == true)
+	@test(candidate([1, -2, 2, -2, 5, -5, 4, -4]) == true)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154443
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    6      6  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+""" You're given a vector of deposit and withdrawal operations on a bank account that starts with
+zero balance. Your task is to detect if at any point the balance of account fallls below zero, and
+at that point function should return true. Otherwise it should return false.
+>>> below_zero([1, 2, 3])
+false
+>>> below_zero([1, 2, -4, 5])
+true"""
+function below_zero(operations::Vector{Int64})::Bool
+    balance = 0
+    for op in operations
+        balance += op
+        if balance < 0
+            return true
+        end
+    end
+    return false
+end
+using Test
+
+@testset begin
+
+candidate = below_zero;
+	@test(candidate(Vector{Int64}([])) == false)
+	@test(candidate([1, 2, -3, 1, 2, -3]) == false)
+	@test(candidate([1, 2, -4, 5, 6]) == true)
+	@test(candidate([1, -1, 2, -2, 5, -5, 4, -4]) == false)
+	@test(candidate([1, -1, 2, -2, 5, -5, 4, -5]) == true)
+	@test(candidate([1, -2, 2, -2, 5, -5, 4, -4]) == true)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154443
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    6      6  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 5 (JL) - HumanEval_5_intersperse
+================================================================================
+
+PROMPT:
+----------------------------------------
+""" Insert a number 'delimeter' between every two consecutive elements of input vector `numbers'
+>>> intersperse([], 4)
+[]
+>>> intersperse([1, 2, 3], 4)
+[1, 4, 2, 4, 3]"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = intersperse;
+	@test(candidate(Vector{Int64}([]), 7) == Vector{Int64}([]))
+	@test(candidate([5, 6, 3, 2], 8) == [5, 8, 6, 8, 3, 8, 2])
+	@test(candidate([2, 2, 2], 2) == [2, 2, 2, 2, 2])
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+""" Insert a number 'delimeter' between every two consecutive elements of input vector `numbers'
+>>> intersperse([], 4)
+[]
+>>> intersperse([1, 2, 3], 4)
+[1, 4, 2, 4, 3]"""
+function intersperse(numbers::Vector{Int64}, delimeter::Int64)::Vector{Int64}
+    n = length(numbers)
+    if n <= 1
+        return copy(numbers)
+    end
+    result = Vector{Int64}()
+    push!(result, numbers[1])
+    for i in 2:n
+        push!(result, delimeter)
+        push!(result, numbers[i])
+    end
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = intersperse;
+	@test(candidate(Vector{Int64}([]), 7) == Vector{Int64}([]))
+	@test(candidate([5, 6, 3, 2], 8) == [5, 8, 6, 8, 3, 8, 2])
+	@test(candidate([2, 2, 2], 2) == [2, 2, 2, 2, 2])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154447
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    3      3  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+""" Insert a number 'delimeter' between every two consecutive elements of input vector `numbers'
+>>> intersperse([], 4)
+[]
+>>> intersperse([1, 2, 3], 4)
+[1, 4, 2, 4, 3]"""
+function intersperse(numbers::Vector{Int64}, delimeter::Int64)::Vector{Int64}
+    # Return an empty vector if there are no elements to intersperse.
+    isempty(numbers) && return Int64[]
+
+    result = Vector{Int64}()
+    for (i, n) in enumerate(numbers)
+        push!(result, n)
+        # Insert the delimiter after each element except the last one.
+        if i < length(numbers)
+            push!(result, delimeter)
+        end
+    end
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = intersperse;
+	@test(candidate(Vector{Int64}([]), 7) == Vector{Int64}([]))
+	@test(candidate([5, 6, 3, 2], 8) == [5, 8, 6, 8, 3, 8, 2])
+	@test(candidate([2, 2, 2], 2) == [2, 2, 2, 2, 2])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154447
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    3      3  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+""" Insert a number 'delimeter' between every two consecutive elements of input vector `numbers'
+>>> intersperse([], 4)
+[]
+>>> intersperse([1, 2, 3], 4)
+[1, 4, 2, 4, 3]"""
+function intersperse(numbers::Vector{Int64}, delimeter::Int64)::Vector{Int64}
+    n = length(numbers)
+    if n <= 1
+        # For 0 or 1 element, just return a copy of the input
+        return copy(numbers)
+    end
+
+    # The resulting vector will have 2n - 1 elements
+    result = Vector{Int64}(undef, 2n - 1)
+
+    for i in 1:n
+        # Place the original element
+        result[2i - 1] = numbers[i]
+        # Insert the delimiter between elements (except after the last one)
+        if i < n
+            result[2i] = delimeter
+        end
+    end
+
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = intersperse;
+	@test(candidate(Vector{Int64}([]), 7) == Vector{Int64}([]))
+	@test(candidate([5, 6, 3, 2], 8) == [5, 8, 6, 8, 3, 8, 2])
+	@test(candidate([2, 2, 2], 2) == [2, 2, 2, 2, 2])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154447
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    3      3  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+""" Insert a number 'delimeter' between every two consecutive elements of input vector `numbers'
+>>> intersperse([], 4)
+[]
+>>> intersperse([1, 2, 3], 4)
+[1, 4, 2, 4, 3]"""
+# Insert a number `delimeter` between every two consecutive elements of the input vector `numbers`
+# Example:
+#   intersperse([], 4)          → []
+#   intersperse([1, 2, 3], 4)   → [1, 4, 2, 4, 3]
+
+function intersperse(numbers::Vector{Int64}, delimeter::Int64)::Vector{Int64}
+    n = length(numbers)
+    # If the vector has 0 or 1 element, nothing to intersperse
+    if n <= 1
+        return copy(numbers)
+    end
+
+    # Allocate the result vector: 2n - 1 elements
+    result = Vector{Int64}(undef, 2n - 1)
+
+    for i in 1:n
+        result[2i - 1] = numbers[i]          # original element
+        if i < n
+            result[2i] = delimeter           # delimiter between elements
+        end
+    end
+
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = intersperse;
+	@test(candidate(Vector{Int64}([]), 7) == Vector{Int64}([]))
+	@test(candidate([5, 6, 3, 2], 8) == [5, 8, 6, 8, 3, 8, 2])
+	@test(candidate([2, 2, 2], 2) == [2, 2, 2, 2, 2])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154447
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    3      3  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 8 (JL) - HumanEval_8_sum_product
+================================================================================
+
+PROMPT:
+----------------------------------------
+""" For a given vector of integers, return a tuple consisting of a sum and a product of all the integers in a vector.
+Empty sum should be equal to 0 and empty product should be equal to 1.
+>>> sum_product([])
+(0, 1)
+>>> sum_product([1, 2, 3, 4])
+(10, 24)"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = sum_product;
+	@test(candidate(Vector{Int64}([])) == (0, 1))
+	@test(candidate([1, 1, 1]) == (3, 1))
+	@test(candidate([100, 0]) == (100, 0))
+	@test(candidate([3, 5, 7]) == (15, 105))
+	@test(candidate([10]) == (10, 10))
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+""" For a given vector of integers, return a tuple consisting of a sum and a product of all the integers in a vector.
+Empty sum should be equal to 0 and empty product should be equal to 1.
+>>> sum_product([])
+(0, 1)
+>>> sum_product([1, 2, 3, 4])
+(10, 24)"""
+function sum_product(numbers::Vector{Int64})::Tuple{Int64, Int64}
+    # `sum` and `prod` already handle the empty vector case correctly:
+    # sum([]) → 0, prod([]) → 1
+    return (sum(numbers), prod(numbers))
+end
+using Test
+
+@testset begin
+
+candidate = sum_product;
+	@test(candidate(Vector{Int64}([])) == (0, 1))
+	@test(candidate([1, 1, 1]) == (3, 1))
+	@test(candidate([100, 0]) == (100, 0))
+	@test(candidate([3, 5, 7]) == (15, 105))
+	@test(candidate([10]) == (10, 10))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154455
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+""" For a given vector of integers, return a tuple consisting of a sum and a product of all the integers in a vector.
+Empty sum should be equal to 0 and empty product should be equal to 1.
+>>> sum_product([])
+(0, 1)
+>>> sum_product([1, 2, 3, 4])
+(10, 24)"""
+function sum_product(numbers::Vector{Int64})::Tuple{Int64, Int64}
+    # Julia's built‑in `sum` and `prod` already handle the empty case correctly:
+    #   sum([])  → 0
+    #   prod([]) → 1
+    return (sum(numbers), prod(numbers))
+end
+using Test
+
+@testset begin
+
+candidate = sum_product;
+	@test(candidate(Vector{Int64}([])) == (0, 1))
+	@test(candidate([1, 1, 1]) == (3, 1))
+	@test(candidate([100, 0]) == (100, 0))
+	@test(candidate([3, 5, 7]) == (15, 105))
+	@test(candidate([10]) == (10, 10))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154455
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+""" For a given vector of integers, return a tuple consisting of a sum and a product of all the integers in a vector.
+Empty sum should be equal to 0 and empty product should be equal to 1.
+>>> sum_product([])
+(0, 1)
+>>> sum_product([1, 2, 3, 4])
+(10, 24)"""
+function sum_product(numbers::Vector{Int64})::Tuple{Int64, Int64}
+    # Sum of the elements (sum([]) is 0)
+    total_sum = sum(numbers)
+    # Product of the elements, defaulting to 1 for an empty vector
+    total_prod = prod(numbers; init = 1)
+    return (total_sum, total_prod)
+end
+using Test
+
+@testset begin
+
+candidate = sum_product;
+	@test(candidate(Vector{Int64}([])) == (0, 1))
+	@test(candidate([1, 1, 1]) == (3, 1))
+	@test(candidate([100, 0]) == (100, 0))
+	@test(candidate([3, 5, 7]) == (15, 105))
+	@test(candidate([10]) == (10, 10))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154455
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+""" For a given vector of integers, return a tuple consisting of a sum and a product of all the integers in a vector.
+Empty sum should be equal to 0 and empty product should be equal to 1.
+>>> sum_product([])
+(0, 1)
+>>> sum_product([1, 2, 3, 4])
+(10, 24)"""
+function sum_product(numbers::Vector{Int64})::Tuple{Int64, Int64}
+    # Julia's built‑in sum and prod already behave as required:
+    #   sum([]) == 0
+    #   prod([]) == 1
+    return (sum(numbers), prod(numbers))
+end
+using Test
+
+@testset begin
+
+candidate = sum_product;
+	@test(candidate(Vector{Int64}([])) == (0, 1))
+	@test(candidate([1, 1, 1]) == (3, 1))
+	@test(candidate([100, 0]) == (100, 0))
+	@test(candidate([3, 5, 7]) == (15, 105))
+	@test(candidate([10]) == (10, 10))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154455
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.2s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 16 (JL) - HumanEval_16_count_distinct_characters
+================================================================================
+
+PROMPT:
+----------------------------------------
+""" Given a string, find out how many distinct characters (regardless of case) does it consist of
+>>> count_distinct_characters("xyzXYZ")
+3
+>>> count_distinct_characters("Jerry")
+4"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = count_distinct_characters;
+	@test(candidate("") == 0)
+	@test(candidate("abcde") == 5)
+	@test(candidate("abcdecadeCADE") == 5)
+	@test(candidate("aaaaAAAAaaaa") == 1)
+	@test(candidate("Jerry jERRY JeRRRY") == 5)
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+""" Given a string, find out how many distinct characters (regardless of case) does it consist of
+>>> count_distinct_characters("xyzXYZ")
+3
+>>> count_distinct_characters("Jerry")
+4"""
+function count_distinct_characters(string::String)::Int64
+    # Convert the string to lower case so that 'A' and 'a' are treated the same
+    lower = lowercase(string)
+
+    # Create a set of characters; duplicates are automatically discarded
+    unique_chars = Set{Char}(lower)
+
+    # Return the number of distinct characters as an Int64
+    return Int64(length(unique_chars))
+end
+using Test
+
+@testset begin
+
+candidate = count_distinct_characters;
+	@test(candidate("") == 0)
+	@test(candidate("abcde") == 5)
+	@test(candidate("abcdecadeCADE") == 5)
+	@test(candidate("aaaaAAAAaaaa") == 1)
+	@test(candidate("Jerry jERRY JeRRRY") == 5)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+""" Given a string, find out how many distinct characters (regardless of case) does it consist of
+>>> count_distinct_characters("xyzXYZ")
+3
+>>> count_distinct_characters("Jerry")
+4"""
+function count_distinct_characters(string::String)::Int64
+    # Convert the string to a single case (lowercase) to ignore case differences
+    lower_str = lowercase(string)
+
+    # Use a Set to collect unique characters
+    unique_chars = Set{Char}()
+    for ch in lower_str
+        push!(unique_chars, ch)
+    end
+
+    # Return the number of distinct characters
+    return length(unique_chars)
+end
+using Test
+
+@testset begin
+
+candidate = count_distinct_characters;
+	@test(candidate("") == 0)
+	@test(candidate("abcde") == 5)
+	@test(candidate("abcdecadeCADE") == 5)
+	@test(candidate("aaaaAAAAaaaa") == 1)
+	@test(candidate("Jerry jERRY JeRRRY") == 5)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+""" Given a string, find out how many distinct characters (regardless of case) does it consist of
+>>> count_distinct_characters("xyzXYZ")
+3
+>>> count_distinct_characters("Jerry")
+4"""
+function count_distinct_characters(string::String)::Int64
+    # Convert the string to lowercase to ignore case
+    lower_str = lowercase(string)
+    # Create a set of characters to keep only distinct ones
+    distinct_chars = Set{Char}()
+    for ch in lower_str
+        push!(distinct_chars, ch)
+    end
+    # Return the number of distinct characters as an Int64
+    return Int64(length(distinct_chars))
+end
+using Test
+
+@testset begin
+
+candidate = count_distinct_characters;
+	@test(candidate("") == 0)
+	@test(candidate("abcde") == 5)
+	@test(candidate("abcdecadeCADE") == 5)
+	@test(candidate("aaaaAAAAaaaa") == 1)
+	@test(candidate("Jerry jERRY JeRRRY") == 5)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+""" Given a string, find out how many distinct characters (regardless of case) does it consist of
+>>> count_distinct_characters("xyzXYZ")
+3
+>>> count_distinct_characters("Jerry")
+4"""
+function count_distinct_characters(string::String)::Int64
+    # Convert the string to lowercase so that case is ignored,
+    # then collect the characters into a Set to keep only unique ones.
+    unique_chars = Set(lowercase(string))
+    # Return the number of distinct characters as an Int64.
+    return Int64(length(unique_chars))
+end
+using Test
+
+@testset begin
+
+candidate = count_distinct_characters;
+	@test(candidate("") == 0)
+	@test(candidate("abcde") == 5)
+	@test(candidate("abcdecadeCADE") == 5)
+	@test(candidate("aaaaAAAAaaaa") == 1)
+	@test(candidate("Jerry jERRY JeRRRY") == 5)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154479
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 20 (JL) - HumanEval_20_find_closest_elements
+================================================================================
+
+PROMPT:
+----------------------------------------
+""" From a supplied vector of numbers (of length at least two) select and return two that are the closest to each
+other and return them in order (smaller number, larger number).
+>>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])
+(2.0, 2.2)
+>>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])
+(2.0, 2.0)"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = find_closest_elements;
+	@test(candidate([1.0, 2.0, 3.9, 4.0, 5.0, 2.2]) == (3.9, 4.0))
+	@test(candidate([1.0, 2.0, 5.9, 4.0, 5.0]) == (5.0, 5.9))
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.2]) == (2.0, 2.2))
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.0]) == (2.0, 2.0))
+	@test(candidate([1.1, 2.2, 3.1, 4.1, 5.1]) == (2.2, 3.1))
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+""" From a supplied vector of numbers (of length at least two) select and return two that are the closest to each
+other and return them in order (smaller number, larger number).
+>>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])
+(2.0, 2.2)
+>>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])
+(2.0, 2.0)"""
+function find_closest_elements(numbers::Vector{Float64})::Tuple{Float64, Float64}
+    # Ensure there are at least two elements
+    if length(numbers) < 2
+        throw(ArgumentError("Input vector must contain at least two elements."))
+    end
+
+    # Sort the numbers to make it easy to find the closest pair
+    sorted_nums = sort(numbers)
+
+    # Initialize with the first pair
+    min_diff = abs(sorted_nums[2] - sorted_nums[1])
+    min_pair = (sorted_nums[1], sorted_nums[2])
+
+    # Scan adjacent pairs to find the minimal difference
+    for i in 1:(length(sorted_nums) - 1)
+        a, b = sorted_nums[i], sorted_nums[i + 1]
+        diff = abs(b - a)
+        if diff < min_diff
+            min_diff = diff
+            min_pair = (a, b)
+        end
+    end
+
+    return min_pair
+end
+using Test
+
+@testset begin
+
+candidate = find_closest_elements;
+	@test(candidate([1.0, 2.0, 3.9, 4.0, 5.0, 2.2]) == (3.9, 4.0))
+	@test(candidate([1.0, 2.0, 5.9, 4.0, 5.0]) == (5.0, 5.9))
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.2]) == (2.0, 2.2))
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.0]) == (2.0, 2.0))
+	@test(candidate([1.1, 2.2, 3.1, 4.1, 5.1]) == (2.2, 3.1))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154492
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+""" From a supplied vector of numbers (of length at least two) select and return two that are the closest to each
+other and return them in order (smaller number, larger number).
+>>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])
+(2.0, 2.2)
+>>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])
+(2.0, 2.0)"""
+function find_closest_elements(numbers::Vector{Float64})::Tuple{Float64, Float64}
+    @assert length(numbers) >= 2 "Input vector must contain at least two elements"
+
+    # Sort the numbers so that the closest pair will be adjacent
+    sorted = sort(numbers)
+
+    # Initialize with the first adjacent pair
+    min_diff = Inf
+    pair = (sorted[1], sorted[2])
+
+    # Scan through the sorted array to find the minimal difference
+    for i in 1:length(sorted)-1
+        diff = sorted[i+1] - sorted[i]
+        if diff < min_diff
+            min_diff = diff
+            pair = (sorted[i], sorted[i+1])
+        end
+    end
+
+    return pair
+end
+using Test
+
+@testset begin
+
+candidate = find_closest_elements;
+	@test(candidate([1.0, 2.0, 3.9, 4.0, 5.0, 2.2]) == (3.9, 4.0))
+	@test(candidate([1.0, 2.0, 5.9, 4.0, 5.0]) == (5.0, 5.9))
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.2]) == (2.0, 2.2))
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.0]) == (2.0, 2.0))
+	@test(candidate([1.1, 2.2, 3.1, 4.1, 5.1]) == (2.2, 3.1))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154492
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+""" From a supplied vector of numbers (of length at least two) select and return two that are the closest to each
+other and return them in order (smaller number, larger number).
+>>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])
+(2.0, 2.2)
+>>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])
+(2.0, 2.0)"""
+function find_closest_elements(numbers::Vector{Float64})::Tuple{Float64, Float64}
+    # Ensure we have at least two elements
+    if length(numbers) < 2
+        error("Input vector must contain at least two elements")
+    end
+
+    # Sort the numbers to make adjacent pairs the only candidates for the
+    # smallest absolute difference.
+    sorted = sort(numbers)
+
+    # Initialize with the first pair
+    min_diff = Inf
+    pair = (sorted[1], sorted[2])
+
+    # Scan through adjacent pairs
+    for i in 1:length(sorted)-1
+        diff = abs(sorted[i+1] - sorted[i])
+        if diff < min_diff
+            min_diff = diff
+            pair = (sorted[i], sorted[i+1])  # already sorted: smaller first
+        end
+    end
+
+    return pair
+end
+using Test
+
+@testset begin
+
+candidate = find_closest_elements;
+	@test(candidate([1.0, 2.0, 3.9, 4.0, 5.0, 2.2]) == (3.9, 4.0))
+	@test(candidate([1.0, 2.0, 5.9, 4.0, 5.0]) == (5.0, 5.9))
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.2]) == (2.0, 2.2))
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.0]) == (2.0, 2.0))
+	@test(candidate([1.1, 2.2, 3.1, 4.1, 5.1]) == (2.2, 3.1))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154492
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+""" From a supplied vector of numbers (of length at least two) select and return two that are the closest to each
+other and return them in order (smaller number, larger number).
+>>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])
+(2.0, 2.2)
+>>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])
+(2.0, 2.0)"""
+function find_closest_elements(numbers::Vector{Float64})::Tuple{Float64, Float64}
+    # Sort the numbers so that the closest pair must be adjacent
+    sorted = sort(numbers)
+
+    # Initialise with the first adjacent pair
+    min_diff = Inf
+    pair = (sorted[1], sorted[2])
+
+    # Scan through the sorted list to find the minimal difference
+    for i in 1:length(sorted) - 1
+        diff = sorted[i + 1] - sorted[i]          # positive because sorted ascending
+        if diff < min_diff
+            min_diff = diff
+            pair = (sorted[i], sorted[i + 1])
+        end
+    end
+
+    return pair
+end
+using Test
+
+@testset begin
+
+candidate = find_closest_elements;
+	@test(candidate([1.0, 2.0, 3.9, 4.0, 5.0, 2.2]) == (3.9, 4.0))
+	@test(candidate([1.0, 2.0, 5.9, 4.0, 5.0]) == (5.0, 5.9))
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.2]) == (2.0, 2.2))
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.0]) == (2.0, 2.0))
+	@test(candidate([1.1, 2.2, 3.1, 4.1, 5.1]) == (2.2, 3.1))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154492
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.2s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 21 (JL) - HumanEval_21_rescale_to_unit
+================================================================================
+
+PROMPT:
+----------------------------------------
+""" Given vector of numbers (of at least two elements), apply a linear transform to that vector,
+such that the smallest number will become 0 and the largest will become 1
+>>> rescale_to_unit([1.0, 2.0, 3.0, 4.0, 5.0])
+[0.0, 0.25, 0.5, 0.75, 1.0]"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = rescale_to_unit;
+	@test(candidate([2.0, 49.9]) == [0.0, 1.0])
+	@test(candidate([100.0, 49.9]) == [1.0, 0.0])
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0]) == [0.0, 0.25, 0.5, 0.75, 1.0])
+	@test(candidate([2.0, 1.0, 5.0, 3.0, 4.0]) == [0.25, 0.0, 1.0, 0.5, 0.75])
+	@test(candidate([12.0, 11.0, 15.0, 13.0, 14.0]) == [0.25, 0.0, 1.0, 0.5, 0.75])
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+""" Given vector of numbers (of at least two elements), apply a linear transform to that vector,
+such that the smallest number will become 0 and the largest will become 1
+>>> rescale_to_unit([1.0, 2.0, 3.0, 4.0, 5.0])
+[0.0, 0.25, 0.5, 0.75, 1.0]"""
+function rescale_to_unit(numbers::Vector{Float64})::Vector{Float64}
+    min_val = minimum(numbers)
+    max_val = maximum(numbers)
+    range = max_val - min_val
+    return [(x - min_val) / range for x in numbers]
+end
+using Test
+
+@testset begin
+
+candidate = rescale_to_unit;
+	@test(candidate([2.0, 49.9]) == [0.0, 1.0])
+	@test(candidate([100.0, 49.9]) == [1.0, 0.0])
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0]) == [0.0, 0.25, 0.5, 0.75, 1.0])
+	@test(candidate([2.0, 1.0, 5.0, 3.0, 4.0]) == [0.25, 0.0, 1.0, 0.5, 0.75])
+	@test(candidate([12.0, 11.0, 15.0, 13.0, 14.0]) == [0.25, 0.0, 1.0, 0.5, 0.75])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154493
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.3s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+""" Given vector of numbers (of at least two elements), apply a linear transform to that vector,
+such that the smallest number will become 0 and the largest will become 1
+>>> rescale_to_unit([1.0, 2.0, 3.0, 4.0, 5.0])
+[0.0, 0.25, 0.5, 0.75, 1.0]"""
+function rescale_to_unit(numbers::Vector{Float64})::Vector{Float64}
+    # Find the minimum and maximum values in the input vector
+    min_val = minimum(numbers)
+    max_val = maximum(numbers)
+
+    # Compute the range. If all elements are equal, avoid division by zero
+    range = max_val - min_val
+    if range == 0.0
+        return zeros(length(numbers))
+    end
+
+    # Apply the linear transformation to each element
+    return [(x - min_val) / range for x in numbers]
+end
+using Test
+
+@testset begin
+
+candidate = rescale_to_unit;
+	@test(candidate([2.0, 49.9]) == [0.0, 1.0])
+	@test(candidate([100.0, 49.9]) == [1.0, 0.0])
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0]) == [0.0, 0.25, 0.5, 0.75, 1.0])
+	@test(candidate([2.0, 1.0, 5.0, 3.0, 4.0]) == [0.25, 0.0, 1.0, 0.5, 0.75])
+	@test(candidate([12.0, 11.0, 15.0, 13.0, 14.0]) == [0.25, 0.0, 1.0, 0.5, 0.75])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154493
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.3s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+""" Given vector of numbers (of at least two elements), apply a linear transform to that vector,
+such that the smallest number will become 0 and the largest will become 1
+>>> rescale_to_unit([1.0, 2.0, 3.0, 4.0, 5.0])
+[0.0, 0.25, 0.5, 0.75, 1.0]"""
+function rescale_to_unit(numbers::Vector{Float64})::Vector{Float64}
+    min_val = minimum(numbers)
+    max_val = maximum(numbers)
+    denom   = max_val - min_val
+
+    # If all numbers are equal, avoid division by zero
+    if denom == 0.0
+        return zeros(length(numbers))
+    end
+
+    return [(x - min_val) / denom for x in numbers]
+end
+using Test
+
+@testset begin
+
+candidate = rescale_to_unit;
+	@test(candidate([2.0, 49.9]) == [0.0, 1.0])
+	@test(candidate([100.0, 49.9]) == [1.0, 0.0])
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0]) == [0.0, 0.25, 0.5, 0.75, 1.0])
+	@test(candidate([2.0, 1.0, 5.0, 3.0, 4.0]) == [0.25, 0.0, 1.0, 0.5, 0.75])
+	@test(candidate([12.0, 11.0, 15.0, 13.0, 14.0]) == [0.25, 0.0, 1.0, 0.5, 0.75])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154493
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.3s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+""" Given vector of numbers (of at least two elements), apply a linear transform to that vector,
+such that the smallest number will become 0 and the largest will become 1
+>>> rescale_to_unit([1.0, 2.0, 3.0, 4.0, 5.0])
+[0.0, 0.25, 0.5, 0.75, 1.0]"""
+function rescale_to_unit(numbers::Vector{Float64})::Vector{Float64}
+    min_val = minimum(numbers)
+    max_val = maximum(numbers)
+    range = max_val - min_val
+    # Linear rescaling: (x - min) / (max - min)
+    return [(x - min_val) / range for x in numbers]
+end
+using Test
+
+@testset begin
+
+candidate = rescale_to_unit;
+	@test(candidate([2.0, 49.9]) == [0.0, 1.0])
+	@test(candidate([100.0, 49.9]) == [1.0, 0.0])
+	@test(candidate([1.0, 2.0, 3.0, 4.0, 5.0]) == [0.0, 0.25, 0.5, 0.75, 1.0])
+	@test(candidate([2.0, 1.0, 5.0, 3.0, 4.0]) == [0.25, 0.0, 1.0, 0.5, 0.75])
+	@test(candidate([12.0, 11.0, 15.0, 13.0, 14.0]) == [0.25, 0.0, 1.0, 0.5, 0.75])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154493
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    5      5  0.3s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 22 (JL) - HumanEval_22_filter_integers
+================================================================================
+
+PROMPT:
+----------------------------------------
+""" Filter given vector of any jlthon values only for integers
+>>> filter_integers(["a", 3.14, 5])
+[5]
+>>> filter_integers([1, 2, 3, "abc", Dict(), []])
+[1, 2, 3]"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = filter_integers;
+	@test(candidate(Vector{Any}([])) == Vector{Int64}([]))
+	@test(candidate([4, Dict(), [], 23.2, 9, "adasd"]) == [4, 9])
+	@test(candidate([3, "c", 3, 3, "a", "b"]) == [3, 3, 3])
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+""" Filter given vector of any jlthon values only for integers
+>>> filter_integers(["a", 3.14, 5])
+[5]
+>>> filter_integers([1, 2, 3, "abc", Dict(), []])
+[1, 2, 3]"""
+function filter_integers(values::Vector{Any})::Vector{Int64}
+    # Keep only elements that are integers and convert them to Int64
+    return [Int64(x) for x in values if isa(x, Integer)]
+end
+using Test
+
+@testset begin
+
+candidate = filter_integers;
+	@test(candidate(Vector{Any}([])) == Vector{Int64}([]))
+	@test(candidate([4, Dict(), [], 23.2, 9, "adasd"]) == [4, 9])
+	@test(candidate([3, "c", 3, 3, "a", "b"]) == [3, 3, 3])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154495
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    3      3  0.5s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+""" Filter given vector of any jlthon values only for integers
+>>> filter_integers(["a", 3.14, 5])
+[5]
+>>> filter_integers([1, 2, 3, "abc", Dict(), []])
+[1, 2, 3]"""
+function filter_integers(values::Vector{Any})::Vector{Int64}
+    return Int64[x for x in values if x isa Int]
+end
+using Test
+
+@testset begin
+
+candidate = filter_integers;
+	@test(candidate(Vector{Any}([])) == Vector{Int64}([]))
+	@test(candidate([4, Dict(), [], 23.2, 9, "adasd"]) == [4, 9])
+	@test(candidate([3, "c", 3, 3, "a", "b"]) == [3, 3, 3])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154495
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    3      3  0.4s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+""" Filter given vector of any jlthon values only for integers
+>>> filter_integers(["a", 3.14, 5])
+[5]
+>>> filter_integers([1, 2, 3, "abc", Dict(), []])
+[1, 2, 3]"""
+function filter_integers(values::Vector{Any})::Vector{Int64}
+    # Keep only values that are of type Int and convert them to Int64
+    return Int64.(filter(x -> isa(x, Int), values))
+end
+using Test
+
+@testset begin
+
+candidate = filter_integers;
+	@test(candidate(Vector{Any}([])) == Vector{Int64}([]))
+	@test(candidate([4, Dict(), [], 23.2, 9, "adasd"]) == [4, 9])
+	@test(candidate([3, "c", 3, 3, "a", "b"]) == [3, 3, 3])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154495
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    3      3  0.5s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+""" Filter given vector of any jlthon values only for integers
+>>> filter_integers(["a", 3.14, 5])
+[5]
+>>> filter_integers([1, 2, 3, "abc", Dict(), []])
+[1, 2, 3]"""
+function filter_integers(values::Vector{Any})::Vector{Int64}
+    # Create an empty vector to hold the integer results
+    result = Int64[]
+    # Iterate over each element in the input vector
+    for v in values
+        # Check if the element is an integer (any subtype of Integer)
+        if isa(v, Integer)
+            # Convert to Int64 (in case it is a different integer type) and push
+            push!(result, Int64(v))
+        end
+    end
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = filter_integers;
+	@test(candidate(Vector{Any}([])) == Vector{Int64}([]))
+	@test(candidate([4, Dict(), [], 23.2, 9, "adasd"]) == [4, 9])
+	@test(candidate([3, "c", 3, 3, "a", "b"]) == [3, 3, 3])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154495
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    3      3  0.4s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 25 (JL) - HumanEval_25_factorize
+================================================================================
+
+PROMPT:
+----------------------------------------
+""" Return vector of prime factors of given integer in the order from smallest to largest.
+Each of the factors should be vectored number of times corresponding to how many times it appeares in factorization.
+Input number should be equal to the product of all factors
+>>> factorize(8)
+[2, 2, 2]
+>>> factorize(25)
+[5, 5]
+>>> factorize(70)
+[2, 5, 7]"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = factorize;
+	@test(candidate(2) == [2])
+	@test(candidate(4) == [2, 2])
+	@test(candidate(8) == [2, 2, 2])
+	@test(candidate(57) == [3, 19])
+	@test(candidate(3249) == [3, 3, 19, 19])
+	@test(candidate(185193) == [3, 3, 3, 19, 19, 19])
+	@test(candidate(20577) == [3, 19, 19, 19])
+	@test(candidate(18) == [2, 3, 3])
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+""" Return vector of prime factors of given integer in the order from smallest to largest.
+Each of the factors should be vectored number of times corresponding to how many times it appeares in factorization.
+Input number should be equal to the product of all factors
+>>> factorize(8)
+[2, 2, 2]
+>>> factorize(25)
+[5, 5]
+>>> factorize(70)
+[2, 5, 7]"""
+function factorize(n::Int64)::Vector{Int64}
+    factors = Int64[]
+    d = Int64(2)
+
+    while d * d <= n
+        while n % d == 0
+            push!(factors, d)
+            n ÷= d          # integer division
+        end
+        d += 1
+    end
+
+    # If n is now > 1, it is a prime factor larger than sqrt(original n)
+    if n > 1
+        push!(factors, n)
+    end
+
+    return factors
+end
+using Test
+
+@testset begin
+
+candidate = factorize;
+	@test(candidate(2) == [2])
+	@test(candidate(4) == [2, 2])
+	@test(candidate(8) == [2, 2, 2])
+	@test(candidate(57) == [3, 19])
+	@test(candidate(3249) == [3, 3, 19, 19])
+	@test(candidate(185193) == [3, 3, 3, 19, 19, 19])
+	@test(candidate(20577) == [3, 19, 19, 19])
+	@test(candidate(18) == [2, 3, 3])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154503
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    8      8  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+""" Return vector of prime factors of given integer in the order from smallest to largest.
+Each of the factors should be vectored number of times corresponding to how many times it appeares in factorization.
+Input number should be equal to the product of all factors
+>>> factorize(8)
+[2, 2, 2]
+>>> factorize(25)
+[5, 5]
+>>> factorize(70)
+[2, 5, 7]"""
+function factorize(n::Int64)::Vector{Int64}
+    result = Int64[]
+
+    # Handle numbers less than 2 (1 or 0)
+    if n < 2
+        return result
+    end
+
+    # Check for factor 2 first
+    while n % 2 == 0
+        push!(result, 2)
+        n ÷= 2
+    end
+
+    # Check odd divisors from 3 upwards
+    d = 3
+    while d * d <= n
+        while n % d == 0
+            push!(result, d)
+            n ÷= d
+        end
+        d += 2
+    end
+
+    # If n is still greater than 1, it is a prime factor
+    if n > 1
+        push!(result, n)
+    end
+
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = factorize;
+	@test(candidate(2) == [2])
+	@test(candidate(4) == [2, 2])
+	@test(candidate(8) == [2, 2, 2])
+	@test(candidate(57) == [3, 19])
+	@test(candidate(3249) == [3, 3, 19, 19])
+	@test(candidate(185193) == [3, 3, 3, 19, 19, 19])
+	@test(candidate(20577) == [3, 19, 19, 19])
+	@test(candidate(18) == [2, 3, 3])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154503
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    8      8  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+""" Return vector of prime factors of given integer in the order from smallest to largest.
+Each of the factors should be vectored number of times corresponding to how many times it appeares in factorization.
+Input number should be equal to the product of all factors
+>>> factorize(8)
+[2, 2, 2]
+>>> factorize(25)
+[5, 5]
+>>> factorize(70)
+[2, 5, 7]"""
+function factorize(n::Int64)::Vector{Int64}
+    # Handle trivial cases
+    if n < 2
+        return Int64[]
+    end
+
+    factors = Int64[]
+    # Check divisibility by 2 first
+    while n % 2 == 0
+        push!(factors, 2)
+        n ÷= 2
+    end
+
+    # Check odd divisors up to sqrt(n)
+    p = 3
+    limit = floor(Int, sqrt(n))
+    while p <= limit && n > 1
+        while n % p == 0
+            push!(factors, p)
+            n ÷= p
+        end
+        p += 2
+        limit = floor(Int, sqrt(n))
+    end
+
+    # If n is now a prime > 1, add it
+    if n > 1
+        push!(factors, n)
+    end
+
+    return factors
+end
+using Test
+
+@testset begin
+
+candidate = factorize;
+	@test(candidate(2) == [2])
+	@test(candidate(4) == [2, 2])
+	@test(candidate(8) == [2, 2, 2])
+	@test(candidate(57) == [3, 19])
+	@test(candidate(3249) == [3, 3, 19, 19])
+	@test(candidate(185193) == [3, 3, 3, 19, 19, 19])
+	@test(candidate(20577) == [3, 19, 19, 19])
+	@test(candidate(18) == [2, 3, 3])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154503
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    8      8  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+""" Return vector of prime factors of given integer in the order from smallest to largest.
+Each of the factors should be vectored number of times corresponding to how many times it appeares in factorization.
+Input number should be equal to the product of all factors
+>>> factorize(8)
+[2, 2, 2]
+>>> factorize(25)
+[5, 5]
+>>> factorize(70)
+[2, 5, 7]"""
+function factorize(n::Int64)::Vector{Int64}
+    # Handle the trivial case
+    if n == 1
+        return Int64[]
+    end
+
+    factors = Int64[]
+
+    # Extract factors of 2 first
+    while n % 2 == 0
+        push!(factors, 2)
+        n ÷= 2
+    end
+
+    # Check odd divisors up to sqrt(n)
+    i = 3
+    while i * i <= n
+        while n % i == 0
+            push!(factors, i)
+            n ÷= i
+        end
+        i += 2
+    end
+
+    # If n is now greater than 1, it is a prime factor
+    if n > 1
+        push!(factors, n)
+    end
+
+    return factors
+end
+using Test
+
+@testset begin
+
+candidate = factorize;
+	@test(candidate(2) == [2])
+	@test(candidate(4) == [2, 2])
+	@test(candidate(8) == [2, 2, 2])
+	@test(candidate(57) == [3, 19])
+	@test(candidate(3249) == [3, 3, 19, 19])
+	@test(candidate(185193) == [3, 3, 3, 19, 19, 19])
+	@test(candidate(20577) == [3, 19, 19, 19])
+	@test(candidate(18) == [2, 3, 3])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154503
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    8      8  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 30 (JL) - HumanEval_30_get_positive
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""Return only positive numbers in the vector.
+>>> get_positive([-1, 2, -4, 5, 6])
+[2, 5, 6]
+>>> get_positive([5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10])
+[5, 3, 2, 3, 9, 123, 1]"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = get_positive;
+	@test(candidate([-1, -2, 4, 5, 6]) == [4, 5, 6])
+	@test(candidate([5, 3, -5, 2, 3, 3, 9, 0, 123, 1, -10]) == [5, 3, 2, 3, 3, 9, 123, 1])
+	@test(candidate([-1, -2]) == Vector{Int64}([]))
+	@test(candidate(Vector{Int64}([])) == Vector{Int64}([]))
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""Return only positive numbers in the vector.
+>>> get_positive([-1, 2, -4, 5, 6])
+[2, 5, 6]
+>>> get_positive([5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10])
+[5, 3, 2, 3, 9, 123, 1]"""
+function get_positive(l::Vector{Int64})::Vector{Int64}
+    return filter(x -> x > 0, l)
+end
+using Test
+
+@testset begin
+
+candidate = get_positive;
+	@test(candidate([-1, -2, 4, 5, 6]) == [4, 5, 6])
+	@test(candidate([5, 3, -5, 2, 3, 3, 9, 0, 123, 1, -10]) == [5, 3, 2, 3, 3, 9, 123, 1])
+	@test(candidate([-1, -2]) == Vector{Int64}([]))
+	@test(candidate(Vector{Int64}([])) == Vector{Int64}([]))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154517
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    4      4  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""Return only positive numbers in the vector.
+>>> get_positive([-1, 2, -4, 5, 6])
+[2, 5, 6]
+>>> get_positive([5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10])
+[5, 3, 2, 3, 9, 123, 1]"""
+function get_positive(l::Vector{Int64})::Vector{Int64}
+    return filter(x -> x > 0, l)
+end
+using Test
+
+@testset begin
+
+candidate = get_positive;
+	@test(candidate([-1, -2, 4, 5, 6]) == [4, 5, 6])
+	@test(candidate([5, 3, -5, 2, 3, 3, 9, 0, 123, 1, -10]) == [5, 3, 2, 3, 3, 9, 123, 1])
+	@test(candidate([-1, -2]) == Vector{Int64}([]))
+	@test(candidate(Vector{Int64}([])) == Vector{Int64}([]))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154517
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    4      4  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""Return only positive numbers in the vector.
+>>> get_positive([-1, 2, -4, 5, 6])
+[2, 5, 6]
+>>> get_positive([5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10])
+[5, 3, 2, 3, 9, 123, 1]"""
+function get_positive(l::Vector{Int64})::Vector{Int64}
+    # Use a comprehension or filter to select elements greater than zero
+    return filter(x -> x > 0, l)
+end
+using Test
+
+@testset begin
+
+candidate = get_positive;
+	@test(candidate([-1, -2, 4, 5, 6]) == [4, 5, 6])
+	@test(candidate([5, 3, -5, 2, 3, 3, 9, 0, 123, 1, -10]) == [5, 3, 2, 3, 3, 9, 123, 1])
+	@test(candidate([-1, -2]) == Vector{Int64}([]))
+	@test(candidate(Vector{Int64}([])) == Vector{Int64}([]))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154517
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    4      4  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""Return only positive numbers in the vector.
+>>> get_positive([-1, 2, -4, 5, 6])
+[2, 5, 6]
+>>> get_positive([5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10])
+[5, 3, 2, 3, 9, 123, 1]"""
+function get_positive(l::Vector{Int64})::Vector{Int64}
+    return filter(x -> x > 0, l)
+end
+using Test
+
+@testset begin
+
+candidate = get_positive;
+	@test(candidate([-1, -2, 4, 5, 6]) == [4, 5, 6])
+	@test(candidate([5, 3, -5, 2, 3, 3, 9, 0, 123, 1, -10]) == [5, 3, 2, 3, 3, 9, 123, 1])
+	@test(candidate([-1, -2]) == Vector{Int64}([]))
+	@test(candidate(Vector{Int64}([])) == Vector{Int64}([]))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154517
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    4      4  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 39 (JL) - HumanEval_39_prime_fib
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""prime_fib returns n-th number that is a Fibonacci number and it's also prime.
+>>> prime_fib(1)
+2
+>>> prime_fib(2)
+3
+>>> prime_fib(3)
+5
+>>> prime_fib(4)
+13
+>>> prime_fib(5)
+89"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = prime_fib;
+	@test(candidate(1) == 2)
+	@test(candidate(2) == 3)
+	@test(candidate(3) == 5)
+	@test(candidate(4) == 13)
+	@test(candidate(5) == 89)
+	@test(candidate(6) == 233)
+	@test(candidate(7) == 1597)
+	@test(candidate(8) == 28657)
+	@test(candidate(9) == 514229)
+	@test(candidate(10) == 433494437)
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""prime_fib returns n-th number that is a Fibonacci number and it's also prime.
+>>> prime_fib(1)
+2
+>>> prime_fib(2)
+3
+>>> prime_fib(3)
+5
+>>> prime_fib(4)
+13
+>>> prime_fib(5)
+89"""
+# Return the n‑th Fibonacci number that is also prime
+function prime_fib(n::Int64)::Int64
+    # Simple deterministic primality test (trial division)
+    function isprime(k::Int64)::Bool
+        if k < 2
+            return false
+        elseif k == 2 || k == 3
+            return true
+        elseif k % 2 == 0
+            return false
+        end
+        i = Int64(3)
+        # Use k ÷ i to avoid overflow of i*i
+        while i <= k ÷ i
+            if k % i == 0
+                return false
+            end
+            i += 2
+        end
+        return true
+    end
+
+    count = 0
+    a, b = Int64(1), Int64(1)   # Fibonacci seeds
+    while true
+        a, b = b, a + b          # a becomes the next Fibonacci number
+        if isprime(a)
+            count += 1
+            if count == n
+                return a
+            end
+        end
+    end
+end
+using Test
+
+@testset begin
+
+candidate = prime_fib;
+	@test(candidate(1) == 2)
+	@test(candidate(2) == 3)
+	@test(candidate(3) == 5)
+	@test(candidate(4) == 13)
+	@test(candidate(5) == 89)
+	@test(candidate(6) == 233)
+	@test(candidate(7) == 1597)
+	@test(candidate(8) == 28657)
+	@test(candidate(9) == 514229)
+	@test(candidate(10) == 433494437)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154542
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   10     10  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""prime_fib returns n-th number that is a Fibonacci number and it's also prime.
+>>> prime_fib(1)
+2
+>>> prime_fib(2)
+3
+>>> prime_fib(3)
+5
+>>> prime_fib(4)
+13
+>>> prime_fib(5)
+89"""
+# Returns the n‑th Fibonacci number that is also a prime.
+# Example usage:
+#   prime_fib(1)  # 2
+#   prime_fib(2)  # 3
+#   prime_fib(3)  # 5
+#   prime_fib(4)  # 13
+#   prime_fib(5)  # 89
+
+function prime_fib(n::Int64)::Int64
+    if n <= 0
+        error("n must be a positive integer")
+    end
+
+    # Helper to test primality
+    is_prime(x::Int64)::Bool = begin
+        if x <= 1
+            return false
+        elseif x <= 3
+            return true
+        elseif x % 2 == 0
+            return false
+        end
+        limit = isqrt(x)          # integer square root
+        i = 3
+        while i <= limit
+            if x % i == 0
+                return false
+            end
+            i += 2
+        end
+        return true
+    end
+
+    count = 0
+    a = 1
+    b = 1
+    result = 0
+
+    while count < n
+        c = a + b
+        a = b
+        b = c
+        if is_prime(c)
+            count += 1
+            result = c
+        end
+    end
+
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = prime_fib;
+	@test(candidate(1) == 2)
+	@test(candidate(2) == 3)
+	@test(candidate(3) == 5)
+	@test(candidate(4) == 13)
+	@test(candidate(5) == 89)
+	@test(candidate(6) == 233)
+	@test(candidate(7) == 1597)
+	@test(candidate(8) == 28657)
+	@test(candidate(9) == 514229)
+	@test(candidate(10) == 433494437)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154542
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   10     10  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""prime_fib returns n-th number that is a Fibonacci number and it's also prime.
+>>> prime_fib(1)
+2
+>>> prime_fib(2)
+3
+>>> prime_fib(3)
+5
+>>> prime_fib(4)
+13
+>>> prime_fib(5)
+89"""
+# prime_fib.jl
+# ------------------------------------------------------------
+# Returns the n‑th Fibonacci number that is also a prime.
+# ------------------------------------------------------------
+
+# Simple primality test (trial division up to sqrt(x))
+function is_prime(x::Int64)::Bool
+    if x < 2
+        return false
+    elseif x == 2
+        return true
+    elseif x % 2 == 0
+        return false
+    end
+    i = 3
+    while i * i <= x
+        if x % i == 0
+            return false
+        end
+        i += 2
+    end
+    return true
+end
+
+# Main function
+function prime_fib(n::Int64)::Int64
+    @assert n >= 1 "n must be a positive integer"
+
+    count = 0          # how many prime‑Fibonacci numbers we have found
+    a, b = 0, 1        # start of Fibonacci sequence
+
+    while true
+        a, b = b, a + b           # next Fibonacci number
+        if is_prime(a)
+            count += 1
+            if count == n
+                return a
+            end
+        end
+    end
+end
+using Test
+
+@testset begin
+
+candidate = prime_fib;
+	@test(candidate(1) == 2)
+	@test(candidate(2) == 3)
+	@test(candidate(3) == 5)
+	@test(candidate(4) == 13)
+	@test(candidate(5) == 89)
+	@test(candidate(6) == 233)
+	@test(candidate(7) == 1597)
+	@test(candidate(8) == 28657)
+	@test(candidate(9) == 514229)
+	@test(candidate(10) == 433494437)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154542
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   10     10  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""prime_fib returns n-th number that is a Fibonacci number and it's also prime.
+>>> prime_fib(1)
+2
+>>> prime_fib(2)
+3
+>>> prime_fib(3)
+5
+>>> prime_fib(4)
+13
+>>> prime_fib(5)
+89"""
+# Check whether an integer is prime (deterministic for 64‑bit values)
+function is_prime(x::Int64)::Bool
+    if x < 2
+        return false
+    elseif x == 2
+        return true
+    elseif x % 2 == 0
+        return false
+    end
+    i = Int64(3)
+    limit = floor(Int64, sqrt(x))
+    while i <= limit
+        if x % i == 0
+            return false
+        end
+        i += 2
+    end
+    return true
+end
+
+# Return the n‑th Fibonacci number that is also prime
+function prime_fib(n::Int64)::Int64
+    if n <= 0
+        error("n must be a positive integer")
+    end
+
+    count = 0
+    a = Int64(0)   # F(0)
+    b = Int64(1)   # F(1)
+
+    while true
+        a, b = b, a + b   # move to next Fibonacci number
+        if is_prime(a)
+            count += 1
+            if count == n
+                return a
+            end
+        end
+    end
+end
+using Test
+
+@testset begin
+
+candidate = prime_fib;
+	@test(candidate(1) == 2)
+	@test(candidate(2) == 3)
+	@test(candidate(3) == 5)
+	@test(candidate(4) == 13)
+	@test(candidate(5) == 89)
+	@test(candidate(6) == 233)
+	@test(candidate(7) == 1597)
+	@test(candidate(8) == 28657)
+	@test(candidate(9) == 514229)
+	@test(candidate(10) == 433494437)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154542
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   10     10  0.1s
+STDERR: (empty)
+--------------------

@@ -6,8 +6,7 @@ __pycache__
 cache
 scratch/
 out_preprocessed/
-raw/
-pass_k_results/
+jsons/
 slurm-*
 before_proc_*/
 after_proc_*/

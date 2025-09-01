@@ -106,8 +106,11 @@ def make_main(args, model_name, gen_completions):
         problems = datasets.load_dataset(
             "json", data_files=args.dataset, split="train")
     else:
+        # revision=DATASET_REVISION,
         problems = datasets.load_dataset(
-            "nuprl/MultiPL-E", f"{args.root_dataset}-{args.lang}", revision=DATASET_REVISION, split="test"
+            "jsbyun121/MultiPL-E-fixed",
+            f"{args.root_dataset}-{args.lang}",
+            split="test"
         )
 
     start_index = args.input_start_index if args.input_start_index is not None else 0

@@ -9,7 +9,7 @@ usage() {
     echo "  -d, --base-dir   Base directory for input/output"
     echo ""
     echo "Example:"
-    echo "  $0 -l r,rkt,ml -d ./before_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024"
+    echo "  $0 -l r,rkt,ml -d ./after_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024"
     exit 1
 }
 

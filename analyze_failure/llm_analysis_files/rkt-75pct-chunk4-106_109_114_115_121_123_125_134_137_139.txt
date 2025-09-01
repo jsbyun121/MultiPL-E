@@ -1,0 +1,3095 @@
+As per my standing instructions, analyze each code-execution result provided. For every item, produce a structured report as follows.
+
+1) Status
+Status: "OK" (Success) or else (Failure)
+Evidence: include exit code, error status, and whether stderr is empty/non-empty (quote the first relevant line).
+
+If Failure (non-zero exit code, error status, or non-empty stderr)
+Root Cause Analysis
+Explain why it failed, grounded in the logs/trace.
+Point to the exact faulty locations (file and line numbers if available). Quote the minimal offending snippets.
+Recommended Fix (Minimal Patch)
+Provide brief code segments (3–7 lines each) that would correct the issue.
+If multiple faults exist, list fixes in order of impact.
+Final Answer
+Classify the ultimate source of failure as one of: faulty problem setting / wrong test case / incorrect code implementation.
+State it on a single line: Final Answer: <chosen category>.
+
+If Success (exit code 0 and empty stderr)
+Critical Correctness Review
+Do not assume success means correctness.
+Check if the code's logic truly matches the intended problem requirements, including edge cases and corner conditions.
+Identify any silent errors, logical flaws, or incompleteness that would still pass execution but fail semantically.
+If the implementation is sound, explain why it is correct. If not, explain the discrepancy clearly.
+Final Answer
+Explicitly confirm or reject correctness in one line: Final Answer: correct or incorrect (with a one-phrase justification if incorrect).
+
+General rules
+Be precise and concise. Don't invent behavior not evidenced by the logs or code.
+When line numbers aren't available, reference the closest identifiable code block.
+Prefer minimal fixes over refactors; include just enough context to apply the patch.
+
+CONTENT TO ANALYZE:
+
+================================================================================
+PROBLEM 106 (RKT) - HumanEval_106_f
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Implement the function f that takes n as a parameter,
+;; and returns a list of size n, such that the value of the element at index i is the factorial of i if i is even
+;; or the sum of numbers from 1 to i otherwise.
+;; i starts from 1.
+;; the factorial of i is the multiplication of the numbers from 1 to i (1 * 2 * ... * i).
+;; Example:
+;; >>> (f 5)
+;; (list 1 2 6 24 15)
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate f))
+    (check-within (candidate 5) (list 1 2 6 24 15) 0.001)
+    (check-within (candidate 7) (list 1 2 6 24 15 720 28) 0.001)
+    (check-within (candidate 1) (list 1) 0.001)
+    (check-within (candidate 3) (list 1 2 6) 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Implement the function f that takes n as a parameter,
+;; and returns a list of size n, such that the value of the element at index i is the factorial of i if i is even
+;; or the sum of numbers from 1 to i otherwise.
+;; i starts from 1.
+;; the factorial of i is the multiplication of the numbers from 1 to i (1 * 2 * ... * i).
+;; Example:
+;; >>> (f 5)
+;; (list 1 2 6 24 15)
+(require racket/math)   ; provides factorial
+
+;; f : Integer -> Listof Integer
+;; Returns a list of length n where the i‑th element (1‑based) is
+;;   * the factorial of i if i is even
+;;   * the sum 1+2+…+i if i is odd
+(define (f n)
+  (for/list ([i (in-range 1 (+ n 1))])          ; i runs from 1 to n
+    (if (even? i)
+        (factorial i)                           ; even index
+        (apply + (range 1 (+ i 1)))))           ; odd index
+)
+
+;; Example
+(f 5)   ; => '(1 2 6 24 15)
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate f))
+    (check-within (candidate 5) (list 1 2 6 24 15) 0.001)
+    (check-within (candidate 7) (list 1 2 6 24 15 720 28) 0.001)
+    (check-within (candidate 1) (list 1) 0.001)
+    (check-within (candidate 3) (list 1 2 6) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755183951
+STDOUT: (empty)
+STDERR:
+/tmp/tmpcavyl7qa.rkt:20:9: factorial: unbound identifier
+  in: factorial
+  location...:
+   /tmp/tmpcavyl7qa.rkt:20:9
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Implement the function f that takes n as a parameter,
+;; and returns a list of size n, such that the value of the element at index i is the factorial of i if i is even
+;; or the sum of numbers from 1 to i otherwise.
+;; i starts from 1.
+;; the factorial of i is the multiplication of the numbers from 1 to i (1 * 2 * ... * i).
+;; Example:
+;; >>> (f 5)
+;; (list 1 2 6 24 15)
+
+;; Returns a list of length n where the i‑th element (1‑based) is
+;;   • the factorial of i if i is even
+;;   • the sum of numbers from 1 to i otherwise
+(define (f n)
+  ;; factorial helper
+  (define (fact k)
+    (if (= k 0)
+        1
+        (* k (fact (- k 1)))))
+  ;; triangular number helper
+  (define (tri k)
+    (/ (* k (+ k 1)) 2))
+  ;; build the list
+  (map (λ (i)
+         (if (even? i)
+             (fact i)
+             (tri i)))
+       (range 1 (+ n 1))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate f))
+    (check-within (candidate 5) (list 1 2 6 24 15) 0.001)
+    (check-within (candidate 7) (list 1 2 6 24 15 720 28) 0.001)
+    (check-within (candidate 1) (list 1) 0.001)
+    (check-within (candidate 3) (list 1 2 6) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183952
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Implement the function f that takes n as a parameter,
+;; and returns a list of size n, such that the value of the element at index i is the factorial of i if i is even
+;; or the sum of numbers from 1 to i otherwise.
+;; i starts from 1.
+;; the factorial of i is the multiplication of the numbers from 1 to i (1 * 2 * ... * i).
+;; Example:
+;; >>> (f 5)
+;; (list 1 2 6 24 15)
+
+;; Implement the function f that takes n as a parameter,
+;; and returns a list of size n, such that the value of the element at index i is the factorial of i if i is even
+;; or the sum of numbers from 1 to i otherwise.
+;; i starts from 1.
+;; the factorial of i is the multiplication of the numbers from 1 to i (1 * 2 * ... * i).
+;; Example:
+;; >>> (f 5)
+;; (list 1 2 6 24 15)
+(define (f n)
+  (for/list ([i (in-range 1 (add1 n))])
+    (if (even? i)
+        (apply * (range 1 (add1 i)))   ; factorial for even i
+        (apply + (range 1 (add1 i)))))) ; sum for odd i
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate f))
+    (check-within (candidate 5) (list 1 2 6 24 15) 0.001)
+    (check-within (candidate 7) (list 1 2 6 24 15 720 28) 0.001)
+    (check-within (candidate 1) (list 1) 0.001)
+    (check-within (candidate 3) (list 1 2 6) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183952
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Implement the function f that takes n as a parameter,
+;; and returns a list of size n, such that the value of the element at index i is the factorial of i if i is even
+;; or the sum of numbers from 1 to i otherwise.
+;; i starts from 1.
+;; the factorial of i is the multiplication of the numbers from 1 to i (1 * 2 * ... * i).
+;; Example:
+;; >>> (f 5)
+;; (list 1 2 6 24 15)
+
+;; Return a list of length n where the i‑th element (i starting from 1)
+;; is the factorial of i if i is even, otherwise the sum 1+2+…+i.
+(define (f n)
+  (define (fact m)
+    (if (= m 0)
+        1
+        (* m (fact (- m 1)))))
+  (define (tri m)
+    (/ (* m (+ m 1)) 2))
+  (build-list n
+              (lambda (idx)
+                (let ((i (+ idx 1)))   ; convert 0‑based index to 1‑based i
+                  (if (even? i)
+                      (fact i)
+                      (tri i))))))
+
+;; Example
+(f 5)   ; => (list 1 2 6 24 15)
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate f))
+    (check-within (candidate 5) (list 1 2 6 24 15) 0.001)
+    (check-within (candidate 7) (list 1 2 6 24 15 720 28) 0.001)
+    (check-within (candidate 1) (list 1) 0.001)
+    (check-within (candidate 3) (list 1 2 6) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183952
+STDOUT:
+'(1 2 6 24 15)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 109 (RKT) - HumanEval_109_move_one_ball
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; We have a list 'arr' of N integers arr[1], arr[2], ..., arr[N].The
+;; numbers in the list will be randomly ordered. Your task is to determine if
+;; it is possible to get a list sorted in non-decreasing order by performing 
+;; the following operation on the given list:
+;;     You are allowed to perform right shift operation any number of times.
+;; One right shift operation means shifting all elements of the list by one
+;; position in the right direction. The last element of the list will be moved to
+;; the starting position in the list i.e. 0th index. 
+;; If it is possible to obtain the sorted list by performing the above operation
+;; then return #t else return #f.
+;; If the given list is empty then return #t.
+;; Note: The given list is guaranteed to have unique elements.
+;; For Example:
+;; >>> (move_one_ball (list 3 4 5 1 2))
+;; #t
+;; Explanation: By performin 2 right shift operations, non-decreasing order can
+;;              be achieved for the given list.
+;; >>> (move_one_ball (list 3 5 4 1 2))
+;; #f
+;; Explanation:It is not possible to get non-decreasing order for the given
+;;             list by performing any number of right shift operations.
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate move_one_ball))
+    (check-within (candidate (list 3 4 5 1 2)) #t 0.001)
+    (check-within (candidate (list 3 5 10 1 2)) #t 0.001)
+    (check-within (candidate (list 4 3 1 2)) #f 0.001)
+    (check-within (candidate (list 3 5 4 1 2)) #f 0.001)
+    (check-within (candidate (list )) #t 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; We have a list 'arr' of N integers arr[1], arr[2], ..., arr[N].The
+;; numbers in the list will be randomly ordered. Your task is to determine if
+;; it is possible to get a list sorted in non-decreasing order by performing 
+;; the following operation on the given list:
+;;     You are allowed to perform right shift operation any number of times.
+;; One right shift operation means shifting all elements of the list by one
+;; position in the right direction. The last element of the list will be moved to
+;; the starting position in the list i.e. 0th index. 
+;; If it is possible to obtain the sorted list by performing the above operation
+;; then return #t else return #f.
+;; If the given list is empty then return #t.
+;; Note: The given list is guaranteed to have unique elements.
+;; For Example:
+;; >>> (move_one_ball (list 3 4 5 1 2))
+;; #t
+;; Explanation: By performin 2 right shift operations, non-decreasing order can
+;;              be achieved for the given list.
+;; >>> (move_one_ball (list 3 5 4 1 2))
+;; #f
+;; Explanation:It is not possible to get non-decreasing order for the given
+;;             list by performing any number of right shift operations.
+
+(require racket/list) ; for take
+
+;; Return #t if `arr` can be made sorted (non‑decreasing) by any number
+;; of right cyclic shifts, otherwise #f.  An empty list is considered
+;; already sorted.
+(define (move_one_ball arr)
+  (if (null? arr)
+      #t
+      (let* ((sorted (sort arr <))          ; ascending order
+             (first (car arr))              ; element to locate
+             ;; Find the index of `first` in the sorted list.
+             (idx (let loop ((i 0) (l sorted))
+                     (cond [(null? l) #f]          ; should never happen
+                           [(equal? (car l) first) i]
+                           [else (loop (+ i 1) (cdr l))])))
+             ;; Build the rotation of `sorted` that starts with `first`.
+             (rotated (append (list-tail sorted idx)
+                              (take sorted idx))))]
+        (equal? arr rotated))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate move_one_ball))
+    (check-within (candidate (list 3 4 5 1 2)) #t 0.001)
+    (check-within (candidate (list 3 5 10 1 2)) #t 0.001)
+    (check-within (candidate (list 4 3 1 2)) #f 0.001)
+    (check-within (candidate (list 3 5 4 1 2)) #f 0.001)
+    (check-within (candidate (list )) #t 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: SyntaxError
+Timestamp: 1755183954
+STDOUT: (empty)
+STDERR:
+/tmp/tmp_nj562eu.rkt:42:50: read-syntax: expected `)` to close preceding `(`, found instead `]`
+  context...:
+   /usr/share/racket/collects/syntax/module-reader.rkt:186:17: body
+   /usr/share/racket/collects/syntax/module-reader.rkt:183:2: wrap-internal
+   /usr/share/racket/collects/racket/../syntax/module-reader.rkt:67:9: wrap-internal/wrapper
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; We have a list 'arr' of N integers arr[1], arr[2], ..., arr[N].The
+;; numbers in the list will be randomly ordered. Your task is to determine if
+;; it is possible to get a list sorted in non-decreasing order by performing 
+;; the following operation on the given list:
+;;     You are allowed to perform right shift operation any number of times.
+;; One right shift operation means shifting all elements of the list by one
+;; position in the right direction. The last element of the list will be moved to
+;; the starting position in the list i.e. 0th index. 
+;; If it is possible to obtain the sorted list by performing the above operation
+;; then return #t else return #f.
+;; If the given list is empty then return #t.
+;; Note: The given list is guaranteed to have unique elements.
+;; For Example:
+;; >>> (move_one_ball (list 3 4 5 1 2))
+;; #t
+;; Explanation: By performin 2 right shift operations, non-decreasing order can
+;;              be achieved for the given list.
+;; >>> (move_one_ball (list 3 5 4 1 2))
+;; #f
+;; Explanation:It is not possible to get non-decreasing order for the given
+;;             list by performing any number of right shift operations.
+
+(require racket/list)
+
+;; Return #t if the list can become sorted by a series of right‑shift
+;; operations, otherwise return #f.  An empty list is considered sorted.
+(define (move_one_ball arr)
+  (cond
+    [(empty? arr) #t]                           ; empty list is trivially sorted
+    [else
+     (define sorted (sort arr <))               ; the unique sorted version
+     (define idx (index-of sorted (first arr))) ; position of first element in sorted
+     (define rotated
+       (append (list-tail sorted idx)            ; tail from idx to end
+               (take sorted idx)))              ; head up to idx
+     (equal? rotated arr)]))                    ; check if rotation matches
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate move_one_ball))
+    (check-within (candidate (list 3 4 5 1 2)) #t 0.001)
+    (check-within (candidate (list 3 5 10 1 2)) #t 0.001)
+    (check-within (candidate (list 4 3 1 2)) #f 0.001)
+    (check-within (candidate (list 3 5 4 1 2)) #f 0.001)
+    (check-within (candidate (list )) #t 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183954
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; We have a list 'arr' of N integers arr[1], arr[2], ..., arr[N].The
+;; numbers in the list will be randomly ordered. Your task is to determine if
+;; it is possible to get a list sorted in non-decreasing order by performing 
+;; the following operation on the given list:
+;;     You are allowed to perform right shift operation any number of times.
+;; One right shift operation means shifting all elements of the list by one
+;; position in the right direction. The last element of the list will be moved to
+;; the starting position in the list i.e. 0th index. 
+;; If it is possible to obtain the sorted list by performing the above operation
+;; then return #t else return #f.
+;; If the given list is empty then return #t.
+;; Note: The given list is guaranteed to have unique elements.
+;; For Example:
+;; >>> (move_one_ball (list 3 4 5 1 2))
+;; #t
+;; Explanation: By performin 2 right shift operations, non-decreasing order can
+;;              be achieved for the given list.
+;; >>> (move_one_ball (list 3 5 4 1 2))
+;; #f
+;; Explanation:It is not possible to get non-decreasing order for the given
+;;             list by performing any number of right shift operations.
+
+;; Return #t if the list can be sorted by a series of right‑shift operations,
+;; otherwise return #f.  An empty list is considered sorted.
+(define (move_one_ball arr)
+  (cond
+    [(empty? arr) #t]                                   ; empty list
+    [else
+     ;; Count the number of indices i where arr[i] > arr[i+1] (mod n).
+     (let* ((n (length arr))
+            (breaks
+             (for/fold ([c 0]) ([i (in-range n)])
+               (let* ((curr (list-ref arr i))
+                      (next (list-ref arr (modulo (+ i 1) n))))
+                 (if (> curr next) (+ c 1) c)))))
+       ;; If there are 0 or 1 such breaks, the list is a rotation of a sorted list.
+       (if (or (= breaks 0) (= breaks 1)) #t #f))]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate move_one_ball))
+    (check-within (candidate (list 3 4 5 1 2)) #t 0.001)
+    (check-within (candidate (list 3 5 10 1 2)) #t 0.001)
+    (check-within (candidate (list 4 3 1 2)) #f 0.001)
+    (check-within (candidate (list 3 5 4 1 2)) #f 0.001)
+    (check-within (candidate (list )) #t 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183954
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; We have a list 'arr' of N integers arr[1], arr[2], ..., arr[N].The
+;; numbers in the list will be randomly ordered. Your task is to determine if
+;; it is possible to get a list sorted in non-decreasing order by performing 
+;; the following operation on the given list:
+;;     You are allowed to perform right shift operation any number of times.
+;; One right shift operation means shifting all elements of the list by one
+;; position in the right direction. The last element of the list will be moved to
+;; the starting position in the list i.e. 0th index. 
+;; If it is possible to obtain the sorted list by performing the above operation
+;; then return #t else return #f.
+;; If the given list is empty then return #t.
+;; Note: The given list is guaranteed to have unique elements.
+;; For Example:
+;; >>> (move_one_ball (list 3 4 5 1 2))
+;; #t
+;; Explanation: By performin 2 right shift operations, non-decreasing order can
+;;              be achieved for the given list.
+;; >>> (move_one_ball (list 3 5 4 1 2))
+;; #f
+;; Explanation:It is not possible to get non-decreasing order for the given
+;;             list by performing any number of right shift operations.
+(require racket/list)
+
+;; Return #t if the list can be sorted by some number of right circular shifts,
+;; otherwise return #f.  An empty list is considered sorted.
+(define (move_one_ball arr)
+  (if (null? arr)
+      #t
+      (let* ([sorted (sort arr <)]
+             ;; Find the index of the smallest element (which should be the first
+             ;; element of the sorted list).
+             [min-index (index-of arr (first sorted))])
+        ;; Rotate the original list left by min-index positions.
+        (define rotated
+          (append (drop arr min-index) (take arr min-index)))
+        (equal? rotated sorted))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate move_one_ball))
+    (check-within (candidate (list 3 4 5 1 2)) #t 0.001)
+    (check-within (candidate (list 3 5 10 1 2)) #t 0.001)
+    (check-within (candidate (list 4 3 1 2)) #f 0.001)
+    (check-within (candidate (list 3 5 4 1 2)) #f 0.001)
+    (check-within (candidate (list )) #t 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183954
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 114 (RKT) - HumanEval_114_minSubArraySum
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Given a list of integers nums, find the minimum sum of any non-empty sub-list
+;; of nums.
+;; Example
+;; >>> (minSubArraySum (list 2 3 4 1 2 4))
+;; 1
+;; >>> (minSubArraySum (list -1 -2 -3))
+;; -6
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate minSubArraySum))
+    (check-within (candidate (list 2 3 4 1 2 4)) 1 0.001)
+    (check-within (candidate (list -1 -2 -3)) -6 0.001)
+    (check-within (candidate (list -1 -2 -3 2 -10)) -14 0.001)
+    (check-within (candidate (list -9999999999999999)) -9999999999999999 0.001)
+    (check-within (candidate (list 0 10 20 1000000)) 0 0.001)
+    (check-within (candidate (list -1 -2 -3 10 -5)) -6 0.001)
+    (check-within (candidate (list 100 -1 -2 -3 10 -5)) -6 0.001)
+    (check-within (candidate (list 10 11 13 8 3 4)) 3 0.001)
+    (check-within (candidate (list 100 -33 32 -1 0 -2)) -33 0.001)
+    (check-within (candidate (list -10)) -10 0.001)
+    (check-within (candidate (list 7)) 7 0.001)
+    (check-within (candidate (list 1 -1)) -1 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a list of integers nums, find the minimum sum of any non-empty sub-list
+;; of nums.
+;; Example
+;; >>> (minSubArraySum (list 2 3 4 1 2 4))
+;; 1
+;; >>> (minSubArraySum (list -1 -2 -3))
+;; -6
+
+;; Find the minimum sum of any non‑empty contiguous sub‑list of `nums`.
+(define (minSubArraySum nums)
+  (cond
+    [(null? nums) (error "minSubArraySum: input list must be non‑empty")]
+    [else
+     (let* ((first (car nums))
+            (rest  (cdr nums))
+            (current first)   ; current minimum ending at the current element
+            (global  first))  ; best minimum seen so far
+       (for ([x rest])
+         (set! current (min x (+ current x)))   ; extend or start new sub‑list
+         (set! global  (min global current)))  ; update best answer
+       global)]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate minSubArraySum))
+    (check-within (candidate (list 2 3 4 1 2 4)) 1 0.001)
+    (check-within (candidate (list -1 -2 -3)) -6 0.001)
+    (check-within (candidate (list -1 -2 -3 2 -10)) -14 0.001)
+    (check-within (candidate (list -9999999999999999)) -9999999999999999 0.001)
+    (check-within (candidate (list 0 10 20 1000000)) 0 0.001)
+    (check-within (candidate (list -1 -2 -3 10 -5)) -6 0.001)
+    (check-within (candidate (list 100 -1 -2 -3 10 -5)) -6 0.001)
+    (check-within (candidate (list 10 11 13 8 3 4)) 3 0.001)
+    (check-within (candidate (list 100 -33 32 -1 0 -2)) -33 0.001)
+    (check-within (candidate (list -10)) -10 0.001)
+    (check-within (candidate (list 7)) 7 0.001)
+    (check-within (candidate (list 1 -1)) -1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183959
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a list of integers nums, find the minimum sum of any non-empty sub-list
+;; of nums.
+;; Example
+;; >>> (minSubArraySum (list 2 3 4 1 2 4))
+;; 1
+;; >>> (minSubArraySum (list -1 -2 -3))
+;; -6
+
+;; Given a list of integers nums, find the minimum sum of any non-empty sub-list
+;; of nums.
+;; Example
+;; >>> (minSubArraySum (list 2 3 4 1 2 4))
+;; 1
+;; >>> (minSubArraySum (list -1 -2 -3))
+;; -6
+(define (minSubArraySum nums)
+  ;; If the list is empty, return 0 (or you could raise an error if desired)
+  (if (null? nums)
+      0
+      (let* ((first-elem (first nums))
+             (rest (cdr nums))
+             ;; The accumulator is a pair (current-min-ending-here . best-min-so-far)
+             (init (cons first-elem first-elem)))
+        ;; Process the rest of the list with a fold
+        (second
+         (foldl
+          (lambda (acc x)
+            (let* ((curr (first acc))
+                   (best (second acc))
+                   (new-curr (min x (+ curr x)))
+                   (new-best (min best new-curr)))
+              (cons new-curr new-best)))
+          init
+          rest)))))
+
+;; Tests
+(check-equal? (minSubArraySum (list 2 3 4 1 2 4)) 1)
+(check-equal? (minSubArraySum (list -1 -2 -3)) -6)
+(check-equal? (minSubArraySum (list 5)) 5)
+(check-equal? (minSubArraySum (list 1 -2 3 -4 5)) -4)
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate minSubArraySum))
+    (check-within (candidate (list 2 3 4 1 2 4)) 1 0.001)
+    (check-within (candidate (list -1 -2 -3)) -6 0.001)
+    (check-within (candidate (list -1 -2 -3 2 -10)) -14 0.001)
+    (check-within (candidate (list -9999999999999999)) -9999999999999999 0.001)
+    (check-within (candidate (list 0 10 20 1000000)) 0 0.001)
+    (check-within (candidate (list -1 -2 -3 10 -5)) -6 0.001)
+    (check-within (candidate (list 100 -1 -2 -3 10 -5)) -6 0.001)
+    (check-within (candidate (list 10 11 13 8 3 4)) 3 0.001)
+    (check-within (candidate (list 100 -33 32 -1 0 -2)) -33 0.001)
+    (check-within (candidate (list -10)) -10 0.001)
+    (check-within (candidate (list 7)) 7 0.001)
+    (check-within (candidate (list 1 -1)) -1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755183959
+STDOUT: (empty)
+STDERR:
+first: contract violation
+  expected: (and/c list? (not/c empty?))
+  given: 3
+  context...:
+   /tmp/tmp9yq7uhfr.rkt:29:10
+   /usr/share/racket/collects/racket/private/list.rkt:228:4: foldl
+   /tmp/tmp9yq7uhfr.rkt:18:0: minSubArraySum
+   /tmp/tmp9yq7uhfr.rkt:39:0
+   body of "/tmp/tmp9yq7uhfr.rkt"
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a list of integers nums, find the minimum sum of any non-empty sub-list
+;; of nums.
+;; Example
+;; >>> (minSubArraySum (list 2 3 4 1 2 4))
+;; 1
+;; >>> (minSubArraySum (list -1 -2 -3))
+;; -6
+
+;; Find the minimum sum of any non‑empty sub‑list of `nums`
+(define (minSubArraySum nums)
+  (cond
+    [(empty? nums) 0]                          ; no elements → 0 (or could raise an error)
+    [else
+     (let loop ((lst  (rest nums))            ; remaining elements
+                (curr (first nums))           ; current min ending here
+                (best (first nums)))          ; best (minimum) found so far
+       (if (empty? lst)
+           best
+           (let* ((x (first lst))
+                  (new-curr (min x (+ curr x)))  ; extend or start new sub‑list
+                  (new-best (min best new-curr)))
+             (loop (rest lst) new-curr new-best))))]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate minSubArraySum))
+    (check-within (candidate (list 2 3 4 1 2 4)) 1 0.001)
+    (check-within (candidate (list -1 -2 -3)) -6 0.001)
+    (check-within (candidate (list -1 -2 -3 2 -10)) -14 0.001)
+    (check-within (candidate (list -9999999999999999)) -9999999999999999 0.001)
+    (check-within (candidate (list 0 10 20 1000000)) 0 0.001)
+    (check-within (candidate (list -1 -2 -3 10 -5)) -6 0.001)
+    (check-within (candidate (list 100 -1 -2 -3 10 -5)) -6 0.001)
+    (check-within (candidate (list 10 11 13 8 3 4)) 3 0.001)
+    (check-within (candidate (list 100 -33 32 -1 0 -2)) -33 0.001)
+    (check-within (candidate (list -10)) -10 0.001)
+    (check-within (candidate (list 7)) 7 0.001)
+    (check-within (candidate (list 1 -1)) -1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183959
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a list of integers nums, find the minimum sum of any non-empty sub-list
+;; of nums.
+;; Example
+;; >>> (minSubArraySum (list 2 3 4 1 2 4))
+;; 1
+;; >>> (minSubArraySum (list -1 -2 -3))
+;; -6
+
+;; Given a list of integers nums, find the minimum sum of any non-empty sub-list
+;; of nums.
+;; Example
+;; >>> (minSubArraySum (list 2 3 4 1 2 4))
+;; 1
+;; >>> (minSubArraySum (list -1 -2 -3))
+;; -6
+(define (minSubArraySum nums)
+  (define (helper lst cur-min global-min)
+    (cond
+      [(null? lst) global-min]
+      [else
+       (let* ([x (car lst)]
+              [new-cur (min x (+ cur-min x))]
+              [new-global (min global-min new-cur)])
+         (helper (cdr lst) new-cur new-global))]))
+  (if (null? nums)
+      (error "minSubArraySum: empty list")
+      (let ([first (car nums)])
+        (helper (cdr nums) first first))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate minSubArraySum))
+    (check-within (candidate (list 2 3 4 1 2 4)) 1 0.001)
+    (check-within (candidate (list -1 -2 -3)) -6 0.001)
+    (check-within (candidate (list -1 -2 -3 2 -10)) -14 0.001)
+    (check-within (candidate (list -9999999999999999)) -9999999999999999 0.001)
+    (check-within (candidate (list 0 10 20 1000000)) 0 0.001)
+    (check-within (candidate (list -1 -2 -3 10 -5)) -6 0.001)
+    (check-within (candidate (list 100 -1 -2 -3 10 -5)) -6 0.001)
+    (check-within (candidate (list 10 11 13 8 3 4)) 3 0.001)
+    (check-within (candidate (list 100 -33 32 -1 0 -2)) -33 0.001)
+    (check-within (candidate (list -10)) -10 0.001)
+    (check-within (candidate (list 7)) 7 0.001)
+    (check-within (candidate (list 1 -1)) -1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183959
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 115 (RKT) - HumanEval_115_max_fill
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; You are given a rectangular grid of wells. Each row represents a single well,
+;; and each 1 in a row represents a single unit of water.
+;; Each well has a corresponding bucket that can be used to extract water from it, 
+;; and all buckets have the same capacity.
+;; Your task is to use the buckets to empty the wells.
+;; Output the number of times you need to lower the buckets.
+;; Example 1:
+;; >>> (max_fill (list (list 0 0 1 0) (list 0 1 0 0) (list 1 1 1 1)) 1)
+;; 6
+;; Example 2:
+;; >>> (max_fill (list (list 0 0 1 1) (list 0 0 0 0) (list 1 1 1 1) (list 0 1 1 1)) 2)
+;; 5
+;; Example 3:
+;; >>> (max_fill (list (list 0 0 0) (list 0 0 0)) 5)
+;; 0
+;; Constraints:
+;;     * all wells have the same length
+;;     * 1 <= grid.length <= 10^2
+;;     * 1 <= grid[:,1].length <= 10^2
+;;     * grid[i][j] -> 0 | 1
+;;     * 1 <= capacity <= 10
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate max_fill))
+    (check-within (candidate (list (list 0 0 1 0) (list 0 1 0 0) (list 1 1 1 1)) 1) 6 0.001)
+    (check-within (candidate (list (list 0 0 1 1) (list 0 0 0 0) (list 1 1 1 1) (list 0 1 1 1)) 2) 5 0.001)
+    (check-within (candidate (list (list 0 0 0) (list 0 0 0)) 5) 0 0.001)
+    (check-within (candidate (list (list 1 1 1 1) (list 1 1 1 1)) 2) 4 0.001)
+    (check-within (candidate (list (list 1 1 1 1) (list 1 1 1 1)) 9) 2 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; You are given a rectangular grid of wells. Each row represents a single well,
+;; and each 1 in a row represents a single unit of water.
+;; Each well has a corresponding bucket that can be used to extract water from it, 
+;; and all buckets have the same capacity.
+;; Your task is to use the buckets to empty the wells.
+;; Output the number of times you need to lower the buckets.
+;; Example 1:
+;; >>> (max_fill (list (list 0 0 1 0) (list 0 1 0 0) (list 1 1 1 1)) 1)
+;; 6
+;; Example 2:
+;; >>> (max_fill (list (list 0 0 1 1) (list 0 0 0 0) (list 1 1 1 1) (list 0 1 1 1)) 2)
+;; 5
+;; Example 3:
+;; >>> (max_fill (list (list 0 0 0) (list 0 0 0)) 5)
+;; 0
+;; Constraints:
+;;     * all wells have the same length
+;;     * 1 <= grid.length <= 10^2
+;;     * 1 <= grid[:,1].length <= 10^2
+;;     * grid[i][j] -> 0 | 1
+;;     * 1 <= capacity <= 10
+
+;; Count the number of times we have to lower a bucket to empty all wells.
+;; Each row in *grid* represents a well; a 1 in the row is one unit of water.
+;; Each well has its own bucket of the same *capacity*.
+(define (max_fill grid capacity)
+  ;; Count the water in a single row
+  (define (row-water row)
+    (apply + row))
+
+  ;; How many bucket lowers are needed for a single row
+  (define (row-steps row)
+    (let ([w (row-water row)])
+      (if (= w 0)
+          0
+          ;; Ceiling of w / capacity:
+          (quotient (+ w capacity -1) capacity))))
+
+  ;; Sum over all rows
+  (apply + (map row-steps grid)))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate max_fill))
+    (check-within (candidate (list (list 0 0 1 0) (list 0 1 0 0) (list 1 1 1 1)) 1) 6 0.001)
+    (check-within (candidate (list (list 0 0 1 1) (list 0 0 0 0) (list 1 1 1 1) (list 0 1 1 1)) 2) 5 0.001)
+    (check-within (candidate (list (list 0 0 0) (list 0 0 0)) 5) 0 0.001)
+    (check-within (candidate (list (list 1 1 1 1) (list 1 1 1 1)) 2) 4 0.001)
+    (check-within (candidate (list (list 1 1 1 1) (list 1 1 1 1)) 9) 2 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183960
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; You are given a rectangular grid of wells. Each row represents a single well,
+;; and each 1 in a row represents a single unit of water.
+;; Each well has a corresponding bucket that can be used to extract water from it, 
+;; and all buckets have the same capacity.
+;; Your task is to use the buckets to empty the wells.
+;; Output the number of times you need to lower the buckets.
+;; Example 1:
+;; >>> (max_fill (list (list 0 0 1 0) (list 0 1 0 0) (list 1 1 1 1)) 1)
+;; 6
+;; Example 2:
+;; >>> (max_fill (list (list 0 0 1 1) (list 0 0 0 0) (list 1 1 1 1) (list 0 1 1 1)) 2)
+;; 5
+;; Example 3:
+;; >>> (max_fill (list (list 0 0 0) (list 0 0 0)) 5)
+;; 0
+;; Constraints:
+;;     * all wells have the same length
+;;     * 1 <= grid.length <= 10^2
+;;     * 1 <= grid[:,1].length <= 10^2
+;;     * grid[i][j] -> 0 | 1
+;;     * 1 <= capacity <= 10
+
+;; Count the number of times a bucket must be lowered to empty all wells.
+;; Each row of the grid represents a well, and each `1` in the row
+;; represents one unit of water.  A bucket can hold at most `capacity`
+;; units of water.  For each well we need  
+;;   ceil( (#ones in that row) / capacity )
+;; bucket lowers, and the total number is the sum over all wells.
+
+(define (max_fill grid capacity)
+  (define (ones-in-row row)
+    (length (filter (lambda (x) (= x 1)) row)))
+  (apply +
+         (map (lambda (row)
+                (let ([ones (ones-in-row row)])
+                  (if (= ones 0)
+                      0
+                      (ceiling (/ ones capacity)))))
+              grid)))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate max_fill))
+    (check-within (candidate (list (list 0 0 1 0) (list 0 1 0 0) (list 1 1 1 1)) 1) 6 0.001)
+    (check-within (candidate (list (list 0 0 1 1) (list 0 0 0 0) (list 1 1 1 1) (list 0 1 1 1)) 2) 5 0.001)
+    (check-within (candidate (list (list 0 0 0) (list 0 0 0)) 5) 0 0.001)
+    (check-within (candidate (list (list 1 1 1 1) (list 1 1 1 1)) 2) 4 0.001)
+    (check-within (candidate (list (list 1 1 1 1) (list 1 1 1 1)) 9) 2 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183960
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; You are given a rectangular grid of wells. Each row represents a single well,
+;; and each 1 in a row represents a single unit of water.
+;; Each well has a corresponding bucket that can be used to extract water from it, 
+;; and all buckets have the same capacity.
+;; Your task is to use the buckets to empty the wells.
+;; Output the number of times you need to lower the buckets.
+;; Example 1:
+;; >>> (max_fill (list (list 0 0 1 0) (list 0 1 0 0) (list 1 1 1 1)) 1)
+;; 6
+;; Example 2:
+;; >>> (max_fill (list (list 0 0 1 1) (list 0 0 0 0) (list 1 1 1 1) (list 0 1 1 1)) 2)
+;; 5
+;; Example 3:
+;; >>> (max_fill (list (list 0 0 0) (list 0 0 0)) 5)
+;; 0
+;; Constraints:
+;;     * all wells have the same length
+;;     * 1 <= grid.length <= 10^2
+;;     * 1 <= grid[:,1].length <= 10^2
+;;     * grid[i][j] -> 0 | 1
+;;     * 1 <= capacity <= 10
+
+;; Compute the total number of times a bucket must be lowered
+;; to empty all wells in the grid.
+(define (max_fill grid capacity)
+  ;; Sum all 1's in the grid
+  (define total
+    (apply + (map (lambda (row) (apply + row)) grid)))
+  ;; If there is no water, no bucket lowering is needed
+  (if (= total 0)
+      0
+      (let* ([q (quotient total capacity)]
+             [r (modulo total capacity)])
+        (if (= r 0) q (+ q 1)))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate max_fill))
+    (check-within (candidate (list (list 0 0 1 0) (list 0 1 0 0) (list 1 1 1 1)) 1) 6 0.001)
+    (check-within (candidate (list (list 0 0 1 1) (list 0 0 0 0) (list 1 1 1 1) (list 0 1 1 1)) 2) 5 0.001)
+    (check-within (candidate (list (list 0 0 0) (list 0 0 0)) 5) 0 0.001)
+    (check-within (candidate (list (list 1 1 1 1) (list 1 1 1 1)) 2) 4 0.001)
+    (check-within (candidate (list (list 1 1 1 1) (list 1 1 1 1)) 9) 2 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: Exception
+Timestamp: 1755183960
+STDOUT: (empty)
+STDERR:
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmpezd7x8_t.rkt:46:4
+actual:     1
+expected:   2
+--------------------
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; You are given a rectangular grid of wells. Each row represents a single well,
+;; and each 1 in a row represents a single unit of water.
+;; Each well has a corresponding bucket that can be used to extract water from it, 
+;; and all buckets have the same capacity.
+;; Your task is to use the buckets to empty the wells.
+;; Output the number of times you need to lower the buckets.
+;; Example 1:
+;; >>> (max_fill (list (list 0 0 1 0) (list 0 1 0 0) (list 1 1 1 1)) 1)
+;; 6
+;; Example 2:
+;; >>> (max_fill (list (list 0 0 1 1) (list 0 0 0 0) (list 1 1 1 1) (list 0 1 1 1)) 2)
+;; 5
+;; Example 3:
+;; >>> (max_fill (list (list 0 0 0) (list 0 0 0)) 5)
+;; 0
+;; Constraints:
+;;     * all wells have the same length
+;;     * 1 <= grid.length <= 10^2
+;;     * 1 <= grid[:,1].length <= 10^2
+;;     * grid[i][j] -> 0 | 1
+;;     * 1 <= capacity <= 10
+
+;; Count the number of times a bucket must be lowered to empty all wells.
+;; Each row in `grid` represents a well; a 1 denotes one unit of water.
+;; A bucket can extract at most `capacity` units from a single well in one lowering.
+;; The minimal number of lowers is the sum over all wells of
+;;   ceil(number_of_units_in_well / capacity)
+(define (max_fill grid capacity)
+  (define (row-count row)
+    (apply + row))          ; total units in this well
+
+  (define (ceil-div a b)
+    (ceiling (/ a b)))      ; ceil(a / b) for integers a, b
+
+  (apply +                     ; sum across all wells
+         (map (lambda (row)
+                (ceil-div (row-count row) capacity))
+              grid)))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate max_fill))
+    (check-within (candidate (list (list 0 0 1 0) (list 0 1 0 0) (list 1 1 1 1)) 1) 6 0.001)
+    (check-within (candidate (list (list 0 0 1 1) (list 0 0 0 0) (list 1 1 1 1) (list 0 1 1 1)) 2) 5 0.001)
+    (check-within (candidate (list (list 0 0 0) (list 0 0 0)) 5) 0 0.001)
+    (check-within (candidate (list (list 1 1 1 1) (list 1 1 1 1)) 2) 4 0.001)
+    (check-within (candidate (list (list 1 1 1 1) (list 1 1 1 1)) 9) 2 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183960
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 121 (RKT) - HumanEval_121_solution
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Given a non-empty list of integers, return the sum of all of the odd elements that are in even positions.
+;; Examples
+;; >>> (solution (list 5 8 7 1))
+;; 12
+;; >>> (solution (list 3 3 3 3 3))
+;; 9
+;; >>> (solution (list 30 13 24 321))
+;; 0
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate solution))
+    (check-within (candidate (list 5 8 7 1)) 12 0.001)
+    (check-within (candidate (list 3 3 3 3 3)) 9 0.001)
+    (check-within (candidate (list 30 13 24 321)) 0 0.001)
+    (check-within (candidate (list 5 9)) 5 0.001)
+    (check-within (candidate (list 2 4 8)) 0 0.001)
+    (check-within (candidate (list 30 13 23 32)) 23 0.001)
+    (check-within (candidate (list 3 13 2 9)) 3 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a non-empty list of integers, return the sum of all of the odd elements that are in even positions.
+;; Examples
+;; >>> (solution (list 5 8 7 1))
+;; 12
+;; >>> (solution (list 3 3 3 3 3))
+;; 9
+;; >>> (solution (list 30 13 24 321))
+;; 0
+
+;; Given a non-empty list of integers, return the sum of all of the odd
+;; elements that are in even positions (0‑indexed).
+;; Examples
+;; >>> (solution (list 5 8 7 1))
+;; 12
+;; >>> (solution (list 3 3 3 3 3))
+;; 9
+;; >>> (solution (list 30 13 24 321))
+;; 0
+
+(define (solution lst)
+  (let loop ((lst lst) (idx 0) (sum 0))
+    (if (null? lst)
+        sum
+        (loop (cdr lst)
+              (+ idx 1)
+              (if (and (zero? (remainder idx 2))
+                       (odd? (car lst)))
+                  (+ sum (car lst))
+                  sum)))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate solution))
+    (check-within (candidate (list 5 8 7 1)) 12 0.001)
+    (check-within (candidate (list 3 3 3 3 3)) 9 0.001)
+    (check-within (candidate (list 30 13 24 321)) 0 0.001)
+    (check-within (candidate (list 5 9)) 5 0.001)
+    (check-within (candidate (list 2 4 8)) 0 0.001)
+    (check-within (candidate (list 30 13 23 32)) 23 0.001)
+    (check-within (candidate (list 3 13 2 9)) 3 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183965
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a non-empty list of integers, return the sum of all of the odd elements that are in even positions.
+;; Examples
+;; >>> (solution (list 5 8 7 1))
+;; 12
+;; >>> (solution (list 3 3 3 3 3))
+;; 9
+;; >>> (solution (list 30 13 24 321))
+;; 0
+
+;; Given a non-empty list of integers, return the sum of all of the odd elements that are in even positions.
+;; Examples
+;; >>> (solution (list 5 8 7 1))
+;; 12
+;; >>> (solution (list 3 3 3 3 3))
+;; 9
+;; >>> (solution (list 30 13 24 321))
+;; 0
+
+(define (solution lst)
+  ;; Helper that walks the list while keeping track of the current index (starting at 0).
+  (define (helper remaining idx acc)
+    (cond
+      [(empty? remaining) acc]                                   ; finished
+      [(and (even? idx) (odd? (first remaining)))                ; even index & odd value
+       (helper (rest remaining) (+ idx 1) (+ acc (first remaining)))]
+      [else                                                      ; otherwise just skip
+       (helper (rest remaining) (+ idx 1) acc)]))
+  (helper lst 0 0))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate solution))
+    (check-within (candidate (list 5 8 7 1)) 12 0.001)
+    (check-within (candidate (list 3 3 3 3 3)) 9 0.001)
+    (check-within (candidate (list 30 13 24 321)) 0 0.001)
+    (check-within (candidate (list 5 9)) 5 0.001)
+    (check-within (candidate (list 2 4 8)) 0 0.001)
+    (check-within (candidate (list 30 13 23 32)) 23 0.001)
+    (check-within (candidate (list 3 13 2 9)) 3 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183965
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a non-empty list of integers, return the sum of all of the odd elements that are in even positions.
+;; Examples
+;; >>> (solution (list 5 8 7 1))
+;; 12
+;; >>> (solution (list 3 3 3 3 3))
+;; 9
+;; >>> (solution (list 30 13 24 321))
+;; 0
+
+;; Given a non-empty list of integers, return the sum of all of the odd elements that are in even positions.
+;; Examples
+;; >>> (solution (list 5 8 7 1))
+;; 12
+;; >>> (solution (list 3 3 3 3 3))
+;; 9
+;; >>> (solution (list 30 13 24 321))
+;; 0
+
+(define (solution lst)
+  ;; Helper function that walks the list while keeping track of the index.
+  (let loop ((remaining lst) (idx 0) (acc 0))
+    (cond
+      [(empty? remaining) acc]                     ; finished
+      [(and (even? idx) (odd? (first remaining))) ; even index & odd element
+       (loop (rest remaining) (+ idx 1) (+ acc (first remaining)))]
+      [else
+       (loop (rest remaining) (+ idx 1) acc)])))   ; otherwise just skip
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate solution))
+    (check-within (candidate (list 5 8 7 1)) 12 0.001)
+    (check-within (candidate (list 3 3 3 3 3)) 9 0.001)
+    (check-within (candidate (list 30 13 24 321)) 0 0.001)
+    (check-within (candidate (list 5 9)) 5 0.001)
+    (check-within (candidate (list 2 4 8)) 0 0.001)
+    (check-within (candidate (list 30 13 23 32)) 23 0.001)
+    (check-within (candidate (list 3 13 2 9)) 3 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183965
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a non-empty list of integers, return the sum of all of the odd elements that are in even positions.
+;; Examples
+;; >>> (solution (list 5 8 7 1))
+;; 12
+;; >>> (solution (list 3 3 3 3 3))
+;; 9
+;; >>> (solution (list 30 13 24 321))
+;; 0
+
+;; Given a non-empty list of integers, return the sum of all of the odd elements that are in even positions.
+;; Examples
+;; >>> (solution (list 5 8 7 1))
+;; 12
+;; >>> (solution (list 3 3 3 3 3))
+;; 9
+;; >>> (solution (list 30 13 24 321))
+;; 0
+
+(define (solution lst)
+  (for/fold ([sum 0]) ([x (in-list lst)] [i (in-range)])
+    (if (and (even? i) (odd? x))
+        (+ sum x)
+        sum)))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate solution))
+    (check-within (candidate (list 5 8 7 1)) 12 0.001)
+    (check-within (candidate (list 3 3 3 3 3)) 9 0.001)
+    (check-within (candidate (list 30 13 24 321)) 0 0.001)
+    (check-within (candidate (list 5 9)) 5 0.001)
+    (check-within (candidate (list 2 4 8)) 0 0.001)
+    (check-within (candidate (list 30 13 23 32)) 23 0.001)
+    (check-within (candidate (list 3 13 2 9)) 3 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: Exception
+Timestamp: 1755183965
+STDOUT: (empty)
+STDERR:
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpwdjsllvw.rkt:31:4
+
+in-range: arity mismatch;
+ the expected number of arguments does not match the given number
+  given: 0
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpwdjsllvw.rkt:32:4
+
+in-range: arity mismatch;
+ the expected number of arguments does not match the given number
+  given: 0
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpwdjsllvw.rkt:33:4
+
+in-range: arity mismatch;
+ the expected number of arguments does not match the given number
+  given: 0
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpwdjsllvw.rkt:34:4
+
+in-range: arity mismatch;
+ the expected number of arguments does not match the given number
+  given: 0
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpwdjsllvw.rkt:35:4
+
+in-range: arity mismatch;
+ the expected number of arguments does not matc
+--------------------
+
+================================================================================
+PROBLEM 123 (RKT) - HumanEval_123_get_odd_collatz
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Given a positive integer n, return a sorted list that has the odd numbers in collatz sequence.
+;; The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+;; as follows: start with any positive integer n. Then each term is obtained from the 
+;; previous term as follows: if the previous term is even, the next term is one half of 
+;; the previous term. If the previous term is odd, the next term is 3 times the previous
+;; term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+;; Note: 
+;;     1. Collatz(1) is [1].
+;;     2. returned list sorted in increasing order.
+;; For example:
+;; get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+;; >>> (get_odd_collatz 5)
+;; (list 1 5)
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate get_odd_collatz))
+    (check-within (candidate 14) (list 1 5 7 11 13 17) 0.001)
+    (check-within (candidate 5) (list 1 5) 0.001)
+    (check-within (candidate 12) (list 1 3 5) 0.001)
+    (check-within (candidate 1) (list 1) 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a positive integer n, return a sorted list that has the odd numbers in collatz sequence.
+;; The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+;; as follows: start with any positive integer n. Then each term is obtained from the 
+;; previous term as follows: if the previous term is even, the next term is one half of 
+;; the previous term. If the previous term is odd, the next term is 3 times the previous
+;; term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+;; Note: 
+;;     1. Collatz(1) is [1].
+;;     2. returned list sorted in increasing order.
+;; For example:
+;; get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+;; >>> (get_odd_collatz 5)
+;; (list 1 5)
+
+;; Return a sorted list of the odd numbers that appear in the Collatz
+;; sequence starting from a positive integer `n`.
+(define (get-odd-collatz n)
+  ;; Helper that walks the Collatz sequence collecting odd values.
+  (define (collatz current acc)
+    (if (= current 1)
+        ;; Include 1 if it is odd (it always is).
+        (if (odd? current)
+            (cons current acc)
+            acc)
+        ;; Compute the next term and recurse.
+        (let ([next (if (even? current)
+                        (/ current 2)
+                        (+ (* 3 current) 1))])
+          (collatz next
+                   (if (odd? current)
+                       (cons current acc)
+                       acc)))))
+  ;; Build the list of odd terms and then sort it.
+  (sort (collatz n '()) <))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate get_odd_collatz))
+    (check-within (candidate 14) (list 1 5 7 11 13 17) 0.001)
+    (check-within (candidate 5) (list 1 5) 0.001)
+    (check-within (candidate 12) (list 1 3 5) 0.001)
+    (check-within (candidate 1) (list 1) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755183967
+STDOUT: (empty)
+STDERR:
+/tmp/tmp6cmurkt5.rkt:41:20: get_odd_collatz: unbound identifier
+  in: get_odd_collatz
+  location...:
+   /tmp/tmp6cmurkt5.rkt:41:20
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a positive integer n, return a sorted list that has the odd numbers in collatz sequence.
+;; The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+;; as follows: start with any positive integer n. Then each term is obtained from the 
+;; previous term as follows: if the previous term is even, the next term is one half of 
+;; the previous term. If the previous term is odd, the next term is 3 times the previous
+;; term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+;; Note: 
+;;     1. Collatz(1) is [1].
+;;     2. returned list sorted in increasing order.
+;; For example:
+;; get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+;; >>> (get_odd_collatz 5)
+;; (list 1 5)
+
+;; Return a sorted list of the odd numbers that appear in the Collatz sequence for n.
+(define (get_odd_collatz n)
+  ;; Helper that builds the Collatz sequence from n down to 1.
+  (define (collatz x)
+    (if (= x 1)
+        (list 1)
+        (cons x (collatz (if (even? x)
+                             (/ x 2)
+                             (+ (* 3 x) 1))))))
+  ;; Build the sequence, filter for odd numbers, then sort ascending.
+  (sort (filter odd? (collatz n)) <))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate get_odd_collatz))
+    (check-within (candidate 14) (list 1 5 7 11 13 17) 0.001)
+    (check-within (candidate 5) (list 1 5) 0.001)
+    (check-within (candidate 12) (list 1 3 5) 0.001)
+    (check-within (candidate 1) (list 1) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183967
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a positive integer n, return a sorted list that has the odd numbers in collatz sequence.
+;; The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+;; as follows: start with any positive integer n. Then each term is obtained from the 
+;; previous term as follows: if the previous term is even, the next term is one half of 
+;; the previous term. If the previous term is odd, the next term is 3 times the previous
+;; term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+;; Note: 
+;;     1. Collatz(1) is [1].
+;;     2. returned list sorted in increasing order.
+;; For example:
+;; get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+;; >>> (get_odd_collatz 5)
+;; (list 1 5)
+
+;; Given a positive integer n, return a sorted list that has the odd numbers in collatz sequence.
+;; The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+;; as follows: start with any positive integer n. Then each term is obtained from the 
+;; previous term as follows: if the previous term is even, the next term is one half of 
+;; the previous term. If the previous term is odd, the next term is 3 times the previous
+;; term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+;; Note: 
+;;     1. Collatz(1) is [1].
+;;     2. returned list sorted in increasing order.
+;; For example:
+;; get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+;; >>> (get_odd_collatz 5)
+;; (list 1 5)
+
+(define (get_odd_collatz n)
+  ;; Helper that returns the list of odd numbers in the Collatz sequence
+  (define (odd-nums x)
+    (cond
+      [(= x 1) (if (odd? x) (list x) '())]   ; base case: include 1 if odd
+      [else
+       (let ([next (if (even? x)
+                       (quotient x 2)           ; integer division
+                       (+ (* 3 x) 1))])        ; next term in the sequence
+         (if (odd? x)
+             (cons x (odd-nums next))   ; prepend current odd number
+             (odd-nums next)))]))       ; otherwise skip it
+
+  ;; Sort the collected odd numbers in ascending order
+  (sort (odd-nums n) <))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate get_odd_collatz))
+    (check-within (candidate 14) (list 1 5 7 11 13 17) 0.001)
+    (check-within (candidate 5) (list 1 5) 0.001)
+    (check-within (candidate 12) (list 1 3 5) 0.001)
+    (check-within (candidate 1) (list 1) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183967
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a positive integer n, return a sorted list that has the odd numbers in collatz sequence.
+;; The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+;; as follows: start with any positive integer n. Then each term is obtained from the 
+;; previous term as follows: if the previous term is even, the next term is one half of 
+;; the previous term. If the previous term is odd, the next term is 3 times the previous
+;; term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+;; Note: 
+;;     1. Collatz(1) is [1].
+;;     2. returned list sorted in increasing order.
+;; For example:
+;; get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+;; >>> (get_odd_collatz 5)
+;; (list 1 5)
+
+;; Given a positive integer n, return a sorted list that has the odd numbers in collatz sequence.
+;; The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+;; as follows: start with any positive integer n. Then each term is obtained from the 
+;; previous term as follows: if the previous term is even, the next term is one half of 
+;; the previous term. If the previous term is odd, the next term is 3 times the previous
+;; term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+;; Note: 
+;;     1. Collatz(1) is [1].
+;;     2. returned list sorted in increasing order.
+;; For example:
+;; get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+;; >>> (get_odd_collatz 5)
+;; (list 1 5)
+
+(define (get_odd_collatz n)
+  ;; Helper to build the full Collatz sequence starting from n
+  (define (collatz x)
+    (if (= x 1)
+        (list 1)
+        (cons x (collatz (if (even? x)
+                             (/ x 2)
+                             (+ (* 3 x) 1))))))
+  ;; Generate the sequence, filter odd numbers, and sort them ascending
+  (sort (filter odd? (collatz n)) <))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate get_odd_collatz))
+    (check-within (candidate 14) (list 1 5 7 11 13 17) 0.001)
+    (check-within (candidate 5) (list 1 5) 0.001)
+    (check-within (candidate 12) (list 1 3 5) 0.001)
+    (check-within (candidate 1) (list 1) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183967
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 125 (RKT) - HumanEval_125_split_words
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Given a string of words, return a list of words split on whitespace, if no whitespaces exists in the text you
+;; should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+;; alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+;; Examples
+;; >>> (split_words "Hello world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "Hello,world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "abcdef")
+;; 3
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate split_words))
+    (check-within (candidate "Hello world!") (list "Hello" "world!") 0.001)
+    (check-within (candidate "Hello,world!") (list "Hello" "world!") 0.001)
+    (check-within (candidate "Hello world,!") (list "Hello" "world,!") 0.001)
+    (check-within (candidate "Hello,Hello,world !") (list "Hello,Hello,world" "!") 0.001)
+    (check-within (candidate "abcdef") 3 0.001)
+    (check-within (candidate "aaabb") 2 0.001)
+    (check-within (candidate "aaaBb") 1 0.001)
+    (check-within (candidate "") 0 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a string of words, return a list of words split on whitespace, if no whitespaces exists in the text you
+;; should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+;; alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+;; Examples
+;; >>> (split_words "Hello world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "Hello,world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "abcdef")
+;; 3
+
+(define (split_words txt)
+  (cond
+    ;; If the text contains any whitespace, split on whitespace.
+    [(regexp-match? #px"\\s+" txt)
+     (regexp-split #px"\\s+" txt)]
+
+    ;; If there is no whitespace but a comma, split on commas.
+    [(string-contains? txt ",")
+     (string-split txt ",")]
+
+    ;; Otherwise, count lower‑case letters with odd alphabetic order.
+    [else
+     (for/sum ([c (in-string txt)]
+               #:when (and (>= (char->integer c) (char->integer #\a))
+                           (<= (char->integer c) (char->integer #\z))
+                           (odd? (- (char->integer c) (char->integer #\a)))))
+       1)]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate split_words))
+    (check-within (candidate "Hello world!") (list "Hello" "world!") 0.001)
+    (check-within (candidate "Hello,world!") (list "Hello" "world!") 0.001)
+    (check-within (candidate "Hello world,!") (list "Hello" "world,!") 0.001)
+    (check-within (candidate "Hello,Hello,world !") (list "Hello,Hello,world" "!") 0.001)
+    (check-within (candidate "abcdef") 3 0.001)
+    (check-within (candidate "aaabb") 2 0.001)
+    (check-within (candidate "aaaBb") 1 0.001)
+    (check-within (candidate "") 0 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183969
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a string of words, return a list of words split on whitespace, if no whitespaces exists in the text you
+;; should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+;; alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+;; Examples
+;; >>> (split_words "Hello world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "Hello,world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "abcdef")
+;; 3
+
+;; Given a string of words, return a list of words split on whitespace,
+;; if no whitespaces exists in the text you should split on commas ','
+;; if no commas exists you should return the number of lower-case letters
+;; with odd order in the alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+;; Examples
+;; >>> (split_words "Hello world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "Hello,world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "abcdef")
+;; 3
+
+(define (split_words txt)
+  (cond
+    ;; If the string contains any whitespace, split on whitespace.
+    [(regexp-match? #px"\\s" txt)
+     (string-split txt)]
+    
+    ;; If no whitespace but contains a comma, split on commas.
+    [(regexp-match? #px"," txt)
+     (string-split txt ",")]
+    
+    ;; Otherwise count lower‑case letters with odd alphabetic order.
+    [else
+     (let loop ((i 0) (cnt 0))
+       (if (= i (string-length txt))
+           cnt
+           (let* ((c (string-ref txt i))
+                  (is-lower (and (char? c)
+                                 (char>=? c #\a)
+                                 (char<=? c #\z))))
+             (if is-lower
+                 (let ((ord (- (char->integer c) (char->integer #\a))))
+                   (loop (add1 i) (if (odd? ord) (add1 cnt) cnt)))
+                 (loop (add1 i) cnt)))))]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate split_words))
+    (check-within (candidate "Hello world!") (list "Hello" "world!") 0.001)
+    (check-within (candidate "Hello,world!") (list "Hello" "world!") 0.001)
+    (check-within (candidate "Hello world,!") (list "Hello" "world,!") 0.001)
+    (check-within (candidate "Hello,Hello,world !") (list "Hello,Hello,world" "!") 0.001)
+    (check-within (candidate "abcdef") 3 0.001)
+    (check-within (candidate "aaabb") 2 0.001)
+    (check-within (candidate "aaaBb") 1 0.001)
+    (check-within (candidate "") 0 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183969
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a string of words, return a list of words split on whitespace, if no whitespaces exists in the text you
+;; should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+;; alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+;; Examples
+;; >>> (split_words "Hello world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "Hello,world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "abcdef")
+;; 3
+
+;; Given a string of words, return a list of words split on whitespace, if no whitespaces exists in the text you
+;; should split on commas ',' if no commas exists you should return the number of lower‑case letters with odd order in the
+;; alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+;;
+;; Examples
+;; >>> (split_words "Hello world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "Hello,world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "abcdef")
+;; 3
+
+(define (split_words txt)
+  (cond
+    ;; If the string contains any whitespace, split on whitespace
+    [(regexp-match? #px"\\s" txt)
+     (regexp-split #px"\\s+" txt)]
+
+    ;; If no whitespace but contains commas, split on commas
+    [(regexp-match? #px"," txt)
+     (regexp-split #px"," txt)]
+
+    ;; Otherwise count lower‑case letters with odd alphabetic index
+    [else
+     (define chars (string->list txt))
+     (foldl (lambda (c acc)
+              (if (and (char>=? c #\a) (char<=? c #\z))
+                  (let ([idx (- (char->integer c) (char->integer #\a))])
+                    (if (odd? idx) (+ acc 1) acc))
+                  acc))
+            0
+            chars)]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate split_words))
+    (check-within (candidate "Hello world!") (list "Hello" "world!") 0.001)
+    (check-within (candidate "Hello,world!") (list "Hello" "world!") 0.001)
+    (check-within (candidate "Hello world,!") (list "Hello" "world,!") 0.001)
+    (check-within (candidate "Hello,Hello,world !") (list "Hello,Hello,world" "!") 0.001)
+    (check-within (candidate "abcdef") 3 0.001)
+    (check-within (candidate "aaabb") 2 0.001)
+    (check-within (candidate "aaaBb") 1 0.001)
+    (check-within (candidate "") 0 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183969
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a string of words, return a list of words split on whitespace, if no whitespaces exists in the text you
+;; should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+;; alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+;; Examples
+;; >>> (split_words "Hello world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "Hello,world!")
+;; (list "Hello" "world!")
+;; >>> (split_words "abcdef")
+;; 3
+
+(require racket/string)
+
+;; Split a string into words, or return a special count.
+;;
+;; • If the text contains any whitespace, split on whitespace.
+;; • Otherwise, if it contains commas, split on commas.
+;; • Otherwise, count the number of lowercase letters whose
+;;   alphabetic index (a = 0, b = 1, …) is odd.
+;;
+;; Examples
+;;   (split_words "Hello world!")   → (list "Hello" "world!")
+;;   (split_words "Hello,world!")   → (list "Hello" "world!")
+;;   (split_words "abcdef")         → 3
+(define (split_words txt)
+  (cond
+    ;; Case 1: whitespace present → split on whitespace
+    [(regexp-match? #px"\\s" txt)
+     (string-split txt #px"\\s+")]
+
+    ;; Case 2: no whitespace but commas present → split on commas
+    [(regexp-match? #px"," txt)
+     (string-split txt ",")]
+
+    ;; Case 3: neither whitespace nor commas → count odd‑indexed lowercase letters
+    [else
+     (for/sum ([c (in-string txt)])
+       (if (and (>= c #\a) (<= c #\z))
+           (if (odd? (- (char->integer c) (char->integer #\a))) 1 0)
+           0))]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate split_words))
+    (check-within (candidate "Hello world!") (list "Hello" "world!") 0.001)
+    (check-within (candidate "Hello,world!") (list "Hello" "world!") 0.001)
+    (check-within (candidate "Hello world,!") (list "Hello" "world,!") 0.001)
+    (check-within (candidate "Hello,Hello,world !") (list "Hello,Hello,world" "!") 0.001)
+    (check-within (candidate "abcdef") 3 0.001)
+    (check-within (candidate "aaabb") 2 0.001)
+    (check-within (candidate "aaaBb") 1 0.001)
+    (check-within (candidate "") 0 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: Exception
+Timestamp: 1755183969
+STDOUT: (empty)
+STDERR:
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp2cjg1tzn.rkt:52:4
+
+>=: contract violation
+  expected: real?
+  given: #\a
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp2cjg1tzn.rkt:53:4
+
+>=: contract violation
+  expected: real?
+  given: #\a
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp2cjg1tzn.rkt:54:4
+
+>=: contract violation
+  expected: real?
+  given: #\a
+--------------------
+--------------------
+
+================================================================================
+PROBLEM 134 (RKT) - HumanEval_134_check_if_last_char_is_a_letter
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Create a function that returns #t if the last character
+;; of a given string is an alphabetical character and is not
+;; a part of a word, and #f otherwise.
+;; Note: "word" is a group of characters separated by space.
+;; Examples:
+;; >>> (check_if_last_char_is_a_letter "apple pie")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "apple pi e")
+;; #t
+;; >>> (check_if_last_char_is_a_letter "apple pi e ")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "")
+;; #f
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate check_if_last_char_is_a_letter))
+    (check-within (candidate "apple") #f 0.001)
+    (check-within (candidate "apple pi e") #t 0.001)
+    (check-within (candidate "eeeee") #f 0.001)
+    (check-within (candidate "A") #t 0.001)
+    (check-within (candidate "Pumpkin pie ") #f 0.001)
+    (check-within (candidate "Pumpkin pie 1") #f 0.001)
+    (check-within (candidate "") #f 0.001)
+    (check-within (candidate "eeeee e ") #f 0.001)
+    (check-within (candidate "apple pie") #f 0.001)
+    (check-within (candidate "apple pi e ") #f 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Create a function that returns #t if the last character
+;; of a given string is an alphabetical character and is not
+;; a part of a word, and #f otherwise.
+;; Note: "word" is a group of characters separated by space.
+;; Examples:
+;; >>> (check_if_last_char_is_a_letter "apple pie")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "apple pi e")
+;; #t
+;; >>> (check_if_last_char_is_a_letter "apple pi e ")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "")
+;; #f
+
+;; Create a function that returns #t if the last character
+;; of a given string is an alphabetical character and is not
+;; a part of a word, and #f otherwise.
+;; Note: "word" is a group of characters separated by space.
+(define (check_if_last_char_is_a_letter txt)
+  ;; Empty string → #f
+  (if (string-empty? txt)
+      #f
+      (let* ((len (string-length txt))
+             (last-idx (- len 1))
+             (last-char (string-ref txt last-idx)))
+        ;; Last character must be alphabetic
+        (if (char-alphabetic? last-char)
+            ;; If it is the only character, it's not part of a word
+            (if (zero? last-idx)
+                #t
+                ;; Otherwise check the preceding character
+                (let ((prev-char (string-ref txt (- last-idx 1))))
+                  (if (char=? prev-char #\space) #t #f)))
+            #f))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate check_if_last_char_is_a_letter))
+    (check-within (candidate "apple") #f 0.001)
+    (check-within (candidate "apple pi e") #t 0.001)
+    (check-within (candidate "eeeee") #f 0.001)
+    (check-within (candidate "A") #t 0.001)
+    (check-within (candidate "Pumpkin pie ") #f 0.001)
+    (check-within (candidate "Pumpkin pie 1") #f 0.001)
+    (check-within (candidate "") #f 0.001)
+    (check-within (candidate "eeeee e ") #f 0.001)
+    (check-within (candidate "apple pie") #f 0.001)
+    (check-within (candidate "apple pi e ") #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755183977
+STDOUT: (empty)
+STDERR:
+/tmp/tmpyf9r46ke.rkt:23:7: string-empty?: unbound identifier
+  in: string-empty?
+  location...:
+   /tmp/tmpyf9r46ke.rkt:23:7
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Create a function that returns #t if the last character
+;; of a given string is an alphabetical character and is not
+;; a part of a word, and #f otherwise.
+;; Note: "word" is a group of characters separated by space.
+;; Examples:
+;; >>> (check_if_last_char_is_a_letter "apple pie")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "apple pi e")
+;; #t
+;; >>> (check_if_last_char_is_a_letter "apple pi e ")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "")
+;; #f
+
+;; Create a function that returns #t if the last character
+;; of a given string is an alphabetical character and is not
+;; a part of a word, and #f otherwise.
+;; Note: "word" is a group of characters separated by space.
+;; Examples:
+;; >>> (check_if_last_char_is_a_letter "apple pie")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "apple pi e")
+;; #t
+;; >>> (check_if_last_char_is_a_letter "apple pi e ")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "")
+;; #f
+(define (check_if_last_char_is_a_letter txt)
+  (cond
+    [(string=? txt "") #f] ; empty string → false
+    [else
+     (let* ([len (string-length txt)]
+            [last-idx (sub1 len)]
+            [last-char (string-ref txt last-idx)])
+       (if (char-alphabetic? last-char)
+           (if (= last-idx 0)
+               #t ; single letter string
+               (let ([prev-char (string-ref txt (sub1 last-idx))])
+                 (char-whitespace? prev-char))) ; preceding char must be whitespace
+           #f))]))
+
+;; Test cases
+(displayln (check_if_last_char_is_a_letter "apple pie"))   ; #f
+(displayln (check_if_last_char_is_a_letter "apple pi e"))   ; #t
+(displayln (check_if_last_char_is_a_letter "apple pi e "))  ; #f
+(displayln (check_if_last_char_is_a_letter ""))            ; #f
+(displayln (check_if_last_char_is_a_letter "a"))           ; #t
+(displayln (check_if_last_char_is_a_letter " a"))          ; #t
+(displayln (check_if_last_char_is_a_letter "a "))          ; #f
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate check_if_last_char_is_a_letter))
+    (check-within (candidate "apple") #f 0.001)
+    (check-within (candidate "apple pi e") #t 0.001)
+    (check-within (candidate "eeeee") #f 0.001)
+    (check-within (candidate "A") #t 0.001)
+    (check-within (candidate "Pumpkin pie ") #f 0.001)
+    (check-within (candidate "Pumpkin pie 1") #f 0.001)
+    (check-within (candidate "") #f 0.001)
+    (check-within (candidate "eeeee e ") #f 0.001)
+    (check-within (candidate "apple pie") #f 0.001)
+    (check-within (candidate "apple pi e ") #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183977
+STDOUT:
+#f
+#t
+#f
+#f
+#t
+#t
+#f
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Create a function that returns #t if the last character
+;; of a given string is an alphabetical character and is not
+;; a part of a word, and #f otherwise.
+;; Note: "word" is a group of characters separated by space.
+;; Examples:
+;; >>> (check_if_last_char_is_a_letter "apple pie")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "apple pi e")
+;; #t
+;; >>> (check_if_last_char_is_a_letter "apple pi e ")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "")
+;; #f
+
+;; Create a function that returns #t if the last character
+;; of a given string is an alphabetical character and is not
+;; a part of a word, and #f otherwise.
+;; Note: "word" is a group of characters separated by space.
+;; Examples:
+;; >>> (check_if_last_char_is_a_letter "apple pie")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "apple pi e")
+;; #t
+;; >>> (check_if_last_char_is_a_letter "apple pi e ")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "")
+;; #f
+(define (check_if_last_char_is_a_letter txt)
+  (cond
+    ;; Empty string → false
+    [(string=? txt "") #f]
+    [else
+     (let* ([len (string-length txt)]
+            [last-char (string-ref txt (- len 1))])
+       (if (char-alphabetic? last-char)
+           (if (= len 1)
+               ;; Single character string that is a letter
+               #t
+               ;; Check the preceding character
+               (let ([prev-char (string-ref txt (- len 2))])
+                 (char=? prev-char #\space)))
+           #f))]))
+
+;; Test cases
+(displayln (check_if_last_char_is_a_letter "apple pie"))   ; #f
+(displayln (check_if_last_char_is_a_letter "apple pi e"))   ; #t
+(displayln (check_if_last_char_is_a_letter "apple pi e "))  ; #f
+(displayln (check_if_last_char_is_a_letter ""))             ; #f
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate check_if_last_char_is_a_letter))
+    (check-within (candidate "apple") #f 0.001)
+    (check-within (candidate "apple pi e") #t 0.001)
+    (check-within (candidate "eeeee") #f 0.001)
+    (check-within (candidate "A") #t 0.001)
+    (check-within (candidate "Pumpkin pie ") #f 0.001)
+    (check-within (candidate "Pumpkin pie 1") #f 0.001)
+    (check-within (candidate "") #f 0.001)
+    (check-within (candidate "eeeee e ") #f 0.001)
+    (check-within (candidate "apple pie") #f 0.001)
+    (check-within (candidate "apple pi e ") #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183977
+STDOUT:
+#f
+#t
+#f
+#f
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Create a function that returns #t if the last character
+;; of a given string is an alphabetical character and is not
+;; a part of a word, and #f otherwise.
+;; Note: "word" is a group of characters separated by space.
+;; Examples:
+;; >>> (check_if_last_char_is_a_letter "apple pie")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "apple pi e")
+;; #t
+;; >>> (check_if_last_char_is_a_letter "apple pi e ")
+;; #f
+;; >>> (check_if_last_char_is_a_letter "")
+;; #f
+
+;; Return #t if the last character is an alphabetical letter
+;; and it is not part of a longer word (i.e., it is a single‑letter
+;; word or the string consists of that single letter).  Otherwise
+;; return #f.
+(define (check_if_last_char_is_a_letter txt)
+  (let ([len (string-length txt)])
+    (cond
+      [(zero? len)                     ; empty string
+       #f]
+      [else
+       (let ([last (string-ref txt (- len 1))])
+         (and (char-alphabetic? last)
+              (or (= len 1)                ; only one character
+                  (char=? (string-ref txt (- len 2)) #\space))))])))
+
+;; Example tests
+(check_if_last_char_is_a_letter "apple pie")   ; => #f
+(check_if_last_char_is_a_letter "apple pi e")  ; => #t
+(check_if_last_char_is_a_letter "apple pi e ") ; => #f
+(check_if_last_char_is_a_letter "")             ; => #f
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate check_if_last_char_is_a_letter))
+    (check-within (candidate "apple") #f 0.001)
+    (check-within (candidate "apple pi e") #t 0.001)
+    (check-within (candidate "eeeee") #f 0.001)
+    (check-within (candidate "A") #t 0.001)
+    (check-within (candidate "Pumpkin pie ") #f 0.001)
+    (check-within (candidate "Pumpkin pie 1") #f 0.001)
+    (check-within (candidate "") #f 0.001)
+    (check-within (candidate "eeeee e ") #f 0.001)
+    (check-within (candidate "apple pie") #f 0.001)
+    (check-within (candidate "apple pi e ") #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183977
+STDOUT:
+#f
+#t
+#f
+#f
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 137 (RKT) - HumanEval_137_compare_one
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Create a function that takes integers, floats, or strings representing
+;; real numbers, and returns the larger variable in its given variable type.
+;; Return #f if the values are equal.
+;; Note: If a real number is represented as a string, the floating point might be . or ,
+;; >>> (compare_one 1 2.5)
+;; 2.5
+;; >>> (compare_one 1 "2,3")
+;; "2,3"
+;; >>> (compare_one "5,1" "6")
+;; "6"
+;; >>> (compare_one "1" 1)
+;; #f
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate compare_one))
+    (check-within (candidate 1 2) 2 0.001)
+    (check-within (candidate 1 2.5) 2.5 0.001)
+    (check-within (candidate 2 3) 3 0.001)
+    (check-within (candidate 5 6) 6 0.001)
+    (check-within (candidate 1 "2,3") "2,3" 0.001)
+    (check-within (candidate "5,1" "6") "6" 0.001)
+    (check-within (candidate "1" "2") "2" 0.001)
+    (check-within (candidate "1" 1) #f 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Create a function that takes integers, floats, or strings representing
+;; real numbers, and returns the larger variable in its given variable type.
+;; Return #f if the values are equal.
+;; Note: If a real number is represented as a string, the floating point might be . or ,
+;; >>> (compare_one 1 2.5)
+;; 2.5
+;; >>> (compare_one 1 "2,3")
+;; "2,3"
+;; >>> (compare_one "5,1" "6")
+;; "6"
+;; >>> (compare_one "1" 1)
+;; #f
+
+;; Create a function that takes integers, floats, or strings representing
+;; real numbers, and returns the larger variable in its given variable type.
+;; Return #f if the values are equal.
+;; Note: If a real number is represented as a string, the floating point might be . or ,
+
+(define (compare_one a b)
+  ;; Convert a value to a numeric value for comparison.
+  (define (to-number x)
+    (cond
+      [(number? x) x]                                 ; already a number
+      [(string? x)
+       ;; Replace comma with dot so that string->number can parse it.
+       (let* ([s (regexp-replace* #rx"," "." x)]
+              [n (string->number s)])
+         (if n n
+             (error "Invalid numeric string" x)))]
+      [else (error "Unsupported type" x)]))
+
+  (define na (to-number a))
+  (define nb (to-number b))
+
+  (cond
+    [(> na nb) a]     ; a is larger – return it in its original type
+    [(< na nb) b]     ; b is larger – return it in its original type
+    [else #f]))       ; equal – return #f
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate compare_one))
+    (check-within (candidate 1 2) 2 0.001)
+    (check-within (candidate 1 2.5) 2.5 0.001)
+    (check-within (candidate 2 3) 3 0.001)
+    (check-within (candidate 5 6) 6 0.001)
+    (check-within (candidate 1 "2,3") "2,3" 0.001)
+    (check-within (candidate "5,1" "6") "6" 0.001)
+    (check-within (candidate "1" "2") "2" 0.001)
+    (check-within (candidate "1" 1) #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: Exception
+Timestamp: 1755183980
+STDOUT: (empty)
+STDERR:
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpovp38s62.rkt:50:4
+
+Invalid numeric string "2,3"
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpovp38s62.rkt:51:4
+
+Invalid numeric string "5,1"
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpovp38s62.rkt:52:4
+
+Invalid numeric string "1"
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpovp38s62.rkt:53:4
+
+Invalid numeric string "1"
+--------------------
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Create a function that takes integers, floats, or strings representing
+;; real numbers, and returns the larger variable in its given variable type.
+;; Return #f if the values are equal.
+;; Note: If a real number is represented as a string, the floating point might be . or ,
+;; >>> (compare_one 1 2.5)
+;; 2.5
+;; >>> (compare_one 1 "2,3")
+;; "2,3"
+;; >>> (compare_one "5,1" "6")
+;; "6"
+;; >>> (compare_one "1" 1)
+;; #f
+(require racket/string)
+
+;; Create a function that takes integers, floats, or strings representing
+;; real numbers, and returns the larger variable in its given variable type.
+;; Return #f if the values are equal.
+;; Note: If a real number is represented as a string, the floating point might be . or ,
+
+(define (compare_one a b)
+  ;; Helper to convert a string representation of a number into a numeric value.
+  (define (parse-number s)
+    (string->number (string-replace s "," ".")))
+
+  ;; Obtain numeric values for comparison.
+  (define a-val (if (number? a) a (parse-number a)))
+  (define b-val (if (number? b) b (parse-number b)))
+
+  ;; Compare and return the larger original argument, or #f if equal.
+  (cond
+    [(> a-val b-val) a]
+    [(< a-val b-val) b]
+    [else #f]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate compare_one))
+    (check-within (candidate 1 2) 2 0.001)
+    (check-within (candidate 1 2.5) 2.5 0.001)
+    (check-within (candidate 2 3) 3 0.001)
+    (check-within (candidate 5 6) 6 0.001)
+    (check-within (candidate 1 "2,3") "2,3" 0.001)
+    (check-within (candidate "5,1" "6") "6" 0.001)
+    (check-within (candidate "1" "2") "2" 0.001)
+    (check-within (candidate "1" 1) #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183980
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Create a function that takes integers, floats, or strings representing
+;; real numbers, and returns the larger variable in its given variable type.
+;; Return #f if the values are equal.
+;; Note: If a real number is represented as a string, the floating point might be . or ,
+;; >>> (compare_one 1 2.5)
+;; 2.5
+;; >>> (compare_one 1 "2,3")
+;; "2,3"
+;; >>> (compare_one "5,1" "6")
+;; "6"
+;; >>> (compare_one "1" 1)
+;; #f
+(require racket/string)
+
+;; Helper: convert a numeric string (with '.' or ',') to a number.
+(define (parse-string s)
+  (string->number (string-replace s "," ".")))
+
+(define (compare_one a b)
+  ;; Convert each argument to its numeric value for comparison.
+  (define a-val (if (string? a) (parse-string a) a))
+  (define b-val (if (string? b) (parse-string b) b))
+
+  ;; Return the larger original argument, or #f if they are equal.
+  (cond
+    [(> a-val b-val) a]
+    [(< a-val b-val) b]
+    [else #f]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate compare_one))
+    (check-within (candidate 1 2) 2 0.001)
+    (check-within (candidate 1 2.5) 2.5 0.001)
+    (check-within (candidate 2 3) 3 0.001)
+    (check-within (candidate 5 6) 6 0.001)
+    (check-within (candidate 1 "2,3") "2,3" 0.001)
+    (check-within (candidate "5,1" "6") "6" 0.001)
+    (check-within (candidate "1" "2") "2" 0.001)
+    (check-within (candidate "1" 1) #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183980
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Create a function that takes integers, floats, or strings representing
+;; real numbers, and returns the larger variable in its given variable type.
+;; Return #f if the values are equal.
+;; Note: If a real number is represented as a string, the floating point might be . or ,
+;; >>> (compare_one 1 2.5)
+;; 2.5
+;; >>> (compare_one 1 "2,3")
+;; "2,3"
+;; >>> (compare_one "5,1" "6")
+;; "6"
+;; >>> (compare_one "1" 1)
+;; #f
+
+(require racket/string)
+
+;; Convert a value to a numeric representation.
+;; Numbers are left untouched, strings are parsed (comma or dot
+;; decimal separator is accepted).
+(define (to-number x)
+  (cond
+    [(number? x) x]
+    [(string? x)
+     (string->number (string-replace x "," "."))]
+    [else
+     (error "compare_one: unsupported type" x)]))
+
+(define (compare_one a b)
+  (define n-a (to-number a))
+  (define n-b (to-number b))
+  (cond
+    [(> n-a n-b) a]
+    [(< n-a n-b) b]
+    [else #f]))
+
+;; Examples
+(displayln (compare_one 1 2.5))      ; => 2.5
+(displayln (compare_one 1 "2,3"))    ; => "2,3"
+(displayln (compare_one "5,1" "6"))  ; => "6"
+(displayln (compare_one "1" 1))      ; => #f
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate compare_one))
+    (check-within (candidate 1 2) 2 0.001)
+    (check-within (candidate 1 2.5) 2.5 0.001)
+    (check-within (candidate 2 3) 3 0.001)
+    (check-within (candidate 5 6) 6 0.001)
+    (check-within (candidate 1 "2,3") "2,3" 0.001)
+    (check-within (candidate "5,1" "6") "6" 0.001)
+    (check-within (candidate "1" "2") "2" 0.001)
+    (check-within (candidate "1" 1) #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183980
+STDOUT:
+2.5
+2,3
+6
+#f
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 139 (RKT) - HumanEval_139_special_factorial
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; The Brazilian factorial is defined as:
+;; brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+;; where n > 0
+;; For example:
+;; >>> (special_factorial 4)
+;; 288
+;; The function will receive an integer as input and should return the special
+;; factorial of this integer.
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate special_factorial))
+    (check-within (candidate 4) 288 0.001)
+    (check-within (candidate 5) 34560 0.001)
+    (check-within (candidate 7) 125411328000 0.001)
+    (check-within (candidate 1) 1 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; The Brazilian factorial is defined as:
+;; brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+;; where n > 0
+;; For example:
+;; >>> (special_factorial 4)
+;; 288
+;; The function will receive an integer as input and should return the special
+;; factorial of this integer.
+
+;; The Brazilian factorial is defined as:
+;; brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+;; where n > 0
+;; For example:
+;; >>> (special_factorial 4)
+;; 288
+;; The function will receive an integer as input and should return the special
+;; factorial of this integer.
+
+(define (special_factorial n)
+  ;; Handle the trivial case
+  (if (zero? n)
+      1
+      ;; Iterate from 1 to n, keeping the current factorial and the
+      ;; running product of all factorials seen so far.
+      (let loop ([i 1]      ; current index
+                 [fact 1]    ; factorial of i
+                 [prod 1])   ; product of factorials up to i-1
+        (if (> i n)
+            prod
+            (let ([new-fact (* fact i)])   ; factorial of i
+              (loop (add1 i) new-fact (* prod new-fact))))))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate special_factorial))
+    (check-within (candidate 4) 288 0.001)
+    (check-within (candidate 5) 34560 0.001)
+    (check-within (candidate 7) 125411328000 0.001)
+    (check-within (candidate 1) 1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: SyntaxError
+Timestamp: 1755183981
+STDOUT: (empty)
+STDERR:
+/tmp/tmp30wlrge0.rkt:33:61: read-syntax: unexpected `)`
+  context...:
+   /usr/share/racket/collects/syntax/module-reader.rkt:186:17: body
+   /usr/share/racket/collects/syntax/module-reader.rkt:183:2: wrap-internal
+   /usr/share/racket/collects/racket/../syntax/module-reader.rkt:67:9: wrap-internal/wrapper
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; The Brazilian factorial is defined as:
+;; brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+;; where n > 0
+;; For example:
+;; >>> (special_factorial 4)
+;; 288
+;; The function will receive an integer as input and should return the special
+;; factorial of this integer.
+
+;; The Brazilian factorial is defined as:
+;; brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+;; where n > 0
+;; For example:
+;; >>> (special_factorial 4)
+;; 288
+;; The function will receive an integer as input and should return the special
+;; factorial of this integer.
+
+(define (special_factorial n)
+  ;; Helper to compute k! (k factorial)
+  (define (fact k)
+    (if (= k 0)
+        1
+        (* k (fact (- k 1)))))
+  ;; Recursive accumulation of the product of factorials
+  (define (accumulate i acc)
+    (if (> i n)
+        acc
+        (accumulate (+ i 1) (* acc (fact i)))))
+  (accumulate 1 1))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate special_factorial))
+    (check-within (candidate 4) 288 0.001)
+    (check-within (candidate 5) 34560 0.001)
+    (check-within (candidate 7) 125411328000 0.001)
+    (check-within (candidate 1) 1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183982
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; The Brazilian factorial is defined as:
+;; brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+;; where n > 0
+;; For example:
+;; >>> (special_factorial 4)
+;; 288
+;; The function will receive an integer as input and should return the special
+;; factorial of this integer.
+
+;; The Brazilian factorial is defined as:
+;; brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+;; where n > 0
+;; For example:
+;; >>> (special_factorial 4)
+;; 288
+;; The function will receive an integer as input and should return the special
+;; factorial of this integer.
+
+(define (special_factorial n)
+  ;; Helper to compute k! recursively
+  (define (fact k)
+    (if (= k 0)
+        1
+        (* k (fact (sub1 k)))))
+  
+  ;; Accumulate the product of factorials from n down to 1
+  (define (loop k acc)
+    (if (< k 1)
+        acc
+        (loop (sub1 k) (* acc (fact k)))))
+  
+  (loop n 1))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate special_factorial))
+    (check-within (candidate 4) 288 0.001)
+    (check-within (candidate 5) 34560 0.001)
+    (check-within (candidate 7) 125411328000 0.001)
+    (check-within (candidate 1) 1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183982
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; The Brazilian factorial is defined as:
+;; brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+;; where n > 0
+;; For example:
+;; >>> (special_factorial 4)
+;; 288
+;; The function will receive an integer as input and should return the special
+;; factorial of this integer.
+
+;; The Brazilian factorial is defined as:
+;; brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+;; where n > 0
+;; For example:
+;; >>> (special_factorial 4)
+;; 288
+;; The function will receive an integer as input and should return the special
+;; factorial of this integer.
+
+(define (special_factorial n)
+  ;; Helper to compute factorial of a single number.
+  (define (fact m)
+    (if (= m 0)
+        1
+        (* m (fact (- m 1)))))
+  ;; Accumulate the product of factorials from n down to 1.
+  (define (loop k acc)
+    (if (< k 1)
+        acc
+        (loop (- k 1) (* acc (fact k)))))
+  (loop n 1))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate special_factorial))
+    (check-within (candidate 4) 288 0.001)
+    (check-within (candidate 5) 34560 0.001)
+    (check-within (candidate 7) 125411328000 0.001)
+    (check-within (candidate 1) 1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183982
+STDOUT: (empty)
+STDERR: (empty)
+--------------------

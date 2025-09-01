@@ -1,0 +1,3080 @@
+As per my standing instructions, analyze each code-execution result provided. For every item, produce a structured report as follows.
+
+1) Status
+Status: "OK" (Success) or else (Failure)
+Evidence: include exit code, error status, and whether stderr is empty/non-empty (quote the first relevant line).
+
+If Failure (non-zero exit code, error status, or non-empty stderr)
+Root Cause Analysis
+Explain why it failed, grounded in the logs/trace.
+Point to the exact faulty locations (file and line numbers if available). Quote the minimal offending snippets.
+Recommended Fix (Minimal Patch)
+Provide brief code segments (3–7 lines each) that would correct the issue.
+If multiple faults exist, list fixes in order of impact.
+Final Answer
+Classify the ultimate source of failure as one of: faulty problem setting / wrong test case / incorrect code implementation.
+State it on a single line: Final Answer: <chosen category>.
+
+If Success (exit code 0 and empty stderr)
+Critical Correctness Review
+Do not assume success means correctness.
+Check if the code's logic truly matches the intended problem requirements, including edge cases and corner conditions.
+Identify any silent errors, logical flaws, or incompleteness that would still pass execution but fail semantically.
+If the implementation is sound, explain why it is correct. If not, explain the discrepancy clearly.
+Final Answer
+Explicitly confirm or reject correctness in one line: Final Answer: correct or incorrect (with a one-phrase justification if incorrect).
+
+General rules
+Be precise and concise. Don't invent behavior not evidenced by the logs or code.
+When line numbers aren't available, reference the closest identifiable code block.
+Prefer minimal fixes over refactors; include just enough context to apply the patch.
+
+CONTENT TO ANALYZE:
+
+================================================================================
+PROBLEM 31 (RKT) - HumanEval_31_is_prime
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Return true if a given number is prime, and false otherwise.
+;; >>> (is_prime 6)
+;; #f
+;; >>> (is_prime 101)
+;; #t
+;; >>> (is_prime 11)
+;; #t
+;; >>> (is_prime 13441)
+;; #t
+;; >>> (is_prime 61)
+;; #t
+;; >>> (is_prime 4)
+;; #f
+;; >>> (is_prime 1)
+;; #f
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate is_prime))
+    (check-within (candidate 6) #f 0.001)
+    (check-within (candidate 101) #t 0.001)
+    (check-within (candidate 11) #t 0.001)
+    (check-within (candidate 13441) #t 0.001)
+    (check-within (candidate 61) #t 0.001)
+    (check-within (candidate 4) #f 0.001)
+    (check-within (candidate 1) #f 0.001)
+    (check-within (candidate 5) #t 0.001)
+    (check-within (candidate 11) #t 0.001)
+    (check-within (candidate 17) #t 0.001)
+    (check-within (candidate 85) #f 0.001)
+    (check-within (candidate 77) #f 0.001)
+    (check-within (candidate 255379) #f 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return true if a given number is prime, and false otherwise.
+;; >>> (is_prime 6)
+;; #f
+;; >>> (is_prime 101)
+;; #t
+;; >>> (is_prime 11)
+;; #t
+;; >>> (is_prime 13441)
+;; #t
+;; >>> (is_prime 61)
+;; #t
+;; >>> (is_prime 4)
+;; #f
+;; >>> (is_prime 1)
+;; #f
+
+;; Return true if a given number is prime, and false otherwise.
+;; >>> (is_prime 6)
+;; #f
+;; >>> (is_prime 101)
+;; #t
+;; >>> (is_prime 11)
+;; #t
+;; >>> (is_prime 13441)
+;; #t
+;; >>> (is_prime 61)
+;; #t
+;; >>> (is_prime 4)
+;; #f
+;; >>> (is_prime 1)
+;; #f
+(define (is_prime n)
+  (cond
+    [(or (not (integer? n)) (< n 2)) #f]          ; handle non‑integers and n <= 1
+    [else
+     (let* ([limit (add1 (floor (sqrt n)))]      ; upper bound for trial division
+            [divisor (in-range 2 limit)])
+       (if (ormap (λ (d) (= (modulo n d) 0)) divisor)
+           #f
+           #t))]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate is_prime))
+    (check-within (candidate 6) #f 0.001)
+    (check-within (candidate 101) #t 0.001)
+    (check-within (candidate 11) #t 0.001)
+    (check-within (candidate 13441) #t 0.001)
+    (check-within (candidate 61) #t 0.001)
+    (check-within (candidate 4) #f 0.001)
+    (check-within (candidate 1) #f 0.001)
+    (check-within (candidate 5) #t 0.001)
+    (check-within (candidate 11) #t 0.001)
+    (check-within (candidate 17) #t 0.001)
+    (check-within (candidate 85) #f 0.001)
+    (check-within (candidate 77) #f 0.001)
+    (check-within (candidate 255379) #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: Exception
+Timestamp: 1755183857
+STDOUT: (empty)
+STDERR:
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp9qgtq2zs.rkt:48:4
+
+ormap: contract violation
+  expected: list?
+  given: #<stream>
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp9qgtq2zs.rkt:49:4
+
+ormap: contract violation
+  expected: list?
+  given: #<stream>
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp9qgtq2zs.rkt:50:4
+
+ormap: contract violation
+  expected: list?
+  given: #<stream>
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp9qgtq2zs.rkt:51:4
+
+ormap: contract violation
+  expected: list?
+  given: #<stream>
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp9qgtq2zs.rkt:52:4
+
+ormap: contract violation
+  expected: list?
+  given: #<stream>
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp9qgtq2zs.rkt:53:4
+
+ormap: contract violation
+  expected: list?
+  given: #<str
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return true if a given number is prime, and false otherwise.
+;; >>> (is_prime 6)
+;; #f
+;; >>> (is_prime 101)
+;; #t
+;; >>> (is_prime 11)
+;; #t
+;; >>> (is_prime 13441)
+;; #t
+;; >>> (is_prime 61)
+;; #t
+;; >>> (is_prime 4)
+;; #f
+;; >>> (is_prime 1)
+;; #f
+
+;; Return true if a given number is prime, and false otherwise.
+;; >>> (is_prime 6)
+;; #f
+;; >>> (is_prime 101)
+;; #t
+;; >>> (is_prime 11)
+;; #t
+;; >>> (is_prime 13441)
+;; #t
+;; >>> (is_prime 61)
+;; #t
+;; >>> (is_prime 4)
+;; #f
+;; >>> (is_prime 1)
+;; #f
+(define (is_prime n)
+  ;; Handle numbers less than 2 first
+  (cond
+    [(< n 2) #f]
+    ;; 2 is the only even prime
+    [(= n 2) #t]
+    ;; Even numbers greater than 2 are not prime
+    [(even? n) #f]
+    [else
+     ;; Check divisibility from 3 up to sqrt(n), stepping by 2
+     (let loop ([i 3]
+                [limit (inexact->exact (floor (sqrt n)))])
+       (cond
+         [(> i limit) #t]          ; no divisor found
+         [(zero? (modulo n i)) #f] ; divisor found
+         [else (loop (+ i 2) limit)]))]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate is_prime))
+    (check-within (candidate 6) #f 0.001)
+    (check-within (candidate 101) #t 0.001)
+    (check-within (candidate 11) #t 0.001)
+    (check-within (candidate 13441) #t 0.001)
+    (check-within (candidate 61) #t 0.001)
+    (check-within (candidate 4) #f 0.001)
+    (check-within (candidate 1) #f 0.001)
+    (check-within (candidate 5) #t 0.001)
+    (check-within (candidate 11) #t 0.001)
+    (check-within (candidate 17) #t 0.001)
+    (check-within (candidate 85) #f 0.001)
+    (check-within (candidate 77) #f 0.001)
+    (check-within (candidate 255379) #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183857
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return true if a given number is prime, and false otherwise.
+;; >>> (is_prime 6)
+;; #f
+;; >>> (is_prime 101)
+;; #t
+;; >>> (is_prime 11)
+;; #t
+;; >>> (is_prime 13441)
+;; #t
+;; >>> (is_prime 61)
+;; #t
+;; >>> (is_prime 4)
+;; #f
+;; >>> (is_prime 1)
+;; #f
+
+;; Return true if a given number is prime, and false otherwise.
+;; >>> (is_prime 6)
+;; #f
+;; >>> (is_prime 101)
+;; #t
+;; >>> (is_prime 11)
+;; #t
+;; >>> (is_prime 13441)
+;; #t
+;; >>> (is_prime 61)
+;; #t
+;; >>> (is_prime 4)
+;; #f
+;; >>> (is_prime 1)
+;; #f
+(define (is_prime n)
+  ;; Handle trivial cases first
+  (cond
+    [(< n 2) #f]                     ; 0 and 1 are not prime
+    [(= n 2) #t]                     ; 2 is the only even prime
+    [(even? n) #f]                   ; all other even numbers are composite
+    [else
+     ;; Check odd divisors up to sqrt(n)
+     (let loop ([i 3])
+       (if (> i (integer-sqrt n))
+           #t                           ; no divisor found
+           (if (zero? (modulo n i))
+               #f                       ; found a divisor
+               (loop (+ i 2)))))]))     ; try next odd number
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate is_prime))
+    (check-within (candidate 6) #f 0.001)
+    (check-within (candidate 101) #t 0.001)
+    (check-within (candidate 11) #t 0.001)
+    (check-within (candidate 13441) #t 0.001)
+    (check-within (candidate 61) #t 0.001)
+    (check-within (candidate 4) #f 0.001)
+    (check-within (candidate 1) #f 0.001)
+    (check-within (candidate 5) #t 0.001)
+    (check-within (candidate 11) #t 0.001)
+    (check-within (candidate 17) #t 0.001)
+    (check-within (candidate 85) #f 0.001)
+    (check-within (candidate 77) #f 0.001)
+    (check-within (candidate 255379) #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183857
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return true if a given number is prime, and false otherwise.
+;; >>> (is_prime 6)
+;; #f
+;; >>> (is_prime 101)
+;; #t
+;; >>> (is_prime 11)
+;; #t
+;; >>> (is_prime 13441)
+;; #t
+;; >>> (is_prime 61)
+;; #t
+;; >>> (is_prime 4)
+;; #f
+;; >>> (is_prime 1)
+;; #f
+
+;; Return true if a given number is prime, and false otherwise.
+;; >>> (is_prime 6)
+;; #f
+;; >>> (is_prime 101)
+;; #t
+;; >>> (is_prime 11)
+;; #t
+;; >>> (is_prime 13441)
+;; #t
+;; >>> (is_prime 61)
+;; #t
+;; >>> (is_prime 4)
+;; #f
+;; >>> (is_prime 1)
+;; #f
+(define (is_prime n)
+  (cond
+    ;; Non‑positive numbers or non‑integers are not prime
+    [(or (< n 2) (not (integer? n))) #f]
+    ;; 2 is the only even prime
+    [(= n 2) #t]
+    ;; All other even numbers are composite
+    [(even? n) #f]
+    ;; Check odd divisors up to the square root of n
+    [else
+     (let loop ([i 3])
+       (cond
+         [(> (* i i) n) #t]                     ; no divisor found
+         [(zero? (modulo n i)) #f]              ; divisor found
+         [else (loop (+ i 2))]))]))            ; try next odd number
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate is_prime))
+    (check-within (candidate 6) #f 0.001)
+    (check-within (candidate 101) #t 0.001)
+    (check-within (candidate 11) #t 0.001)
+    (check-within (candidate 13441) #t 0.001)
+    (check-within (candidate 61) #t 0.001)
+    (check-within (candidate 4) #f 0.001)
+    (check-within (candidate 1) #f 0.001)
+    (check-within (candidate 5) #t 0.001)
+    (check-within (candidate 11) #t 0.001)
+    (check-within (candidate 17) #t 0.001)
+    (check-within (candidate 85) #f 0.001)
+    (check-within (candidate 77) #f 0.001)
+    (check-within (candidate 255379) #f 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183857
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 36 (RKT) - HumanEval_36_fizz_buzz
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Return the number of times the digit 7 appears in integers less than n which are divisible by 11 or 13.
+;; >>> (fizz_buzz 50)
+;; 0
+;; >>> (fizz_buzz 78)
+;; 2
+;; >>> (fizz_buzz 79)
+;; 3
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate fizz_buzz))
+    (check-within (candidate 50) 0 0.001)
+    (check-within (candidate 78) 2 0.001)
+    (check-within (candidate 79) 3 0.001)
+    (check-within (candidate 100) 3 0.001)
+    (check-within (candidate 200) 6 0.001)
+    (check-within (candidate 4000) 192 0.001)
+    (check-within (candidate 10000) 639 0.001)
+    (check-within (candidate 100000) 8026 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return the number of times the digit 7 appears in integers less than n which are divisible by 11 or 13.
+;; >>> (fizz_buzz 50)
+;; 0
+;; >>> (fizz_buzz 78)
+;; 2
+;; >>> (fizz_buzz 79)
+;; 3
+
+;; Return the number of times the digit 7 appears in integers less than n
+;; which are divisible by 11 or 13.
+;; >>> (fizz_buzz 50)
+;; 0
+;; >>> (fizz_buzz 78)
+;; 2
+;; >>> (fizz_buzz 79)
+;; 3
+
+(define (count-7 x)
+  ;; Count occurrences of digit 7 in the decimal representation of x.
+  (if (= x 0)
+      0
+      (+ (if (= (modulo x 10) 7) 1 0)
+         (count-7 (quotient x 10)))))
+
+(define (fizz_buzz n)
+  (apply + (for/list ([i (in-range n)])
+             (if (or (zero? (modulo i 11))
+                     (zero? (modulo i 13)))
+                 (count-7 i)
+                 0))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate fizz_buzz))
+    (check-within (candidate 50) 0 0.001)
+    (check-within (candidate 78) 2 0.001)
+    (check-within (candidate 79) 3 0.001)
+    (check-within (candidate 100) 3 0.001)
+    (check-within (candidate 200) 6 0.001)
+    (check-within (candidate 4000) 192 0.001)
+    (check-within (candidate 10000) 639 0.001)
+    (check-within (candidate 100000) 8026 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183861
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return the number of times the digit 7 appears in integers less than n which are divisible by 11 or 13.
+;; >>> (fizz_buzz 50)
+;; 0
+;; >>> (fizz_buzz 78)
+;; 2
+;; >>> (fizz_buzz 79)
+;; 3
+
+;; Return the number of times the digit 7 appears in integers less than n
+;; which are divisible by 11 or 13.
+;;
+;; Examples:
+;; >>> (fizz_buzz 50)
+;; 0
+;; >>> (fizz_buzz 78)
+;; 2
+;; >>> (fizz_buzz 79)
+;; 3
+
+(define (fizz_buzz n)
+  ;; Count how many times digit 7 appears in the decimal representation of x.
+  (define (count-7s x)
+    (let loop ([y x] [cnt 0])
+      (if (zero? y)
+          cnt
+          (loop (quotient y 10)
+                (+ cnt (if (= (modulo y 10) 7) 1 0))))))
+  
+  ;; Iterate through all numbers < n and accumulate the counts.
+  (let loop ([i 1] [acc 0])
+    (if (>= i n)
+        acc
+        (if (or (= (modulo i 11) 0) (= (modulo i 13) 0))
+            (loop (+ i 1) (+ acc (count-7s i)))
+            (loop (+ i 1) acc)))))
+
+;; Test cases
+(printf "fizz_buzz 50  -> ~a\n" (fizz_buzz 50))   ; 0
+(printf "fizz_buzz 78  -> ~a\n" (fizz_buzz 78))   ; 2
+(printf "fizz_buzz 79  -> ~a\n" (fizz_buzz 79))   ; 3
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate fizz_buzz))
+    (check-within (candidate 50) 0 0.001)
+    (check-within (candidate 78) 2 0.001)
+    (check-within (candidate 79) 3 0.001)
+    (check-within (candidate 100) 3 0.001)
+    (check-within (candidate 200) 6 0.001)
+    (check-within (candidate 4000) 192 0.001)
+    (check-within (candidate 10000) 639 0.001)
+    (check-within (candidate 100000) 8026 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183861
+STDOUT:
+fizz_buzz 50  -> 0
+fizz_buzz 78  -> 2
+fizz_buzz 79  -> 3
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return the number of times the digit 7 appears in integers less than n which are divisible by 11 or 13.
+;; >>> (fizz_buzz 50)
+;; 0
+;; >>> (fizz_buzz 78)
+;; 2
+;; >>> (fizz_buzz 79)
+;; 3
+
+;; Return the number of times the digit 7 appears in integers less than n
+;; which are divisible by 11 or 13.
+;; >>> (fizz_buzz 50)
+;; 0
+;; >>> (fizz_buzz 78)
+;; 2
+;; >>> (fizz_buzz 79)
+;; 3
+(define (fizz_buzz n)
+  ;; Count the number of '7' characters in the decimal representation of x.
+  (define (count-7s x)
+    (let loop ((s (number->string x))
+               (idx 0)
+               (cnt 0))
+      (if (= idx (string-length s))
+          cnt
+          (loop s
+                (+ idx 1)
+                (if (char=? (string-ref s idx) #\7)
+                    (+ cnt 1)
+                    cnt)))))
+  ;; Sum the counts for all numbers i with 1 ≤ i < n that are
+  ;; divisible by 11 or 13.
+  (foldl (lambda (i acc)
+           (if (or (= (modulo i 11) 0) (= (modulo i 13) 0))
+               (+ acc (count-7s i))
+               acc))
+         0
+         (in-range 1 n)))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate fizz_buzz))
+    (check-within (candidate 50) 0 0.001)
+    (check-within (candidate 78) 2 0.001)
+    (check-within (candidate 79) 3 0.001)
+    (check-within (candidate 100) 3 0.001)
+    (check-within (candidate 200) 6 0.001)
+    (check-within (candidate 4000) 192 0.001)
+    (check-within (candidate 10000) 639 0.001)
+    (check-within (candidate 100000) 8026 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: Exception
+Timestamp: 1755183861
+STDOUT: (empty)
+STDERR:
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpr4f0wh7o.rkt:45:4
+
+foldl: contract violation
+  expected: list?
+  given: #<stream>
+  argument position: 3rd
+  other arguments...:
+   #<procedure:...tmp/tmpr4f0wh7o.rkt:34:9>
+   0
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpr4f0wh7o.rkt:46:4
+
+foldl: contract violation
+  expected: list?
+  given: #<stream>
+  argument position: 3rd
+  other arguments...:
+   #<procedure:...tmp/tmpr4f0wh7o.rkt:34:9>
+   0
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpr4f0wh7o.rkt:47:4
+
+foldl: contract violation
+  expected: list?
+  given: #<stream>
+  argument position: 3rd
+  other arguments...:
+   #<procedure:...tmp/tmpr4f0wh7o.rkt:34:9>
+   0
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmpr4f0wh7o.rkt:48:4
+
+foldl: contract violation
+  expected: list?
+  given: #<stream>
+  argument position: 3rd
+  other arguments...:
+   #<proce
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return the number of times the digit 7 appears in integers less than n which are divisible by 11 or 13.
+;; >>> (fizz_buzz 50)
+;; 0
+;; >>> (fizz_buzz 78)
+;; 2
+;; >>> (fizz_buzz 79)
+;; 3
+
+;; Return the number of times the digit 7 appears in integers less than n
+;; which are divisible by 11 or 13.
+;; >>> (fizz_buzz 50)
+;; 0
+;; >>> (fizz_buzz 78)
+;; 2
+;; >>> (fizz_buzz 79)
+;; 3
+(define (fizz_buzz n)
+  ;; Helper that counts the number of '7' characters in a string.
+  (define (count-7 s)
+    (length (regexp-match* #px"7" s)))
+
+  ;; Iterate over all numbers from 1 up to n‑1.
+  (for/sum ([i (in-range 1 n)])
+    (if (or (= (modulo i 11) 0)
+            (= (modulo i 13) 0))
+        (count-7 (number->string i))
+        0)))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate fizz_buzz))
+    (check-within (candidate 50) 0 0.001)
+    (check-within (candidate 78) 2 0.001)
+    (check-within (candidate 79) 3 0.001)
+    (check-within (candidate 100) 3 0.001)
+    (check-within (candidate 200) 6 0.001)
+    (check-within (candidate 4000) 192 0.001)
+    (check-within (candidate 10000) 639 0.001)
+    (check-within (candidate 100000) 8026 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183861
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 47 (RKT) - HumanEval_47_median
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Return median of elements in the list l.
+;; >>> (median (list 3 1 2 4 5))
+;; 3
+;; >>> (median (list -10 4 6 1000 10 20))
+;; 15.0
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate median))
+    (check-within (candidate (list 3 1 2 4 5)) 3 0.001)
+    (check-within (candidate (list -10 4 6 1000 10 20)) 8.0 0.001)
+    (check-within (candidate (list 5)) 5 0.001)
+    (check-within (candidate (list 6 5)) 5.5 0.001)
+    (check-within (candidate (list 8 1 3 9 9 2 7)) 7 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return median of elements in the list l.
+;; >>> (median (list 3 1 2 4 5))
+;; 3
+;; >>> (median (list -10 4 6 1000 10 20))
+;; 15.0
+
+;; Return median of elements in the list l.
+;; >>> (median (list 3 1 2 4 5))
+;; 3
+;; >>> (median (list -10 4 6 1000 10 20))
+;; 15.0
+(define (median l)
+  (define sorted (sort l <))
+  (define n (length sorted))
+  (if (odd? n)
+      (list-ref sorted (quotient n 2))
+      (let* ((mid1 (list-ref sorted (quotient n 2)))
+             (mid2 (list-ref sorted (+ (quotient n 2) 1))))
+        (/ (+ mid1 mid2) 2.0))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate median))
+    (check-within (candidate (list 3 1 2 4 5)) 3 0.001)
+    (check-within (candidate (list -10 4 6 1000 10 20)) 8.0 0.001)
+    (check-within (candidate (list 5)) 5 0.001)
+    (check-within (candidate (list 6 5)) 5.5 0.001)
+    (check-within (candidate (list 8 1 3 9 9 2 7)) 7 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: Exception
+Timestamp: 1755183870
+STDOUT: (empty)
+STDERR:
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmplmywkoo5.rkt:28:4
+actual:     15.0
+expected:   8.0
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmplmywkoo5.rkt:30:4
+
+list-ref: index too large for list
+  index: 2
+  in: '(5 6)
+--------------------
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return median of elements in the list l.
+;; >>> (median (list 3 1 2 4 5))
+;; 3
+;; >>> (median (list -10 4 6 1000 10 20))
+;; 15.0
+
+;; Return median of elements in the list `l`.
+;; >>> (median (list 3 1 2 4 5))
+;; 3
+;; >>> (median (list -10 4 6 1000 10 20))
+;; 8
+(define (median l)
+  (let* ([sorted (sort l <)]
+         [len (length sorted)])
+    (if (odd? len)
+        ;; Odd number of elements: return the middle one.
+        (list-ref sorted (quotient len 2))
+        ;; Even number of elements: average the two middle ones.
+        (let* ([mid-left (list-ref sorted (sub1 (quotient len 2)))]
+               [mid-right (list-ref sorted (quotient len 2))])
+          (/ (+ mid-left mid-right) 2)))))
+
+;; Example usage
+(displayln (median (list 3 1 2 4 5)))          ; => 3
+(displayln (median (list -10 4 6 1000 10 20))) ; => 8
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate median))
+    (check-within (candidate (list 3 1 2 4 5)) 3 0.001)
+    (check-within (candidate (list -10 4 6 1000 10 20)) 8.0 0.001)
+    (check-within (candidate (list 5)) 5 0.001)
+    (check-within (candidate (list 6 5)) 5.5 0.001)
+    (check-within (candidate (list 8 1 3 9 9 2 7)) 7 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183870
+STDOUT:
+3
+8
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return median of elements in the list l.
+;; >>> (median (list 3 1 2 4 5))
+;; 3
+;; >>> (median (list -10 4 6 1000 10 20))
+;; 15.0
+
+;; Return median of elements in the list l.
+;; >>> (median (list 3 1 2 4 5))
+;; 3
+;; >>> (median (list -10 4 6 1000 10 20))
+;; 8.0
+(define (median l)
+  (define sorted (sort l <))
+  (define n (length sorted))
+  (if (odd? n)
+      (list-ref sorted (quotient n 2))
+      (let* ((mid1 (quotient n 2))
+             (mid2 (- mid1 1))
+             (sum (+ (list-ref sorted mid1)
+                     (list-ref sorted mid2))))
+        (/ sum 2.0))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate median))
+    (check-within (candidate (list 3 1 2 4 5)) 3 0.001)
+    (check-within (candidate (list -10 4 6 1000 10 20)) 8.0 0.001)
+    (check-within (candidate (list 5)) 5 0.001)
+    (check-within (candidate (list 6 5)) 5.5 0.001)
+    (check-within (candidate (list 8 1 3 9 9 2 7)) 7 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183870
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return median of elements in the list l.
+;; >>> (median (list 3 1 2 4 5))
+;; 3
+;; >>> (median (list -10 4 6 1000 10 20))
+;; 15.0
+
+;; Return median of elements in the list l.
+;; >>> (median (list 3 1 2 4 5))
+;; 3
+;; >>> (median (list -10 4 6 1000 10 20))
+;; 15.0
+(define (median l)
+  (define sorted (sort l <))          ; sort the list in ascending order
+  (define n (length sorted))
+  (cond
+    [(odd? n)                         ; odd number of elements
+     (list-ref sorted (quotient n 2))]
+    [else                             ; even number of elements
+     (let* ([mid1 (list-ref sorted (- (quotient n 2) 1))]
+            [mid2 (list-ref sorted (quotient n 2))])
+       (/ (+ mid1 mid2) 2.0))]))      ; average as a floating‑point number
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate median))
+    (check-within (candidate (list 3 1 2 4 5)) 3 0.001)
+    (check-within (candidate (list -10 4 6 1000 10 20)) 8.0 0.001)
+    (check-within (candidate (list 5)) 5 0.001)
+    (check-within (candidate (list 6 5)) 5.5 0.001)
+    (check-within (candidate (list 8 1 3 9 9 2 7)) 7 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183870
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 51 (RKT) - HumanEval_51_remove_vowels
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; remove_vowels is a function that takes string and returns string without vowels.
+;; >>> (remove_vowels "")
+;; ""
+;; >>> (remove_vowels "abcdef")
+;; "bcdf"
+;; >>> (remove_vowels "aaaaa")
+;; ""
+;; >>> (remove_vowels "aaBAA")
+;; "B"
+;; >>> (remove_vowels "zbcd")
+;; "zbcd"
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate remove_vowels))
+    (check-within (candidate "") "" 0.001)
+    (check-within (candidate "abcdef
+ghijklm") "bcdf
+ghjklm" 0.001)
+    (check-within (candidate "fedcba") "fdcb" 0.001)
+    (check-within (candidate "eeeee") "" 0.001)
+    (check-within (candidate "acBAA") "cB" 0.001)
+    (check-within (candidate "EcBOO") "cB" 0.001)
+    (check-within (candidate "ybcd") "ybcd" 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; remove_vowels is a function that takes string and returns string without vowels.
+;; >>> (remove_vowels "")
+;; ""
+;; >>> (remove_vowels "abcdef")
+;; "bcdf"
+;; >>> (remove_vowels "aaaaa")
+;; ""
+;; >>> (remove_vowels "aaBAA")
+;; "B"
+;; >>> (remove_vowels "zbcd")
+;; "zbcd"
+
+(require racket/string)
+
+;; remove_vowels is a function that takes string and returns string without vowels.
+;; >>> (remove_vowels "")
+;; ""
+;; >>> (remove_vowels "abcdef")
+;; "bcdf"
+;; >>> (remove_vowels "aaaaa")
+;; ""
+;; >>> (remove_vowels "aaBAA")
+;; "B"
+;; >>> (remove_vowels "zbcd")
+;; "zbcd"
+(define (remove_vowels text)
+  (string-filter
+   (lambda (c)
+     (not (member c '(#\a #\e #\i #\o #\u #\A #\E #\I #\O #\U))))
+   text))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate remove_vowels))
+    (check-within (candidate "") "" 0.001)
+    (check-within (candidate "abcdef
+ghijklm") "bcdf
+ghjklm" 0.001)
+    (check-within (candidate "fedcba") "fdcb" 0.001)
+    (check-within (candidate "eeeee") "" 0.001)
+    (check-within (candidate "acBAA") "cB" 0.001)
+    (check-within (candidate "EcBOO") "cB" 0.001)
+    (check-within (candidate "ybcd") "ybcd" 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755183873
+STDOUT: (empty)
+STDERR:
+/tmp/tmpkyw7shnp.rkt:29:3: string-filter: unbound identifier
+  in: string-filter
+  location...:
+   /tmp/tmpkyw7shnp.rkt:29:3
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; remove_vowels is a function that takes string and returns string without vowels.
+;; >>> (remove_vowels "")
+;; ""
+;; >>> (remove_vowels "abcdef")
+;; "bcdf"
+;; >>> (remove_vowels "aaaaa")
+;; ""
+;; >>> (remove_vowels "aaBAA")
+;; "B"
+;; >>> (remove_vowels "zbcd")
+;; "zbcd"
+
+;; remove_vowels is a function that takes a string and returns a string
+;; without any of the vowels a, e, i, o, u (case‑insensitive).
+;;
+;; >>> (remove_vowels "")
+;; ""
+;; >>> (remove_vowels "abcdef")
+;; "bcdf"
+;; >>> (remove_vowels "aaaaa")
+;; ""
+;; >>> (remove_vowels "aaBAA")
+;; "B"
+;; >>> (remove_vowels "zbcd")
+;; "zbcd"
+
+(define (remove_vowels text)
+  (apply string
+         (filter
+          (lambda (c)
+            (not (member c '(#\a #\e #\i #\o #\u
+                             #\A #\E #\I #\O #\U))))
+          (string->list text))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate remove_vowels))
+    (check-within (candidate "") "" 0.001)
+    (check-within (candidate "abcdef
+ghijklm") "bcdf
+ghjklm" 0.001)
+    (check-within (candidate "fedcba") "fdcb" 0.001)
+    (check-within (candidate "eeeee") "" 0.001)
+    (check-within (candidate "acBAA") "cB" 0.001)
+    (check-within (candidate "EcBOO") "cB" 0.001)
+    (check-within (candidate "ybcd") "ybcd" 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183873
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; remove_vowels is a function that takes string and returns string without vowels.
+;; >>> (remove_vowels "")
+;; ""
+;; >>> (remove_vowels "abcdef")
+;; "bcdf"
+;; >>> (remove_vowels "aaaaa")
+;; ""
+;; >>> (remove_vowels "aaBAA")
+;; "B"
+;; >>> (remove_vowels "zbcd")
+;; "zbcd"
+
+;; remove_vowels is a function that takes a string and returns a string
+;; without any vowels (both lowercase and uppercase).
+;;
+;; Examples:
+;;   (remove_vowels "")           ; => ""
+;;   (remove_vowels "abcdef")     ; => "bcdf"
+;;   (remove_vowels "aaaaa")      ; => ""
+;;   (remove_vowels "aaBAA")      ; => "B"
+;;   (remove_vowels "zbcd")       ; => "zbcd"
+
+(define (remove_vowels text)
+  ;; Use a regular expression that matches any vowel (case‑insensitive)
+  ;; and replace all matches with the empty string.
+  (regexp-replace* #rx"[aeiouAEIOU]" text ""))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate remove_vowels))
+    (check-within (candidate "") "" 0.001)
+    (check-within (candidate "abcdef
+ghijklm") "bcdf
+ghjklm" 0.001)
+    (check-within (candidate "fedcba") "fdcb" 0.001)
+    (check-within (candidate "eeeee") "" 0.001)
+    (check-within (candidate "acBAA") "cB" 0.001)
+    (check-within (candidate "EcBOO") "cB" 0.001)
+    (check-within (candidate "ybcd") "ybcd" 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183873
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; remove_vowels is a function that takes string and returns string without vowels.
+;; >>> (remove_vowels "")
+;; ""
+;; >>> (remove_vowels "abcdef")
+;; "bcdf"
+;; >>> (remove_vowels "aaaaa")
+;; ""
+;; >>> (remove_vowels "aaBAA")
+;; "B"
+;; >>> (remove_vowels "zbcd")
+;; "zbcd"
+
+;; remove_vowels is a function that takes string and returns string without vowels.
+;; >>> (remove_vowels "")
+;; ""
+;; >>> (remove_vowels "abcdef")
+;; "bcdf"
+;; >>> (remove_vowels "aaaaa")
+;; ""
+;; >>> (remove_vowels "aaBAA")
+;; "B"
+;; >>> (remove_vowels "zbcd")
+;; "zbcd"
+(define (remove_vowels text)
+  ;; Use a regular expression to replace all vowels (both lower‑ and upper‑case)
+  ;; with the empty string.
+  (regexp-replace* #rx"[aeiouAEIOU]" text ""))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate remove_vowels))
+    (check-within (candidate "") "" 0.001)
+    (check-within (candidate "abcdef
+ghijklm") "bcdf
+ghjklm" 0.001)
+    (check-within (candidate "fedcba") "fdcb" 0.001)
+    (check-within (candidate "eeeee") "" 0.001)
+    (check-within (candidate "acBAA") "cB" 0.001)
+    (check-within (candidate "EcBOO") "cB" 0.001)
+    (check-within (candidate "ybcd") "ybcd" 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183873
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 55 (RKT) - HumanEval_55_fib
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Return n-th Fibonacci number.
+;; >>> (fib 10)
+;; 55
+;; >>> (fib 1)
+;; 1
+;; >>> (fib 8)
+;; 21
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate fib))
+    (check-within (candidate 10) 55 0.001)
+    (check-within (candidate 1) 1 0.001)
+    (check-within (candidate 8) 21 0.001)
+    (check-within (candidate 11) 89 0.001)
+    (check-within (candidate 12) 144 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return n-th Fibonacci number.
+;; >>> (fib 10)
+;; 55
+;; >>> (fib 1)
+;; 1
+;; >>> (fib 8)
+;; 21
+
+;; Return n-th Fibonacci number.
+;; >>> (fib 10)
+;; 55
+;; >>> (fib 1)
+;; 1
+;; >>> (fib 8)
+;; 21
+(define (fib n)
+  (cond
+    [(<= n 1) 1]
+    [else (+ (fib (- n 1)) (fib (- n 2)))]))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate fib))
+    (check-within (candidate 10) 55 0.001)
+    (check-within (candidate 1) 1 0.001)
+    (check-within (candidate 8) 21 0.001)
+    (check-within (candidate 11) 89 0.001)
+    (check-within (candidate 12) 144 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: Exception
+Timestamp: 1755183877
+STDOUT: (empty)
+STDERR:
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmphv81gl_3.rkt:27:4
+actual:     89
+expected:   55
+--------------------
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmphv81gl_3.rkt:29:4
+actual:     34
+expected:   21
+--------------------
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmphv81gl_3.rkt:30:4
+actual:     144
+expected:   89
+--------------------
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmphv81gl_3.rkt:31:4
+actual:     233
+expected:   144
+--------------------
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return n-th Fibonacci number.
+;; >>> (fib 10)
+;; 55
+;; >>> (fib 1)
+;; 1
+;; >>> (fib 8)
+;; 21
+
+;; Return n-th Fibonacci number.
+;; >>> (fib 10)
+;; 55
+;; >>> (fib 1)
+;; 1
+;; >>> (fib 8)
+;; 21
+(define (fib n)
+  (if (<= n 1)
+      n
+      (+ (fib (- n 1))
+         (fib (- n 2)))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate fib))
+    (check-within (candidate 10) 55 0.001)
+    (check-within (candidate 1) 1 0.001)
+    (check-within (candidate 8) 21 0.001)
+    (check-within (candidate 11) 89 0.001)
+    (check-within (candidate 12) 144 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183877
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return n-th Fibonacci number.
+;; >>> (fib 10)
+;; 55
+;; >>> (fib 1)
+;; 1
+;; >>> (fib 8)
+;; 21
+
+;; Return n‑th Fibonacci number.
+;; >>> (fib 10)
+;; 55
+;; >>> (fib 1)
+;; 1
+;; >>> (fib 8)
+;; 21
+(define (fib n)
+  ;; Tail‑recursive helper that keeps the two most recent
+  ;; Fibonacci numbers in `a` and `b`, and counts down `cnt`.
+  (define (fib-iter a b cnt)
+    (if (= cnt 0)
+        a
+        (fib-iter b (+ a b) (- cnt 1))))
+  ;; Start with F0 = 0 and F1 = 1, and compute the n‑th term.
+  (fib-iter 0 1 n))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate fib))
+    (check-within (candidate 10) 55 0.001)
+    (check-within (candidate 1) 1 0.001)
+    (check-within (candidate 8) 21 0.001)
+    (check-within (candidate 11) 89 0.001)
+    (check-within (candidate 12) 144 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183877
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return n-th Fibonacci number.
+;; >>> (fib 10)
+;; 55
+;; >>> (fib 1)
+;; 1
+;; >>> (fib 8)
+;; 21
+
+;; Return n-th Fibonacci number.
+;; >>> (fib 10)
+;; 55
+;; >>> (fib 1)
+;; 1
+;; >>> (fib 8)
+;; 21
+(define (fib n)
+  (if (<= n 1)
+      n
+      (+ (fib (- n 1)) (fib (- n 2)))))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate fib))
+    (check-within (candidate 10) 55 0.001)
+    (check-within (candidate 1) 1 0.001)
+    (check-within (candidate 8) 21 0.001)
+    (check-within (candidate 11) 89 0.001)
+    (check-within (candidate 12) 144 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183877
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 58 (RKT) - HumanEval_58_common
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Return sorted unique common elements for two lists.
+;; >>> (common (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121))
+;; (list 1 5 653)
+;; >>> (common (list 5 3 2 8) (list 3 2))
+;; (list 2 3)
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate common))
+    (check-within (candidate (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121)) (list 1 5 653) 0.001)
+    (check-within (candidate (list 5 3 2 8) (list 3 2)) (list 2 3) 0.001)
+    (check-within (candidate (list 4 3 2 8) (list 3 2 4)) (list 2 3 4) 0.001)
+    (check-within (candidate (list 4 3 2 8) (list )) (list ) 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return sorted unique common elements for two lists.
+;; >>> (common (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121))
+;; (list 1 5 653)
+;; >>> (common (list 5 3 2 8) (list 3 2))
+;; (list 2 3)
+
+;; Return sorted unique common elements for two lists.
+;; >>> (common (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121))
+;; (list 1 5 653)
+;; >>> (common (list 5 3 2 8) (list 3 2))
+;; (list 2 3)
+(define (common l1 l2)
+  (sort
+   (remove-duplicates
+    (filter (lambda (x) (member x l2)) l1))
+   <))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate common))
+    (check-within (candidate (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121)) (list 1 5 653) 0.001)
+    (check-within (candidate (list 5 3 2 8) (list 3 2)) (list 2 3) 0.001)
+    (check-within (candidate (list 4 3 2 8) (list 3 2 4)) (list 2 3 4) 0.001)
+    (check-within (candidate (list 4 3 2 8) (list )) (list ) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183879
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return sorted unique common elements for two lists.
+;; >>> (common (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121))
+;; (list 1 5 653)
+;; >>> (common (list 5 3 2 8) (list 3 2))
+;; (list 2 3)
+
+;; Return sorted unique common elements for two lists.
+;; >>> (common (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121))
+;; (list 1 5 653)
+;; >>> (common (list 5 3 2 8) (list 3 2))
+;; (list 2 3)
+(define (common l1 l2)
+  (sort (remove-duplicates (filter (lambda (x) (member x l2)) l1)) <))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate common))
+    (check-within (candidate (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121)) (list 1 5 653) 0.001)
+    (check-within (candidate (list 5 3 2 8) (list 3 2)) (list 2 3) 0.001)
+    (check-within (candidate (list 4 3 2 8) (list 3 2 4)) (list 2 3 4) 0.001)
+    (check-within (candidate (list 4 3 2 8) (list )) (list ) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183879
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return sorted unique common elements for two lists.
+;; >>> (common (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121))
+;; (list 1 5 653)
+;; >>> (common (list 5 3 2 8) (list 3 2))
+;; (list 2 3)
+
+;; Return sorted unique common elements for two lists.
+;; >>> (common (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121))
+;; (list 1 5 653)
+;; >>> (common (list 5 3 2 8) (list 3 2))
+;; (list 2 3)
+(define (common l1 l2)
+  (sort
+   (remove-duplicates
+    (filter (lambda (x) (member x l2)) l1))
+   <))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate common))
+    (check-within (candidate (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121)) (list 1 5 653) 0.001)
+    (check-within (candidate (list 5 3 2 8) (list 3 2)) (list 2 3) 0.001)
+    (check-within (candidate (list 4 3 2 8) (list 3 2 4)) (list 2 3 4) 0.001)
+    (check-within (candidate (list 4 3 2 8) (list )) (list ) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183879
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return sorted unique common elements for two lists.
+;; >>> (common (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121))
+;; (list 1 5 653)
+;; >>> (common (list 5 3 2 8) (list 3 2))
+;; (list 2 3)
+
+(require racket/set)
+
+;; Return sorted unique common elements for two lists.
+;; >>> (common (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121))
+;; (list 1 5 653)
+;; >>> (common (list 5 3 2 8) (list 3 2))
+;; (list 2 3)
+(define (common l1 l2)
+  (sort
+   (set->list
+    (set-intersection (list->set l1) (list->set l2)))
+   <))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate common))
+    (check-within (candidate (list 1 4 3 34 653 2 5) (list 5 7 1 5 9 653 121)) (list 1 5 653) 0.001)
+    (check-within (candidate (list 5 3 2 8) (list 3 2)) (list 2 3) 0.001)
+    (check-within (candidate (list 4 3 2 8) (list 3 2 4)) (list 2 3 4) 0.001)
+    (check-within (candidate (list 4 3 2 8) (list )) (list ) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755183879
+STDOUT: (empty)
+STDERR:
+/tmp/tmp22pmood2.rkt:19:5: set-intersection: unbound identifier
+  in: set-intersection
+  location...:
+   /tmp/tmp22pmood2.rkt:19:5
+--------------------
+
+================================================================================
+PROBLEM 59 (RKT) - HumanEval_59_largest_prime_factor
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Return the largest prime factor of n. Assume n > 1 and is not a prime.
+;; >>> (largest_prime_factor 13195)
+;; 29
+;; >>> (largest_prime_factor 2048)
+;; 2
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate largest_prime_factor))
+    (check-within (candidate 15) 5 0.001)
+    (check-within (candidate 27) 3 0.001)
+    (check-within (candidate 63) 7 0.001)
+    (check-within (candidate 330) 11 0.001)
+    (check-within (candidate 13195) 29 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return the largest prime factor of n. Assume n > 1 and is not a prime.
+;; >>> (largest_prime_factor 13195)
+;; 29
+;; >>> (largest_prime_factor 2048)
+;; 2
+
+;; Return the largest prime factor of n. Assume n > 1 and is not a prime.
+;; >>> (largest_prime_factor 13195)
+;; 29
+;; >>> (largest_prime_factor 2048)
+;; 2
+(define (largest_prime_factor n)
+  ;; Recursive helper that tests divisors starting at d.
+  (define (factor n d largest)
+    (cond
+      ;; If n is reduced below the current divisor, we are done.
+      [(< n d) largest]
+      ;; If d divides n, record it and continue with n/d.
+      [(zero? (modulo n d))
+       (factor (/ n d) d (max largest d))]
+      ;; Otherwise try the next divisor.
+      [else
+       (factor n (+ d 1) largest)]))
+  ;; Start searching from divisor 2 with initial largest factor 1.
+  (factor n 2 1))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate largest_prime_factor))
+    (check-within (candidate 15) 5 0.001)
+    (check-within (candidate 27) 3 0.001)
+    (check-within (candidate 63) 7 0.001)
+    (check-within (candidate 330) 11 0.001)
+    (check-within (candidate 13195) 29 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183880
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return the largest prime factor of n. Assume n > 1 and is not a prime.
+;; >>> (largest_prime_factor 13195)
+;; 29
+;; >>> (largest_prime_factor 2048)
+;; 2
+
+;; Return the largest prime factor of n. Assume n > 1 and is not a prime.
+;; >>> (largest_prime_factor 13195)
+;; 29
+;; >>> (largest_prime_factor 2048)
+;; 2
+(define (largest_prime_factor n)
+  ;; Recursive helper that examines potential factors starting at i.
+  (define (factor n largest i)
+    (cond
+      ;; If i*i > n, any remaining n > 1 is itself a prime factor.
+      [(> (* i i) n) (if (> n 1) (max largest n) largest)]
+      ;; If i divides n, record it and keep dividing n by i.
+      [(zero? (mod n i))
+       (factor (quotient n i) i (max largest i))]
+      ;; Otherwise, try the next candidate factor.
+      [else
+       (factor n (+ i 1) largest)]))
+
+  ;; Handle the factor 2 separately for efficiency.
+  (let loop ([n n] [largest 1])
+    (cond
+      [(even? n) (loop (quotient n 2) 2)]
+      [else (factor n largest 3)])))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate largest_prime_factor))
+    (check-within (candidate 15) 5 0.001)
+    (check-within (candidate 27) 3 0.001)
+    (check-within (candidate 63) 7 0.001)
+    (check-within (candidate 330) 11 0.001)
+    (check-within (candidate 13195) 29 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755183880
+STDOUT: (empty)
+STDERR:
+/tmp/tmpzs6bswv0.rkt:21:15: mod: unbound identifier
+  in: mod
+  location...:
+   /tmp/tmpzs6bswv0.rkt:21:15
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return the largest prime factor of n. Assume n > 1 and is not a prime.
+;; >>> (largest_prime_factor 13195)
+;; 29
+;; >>> (largest_prime_factor 2048)
+;; 2
+
+;; Return the largest prime factor of n. Assume n > 1 and is not a prime.
+;; >>> (largest_prime_factor 13195)
+;; 29
+;; >>> (largest_prime_factor 2048)
+;; 2
+(define (largest_prime_factor n)
+  (let loop ((i 2)          ; current divisor candidate
+             (num n)        ; remaining number to factor
+             (largest 0))   ; largest factor found so far
+    (cond
+      ;; If i*i exceeds the remaining number, num itself is prime
+      [(> (* i i) num)
+       (if (> num 1) num largest)]
+      ;; If num is divisible by i, update largest and divide num
+      [(zero? (modulo num i))
+       (loop i (quotient num i) i)]
+      ;; Otherwise, try the next integer
+      [else
+       (loop (+ i 1) num largest)])))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate largest_prime_factor))
+    (check-within (candidate 15) 5 0.001)
+    (check-within (candidate 27) 3 0.001)
+    (check-within (candidate 63) 7 0.001)
+    (check-within (candidate 330) 11 0.001)
+    (check-within (candidate 13195) 29 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183880
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Return the largest prime factor of n. Assume n > 1 and is not a prime.
+;; >>> (largest_prime_factor 13195)
+;; 29
+;; >>> (largest_prime_factor 2048)
+;; 2
+
+;; Return the largest prime factor of n. Assume n > 1 and is not a prime.
+;; >>> (largest_prime_factor 13195)
+;; 29
+;; >>> (largest_prime_factor 2048)
+;; 2
+(define (largest_prime_factor n)
+  (define (helper n d largest)
+    (cond
+      ;; If d has exceeded sqrt(n), then n itself (if > 1) is the largest prime factor
+      ((> d (sqrt n)) (if (> n 1) n largest))
+      ;; If d divides n, divide out all copies of d and update largest
+      ((zero? (modulo n d))
+       (helper (quotient n d) d d))
+      ;; Otherwise, try the next candidate divisor
+      (else (helper n (+ d 1) largest))))
+  ;; Start with divisor 2 and no largest factor found yet
+  (helper n 2 1))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate largest_prime_factor))
+    (check-within (candidate 15) 5 0.001)
+    (check-within (candidate 27) 3 0.001)
+    (check-within (candidate 63) 7 0.001)
+    (check-within (candidate 330) 11 0.001)
+    (check-within (candidate 13195) 29 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183880
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 68 (RKT) - HumanEval_68_pluck
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; "Given a list representing a branch of a tree that has non-negative integer nodes
+;; your task is to pluck one of the nodes and return it.
+;; The plucked node should be the node with the smallest even value.
+;; If multiple nodes with the same smallest even value are found return the node that has smallest index.
+;; The plucked node should be returned in a list, [ smalest_value, its index ],
+;; If there are no even values or the given list is empty, return [].
+;; Example 1:
+;; >>> (pluck (list 4 2 3))
+;; (list 2 1)
+;; Explanation: 2 has the smallest even value, and 2 has the smallest index.
+;; Example 2:
+;; >>> (pluck (list 1 2 3))
+;; (list 2 1)
+;; Explanation: 2 has the smallest even value, and 2 has the smallest index.
+;; Example 3:
+;; >>> (pluck (list ))
+;; (list )
+;; Example 4:
+;; >>> (pluck (list 5 0 3 0 4 2))
+;; (list 0 1)
+;; Explanation: 0 is the smallest value, but  there are two zeros,
+;;              so we will choose the first zero, which has the smallest index.
+;; Constraints:
+;;     * 1 <= nodes.length <= 10000
+;;     * 0 <= node.value
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate pluck))
+    (check-within (candidate (list 4 2 3)) (list 2 1) 0.001)
+    (check-within (candidate (list 1 2 3)) (list 2 1) 0.001)
+    (check-within (candidate (list )) (list ) 0.001)
+    (check-within (candidate (list 5 0 3 0 4 2)) (list 0 1) 0.001)
+    (check-within (candidate (list 1 2 3 0 5 3)) (list 0 3) 0.001)
+    (check-within (candidate (list 5 4 8 4 8)) (list 4 1) 0.001)
+    (check-within (candidate (list 7 6 7 1)) (list 6 1) 0.001)
+    (check-within (candidate (list 7 9 7 1)) (list ) 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; "Given a list representing a branch of a tree that has non-negative integer nodes
+;; your task is to pluck one of the nodes and return it.
+;; The plucked node should be the node with the smallest even value.
+;; If multiple nodes with the same smallest even value are found return the node that has smallest index.
+;; The plucked node should be returned in a list, [ smalest_value, its index ],
+;; If there are no even values or the given list is empty, return [].
+;; Example 1:
+;; >>> (pluck (list 4 2 3))
+;; (list 2 1)
+;; Explanation: 2 has the smallest even value, and 2 has the smallest index.
+;; Example 2:
+;; >>> (pluck (list 1 2 3))
+;; (list 2 1)
+;; Explanation: 2 has the smallest even value, and 2 has the smallest index.
+;; Example 3:
+;; >>> (pluck (list ))
+;; (list )
+;; Example 4:
+;; >>> (pluck (list 5 0 3 0 4 2))
+;; (list 0 1)
+;; Explanation: 0 is the smallest value, but  there are two zeros,
+;;              so we will choose the first zero, which has the smallest index.
+;; Constraints:
+;;     * 1 <= nodes.length <= 10000
+;;     * 0 <= node.value
+
+;; Pluck the node with the smallest even value.
+;; If several nodes share that value, choose the one with the smallest index.
+;; Return a list [value index] or an empty list if no even values exist.
+(define (pluck arr)
+  ;; Helper: fold over the list with an index counter.
+  (let loop ((lst  arr)          ; remaining elements
+             (idx  0)            ; current index
+             (best #f))          ; current best pair [value index]
+    (cond
+      [(empty? lst)                     ; finished traversing
+       (if best
+           (list (first best) (second best)) ; return best pair
+           '())]                           ; no even values found
+      [else
+       (let* ((v   (first lst))
+              (rest (rest lst)))
+         (if (even? v)
+             (let ((curr (if best
+                             (if (or (< v (first best))
+                                     (and (= v (first best))
+                                          (< idx (second best))))
+                                 (list v idx)
+                                 best)
+                             (list v idx))))
+               (loop rest (add1 idx) curr))
+             (loop rest (add1 idx) best)))])))
+
+;; Example usage:
+;; (pluck (list 4 2 3))   ; => (list 2 1)
+;; (pluck (list 1 2 3))   ; => (list 2 1)
+;; (pluck (list))         ; => (list)
+;; (pluck (list 5 0 3 0 4 2)) ; => (list 0 1)
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate pluck))
+    (check-within (candidate (list 4 2 3)) (list 2 1) 0.001)
+    (check-within (candidate (list 1 2 3)) (list 2 1) 0.001)
+    (check-within (candidate (list )) (list ) 0.001)
+    (check-within (candidate (list 5 0 3 0 4 2)) (list 0 1) 0.001)
+    (check-within (candidate (list 1 2 3 0 5 3)) (list 0 3) 0.001)
+    (check-within (candidate (list 5 4 8 4 8)) (list 4 1) 0.001)
+    (check-within (candidate (list 7 6 7 1)) (list 6 1) 0.001)
+    (check-within (candidate (list 7 9 7 1)) (list ) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183888
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; "Given a list representing a branch of a tree that has non-negative integer nodes
+;; your task is to pluck one of the nodes and return it.
+;; The plucked node should be the node with the smallest even value.
+;; If multiple nodes with the same smallest even value are found return the node that has smallest index.
+;; The plucked node should be returned in a list, [ smalest_value, its index ],
+;; If there are no even values or the given list is empty, return [].
+;; Example 1:
+;; >>> (pluck (list 4 2 3))
+;; (list 2 1)
+;; Explanation: 2 has the smallest even value, and 2 has the smallest index.
+;; Example 2:
+;; >>> (pluck (list 1 2 3))
+;; (list 2 1)
+;; Explanation: 2 has the smallest even value, and 2 has the smallest index.
+;; Example 3:
+;; >>> (pluck (list ))
+;; (list )
+;; Example 4:
+;; >>> (pluck (list 5 0 3 0 4 2))
+;; (list 0 1)
+;; Explanation: 0 is the smallest value, but  there are two zeros,
+;;              so we will choose the first zero, which has the smallest index.
+;; Constraints:
+;;     * 1 <= nodes.length <= 10000
+;;     * 0 <= node.value
+
+;; Find the smallest even value in the list `arr` and return it together
+;; with its zero‑based index as a two‑element list.
+;; If no even value exists or the list is empty, return the empty list.
+(define (pluck arr)
+  ;; Helper to decide whether a candidate pair (value index) is better
+  ;; than the current best pair.
+  (define (better? cand best)
+    (or (not best)                             ; nothing yet
+        (< (first cand) (first best))          ; smaller value
+        (and (= (first cand) (first best))
+             (< (second cand) (second best))))) ; same value, smaller index)
+
+  ;; Iterate over the list keeping track of the best pair found so far.
+  (let loop ((lst arr)      ; remaining list
+             (idx 0)        ; current index
+             (best #f))     ; best pair so far, or #f if none
+    (cond
+      [(empty? lst)
+       (if best
+           (list (first best) (second best))  ; return [value index]
+           '())]                              ; no even values found
+      [else
+       (let* ((v (first lst))
+              (cand (if (even? v) (list v idx) #f)))
+         (if cand
+             (loop (rest lst) (+ idx 1)
+                   (better? cand best) cand)
+             (loop (rest lst) (+ idx 1) best)))])))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate pluck))
+    (check-within (candidate (list 4 2 3)) (list 2 1) 0.001)
+    (check-within (candidate (list 1 2 3)) (list 2 1) 0.001)
+    (check-within (candidate (list )) (list ) 0.001)
+    (check-within (candidate (list 5 0 3 0 4 2)) (list 0 1) 0.001)
+    (check-within (candidate (list 1 2 3 0 5 3)) (list 0 3) 0.001)
+    (check-within (candidate (list 5 4 8 4 8)) (list 4 1) 0.001)
+    (check-within (candidate (list 7 6 7 1)) (list 6 1) 0.001)
+    (check-within (candidate (list 7 9 7 1)) (list ) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: Exception
+Timestamp: 1755183888
+STDOUT: (empty)
+STDERR:
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp7e6zgmkb.rkt:62:4
+
+loop: arity mismatch;
+ the expected number of arguments does not match the given number
+  expected: 3
+  given: 4
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp7e6zgmkb.rkt:63:4
+
+loop: arity mismatch;
+ the expected number of arguments does not match the given number
+  expected: 3
+  given: 4
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp7e6zgmkb.rkt:65:4
+
+loop: arity mismatch;
+ the expected number of arguments does not match the given number
+  expected: 3
+  given: 4
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp7e6zgmkb.rkt:66:4
+
+loop: arity mismatch;
+ the expected number of arguments does not match the given number
+  expected: 3
+  given: 4
+--------------------
+--------------------
+ERROR
+name:       check-within
+location:   /tmp/tmp7e6zgmkb.rkt:67:4
+
+loop: arity mismatch;
+ the expect
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; "Given a list representing a branch of a tree that has non-negative integer nodes
+;; your task is to pluck one of the nodes and return it.
+;; The plucked node should be the node with the smallest even value.
+;; If multiple nodes with the same smallest even value are found return the node that has smallest index.
+;; The plucked node should be returned in a list, [ smalest_value, its index ],
+;; If there are no even values or the given list is empty, return [].
+;; Example 1:
+;; >>> (pluck (list 4 2 3))
+;; (list 2 1)
+;; Explanation: 2 has the smallest even value, and 2 has the smallest index.
+;; Example 2:
+;; >>> (pluck (list 1 2 3))
+;; (list 2 1)
+;; Explanation: 2 has the smallest even value, and 2 has the smallest index.
+;; Example 3:
+;; >>> (pluck (list ))
+;; (list )
+;; Example 4:
+;; >>> (pluck (list 5 0 3 0 4 2))
+;; (list 0 1)
+;; Explanation: 0 is the smallest value, but  there are two zeros,
+;;              so we will choose the first zero, which has the smallest index.
+;; Constraints:
+;;     * 1 <= nodes.length <= 10000
+;;     * 0 <= node.value
+
+;; Pluck the node with the smallest even value.
+;; If there are ties, the node with the smallest index is chosen.
+;; Returns a list [value index] or an empty list if no even values exist.
+(define (pluck arr)
+  (let loop ([lst arr]          ; remaining list
+             [idx 0]            ; current index
+             [best #f]          ; best even value found so far
+             [best-idx -1])     ; index of the best value
+    (cond
+      [(empty? lst)
+       (if best
+           (list best best-idx)
+           (list))]          ; empty list if no even value
+      [else
+       (let ([val (first lst)])
+         (if (even? val)
+             (if (or (not best) (< val best))
+                 ;; Found a smaller even value; update best
+                 (loop (rest lst) (+ idx 1) val idx)
+                 ;; Same or larger even value; keep current best
+                 (loop (rest lst) (+ idx 1) best best-idx))
+             ;; Current value is odd; skip it
+             (loop (rest lst) (+ idx 1) best best-idx)))])))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate pluck))
+    (check-within (candidate (list 4 2 3)) (list 2 1) 0.001)
+    (check-within (candidate (list 1 2 3)) (list 2 1) 0.001)
+    (check-within (candidate (list )) (list ) 0.001)
+    (check-within (candidate (list 5 0 3 0 4 2)) (list 0 1) 0.001)
+    (check-within (candidate (list 1 2 3 0 5 3)) (list 0 3) 0.001)
+    (check-within (candidate (list 5 4 8 4 8)) (list 4 1) 0.001)
+    (check-within (candidate (list 7 6 7 1)) (list 6 1) 0.001)
+    (check-within (candidate (list 7 9 7 1)) (list ) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183888
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; "Given a list representing a branch of a tree that has non-negative integer nodes
+;; your task is to pluck one of the nodes and return it.
+;; The plucked node should be the node with the smallest even value.
+;; If multiple nodes with the same smallest even value are found return the node that has smallest index.
+;; The plucked node should be returned in a list, [ smalest_value, its index ],
+;; If there are no even values or the given list is empty, return [].
+;; Example 1:
+;; >>> (pluck (list 4 2 3))
+;; (list 2 1)
+;; Explanation: 2 has the smallest even value, and 2 has the smallest index.
+;; Example 2:
+;; >>> (pluck (list 1 2 3))
+;; (list 2 1)
+;; Explanation: 2 has the smallest even value, and 2 has the smallest index.
+;; Example 3:
+;; >>> (pluck (list ))
+;; (list )
+;; Example 4:
+;; >>> (pluck (list 5 0 3 0 4 2))
+;; (list 0 1)
+;; Explanation: 0 is the smallest value, but  there are two zeros,
+;;              so we will choose the first zero, which has the smallest index.
+;; Constraints:
+;;     * 1 <= nodes.length <= 10000
+;;     * 0 <= node.value
+
+;; Find the smallest even value in the list and return it together with its
+;; 0‑based index.  If the list is empty or contains no even values, return
+;; the empty list.
+(define (pluck arr)
+  (let loop ((lst   arr)
+             (idx   0)
+             (best  #f)   ; best even value found so far
+             (best-idx 0)) ; index of best
+    (cond
+      [(empty? lst)
+       (if best
+           (list best best-idx)
+           '())]                 ; no even value found
+      [else
+       (let ((x (first lst)))
+         (if (and (even? x) (or (not best) (< x best)))
+             (loop (rest lst) (+ idx 1) x idx) ; new best
+             (loop (rest lst) (+ idx 1) best best-idx)))]))) ; keep old best
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate pluck))
+    (check-within (candidate (list 4 2 3)) (list 2 1) 0.001)
+    (check-within (candidate (list 1 2 3)) (list 2 1) 0.001)
+    (check-within (candidate (list )) (list ) 0.001)
+    (check-within (candidate (list 5 0 3 0 4 2)) (list 0 1) 0.001)
+    (check-within (candidate (list 1 2 3 0 5 3)) (list 0 3) 0.001)
+    (check-within (candidate (list 5 4 8 4 8)) (list 4 1) 0.001)
+    (check-within (candidate (list 7 6 7 1)) (list 6 1) 0.001)
+    (check-within (candidate (list 7 9 7 1)) (list ) 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183888
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 71 (RKT) - HumanEval_71_triangle_area
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Given the lengths of the three sides of a triangle. Return the area of
+;; the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+;; Otherwise return -1
+;; Three sides make a valid triangle when the sum of any two sides is greater 
+;; than the third side.
+;; Example:
+;; >>> (triangle_area 3 4 5)
+;; 6.0
+;; >>> (triangle_area 1 2 10)
+;; -1
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate triangle_area))
+    (check-within (candidate 3 4 5) 6.0 0.001)
+    (check-within (candidate 1 2 10) -1 0.001)
+    (check-within (candidate 4 8 5) 8.18 0.001)
+    (check-within (candidate 2 2 2) 1.73 0.001)
+    (check-within (candidate 1 2 3) -1 0.001)
+    (check-within (candidate 10 5 7) 16.25 0.001)
+    (check-within (candidate 2 6 3) -1 0.001)
+    (check-within (candidate 1 1 1) 0.43 0.001)
+    (check-within (candidate 2 2 10) -1 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given the lengths of the three sides of a triangle. Return the area of
+;; the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+;; Otherwise return -1
+;; Three sides make a valid triangle when the sum of any two sides is greater 
+;; than the third side.
+;; Example:
+;; >>> (triangle_area 3 4 5)
+;; 6.0
+;; >>> (triangle_area 1 2 10)
+;; -1
+
+;; Given the lengths of the three sides of a triangle. Return the area of
+;; the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+;; Otherwise return -1
+;; Three sides make a valid triangle when the sum of any two sides is greater 
+;; than the third side.
+;; Example:
+;; >>> (triangle_area 3 4 5)
+;; 6.0
+;; >>> (triangle_area 1 2 10)
+;; -1
+(define (triangle_area a b c)
+  (if (and (> (+ a b) c)
+           (> (+ a c) b)
+           (> (+ b c) a))
+      (let* ((s (/ (+ a b c) 2))
+             (area (sqrt (* s (- s a) (- s b) (- s c)))))
+        (/ (round (* area 100)) 100))
+      -1))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate triangle_area))
+    (check-within (candidate 3 4 5) 6.0 0.001)
+    (check-within (candidate 1 2 10) -1 0.001)
+    (check-within (candidate 4 8 5) 8.18 0.001)
+    (check-within (candidate 2 2 2) 1.73 0.001)
+    (check-within (candidate 1 2 3) -1 0.001)
+    (check-within (candidate 10 5 7) 16.25 0.001)
+    (check-within (candidate 2 6 3) -1 0.001)
+    (check-within (candidate 1 1 1) 0.43 0.001)
+    (check-within (candidate 2 2 10) -1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183891
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given the lengths of the three sides of a triangle. Return the area of
+;; the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+;; Otherwise return -1
+;; Three sides make a valid triangle when the sum of any two sides is greater 
+;; than the third side.
+;; Example:
+;; >>> (triangle_area 3 4 5)
+;; 6.0
+;; >>> (triangle_area 1 2 10)
+;; -1
+
+;; Given the lengths of the three sides of a triangle. Return the area of
+;; the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+;; Otherwise return -1
+;; Three sides make a valid triangle when the sum of any two sides is greater 
+;; than the third side.
+;; Example:
+;; >>> (triangle_area 3 4 5)
+;; 6.0
+;; >>> (triangle_area 1 2 10)
+;; -1
+(define (triangle_area a b c)
+  (if (and (> (+ a b) c)
+           (> (+ a c) b)
+           (> (+ b c) a))
+      (let* ([s (/ (+ a b c) 2)]
+             [area (sqrt (* s (- s a) (- s b) (- s c)))]
+             [rounded (/ (round (* 100 area)) 100)])
+        (inexact rounded))   ; ensure a real number like 6.0
+      -1))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate triangle_area))
+    (check-within (candidate 3 4 5) 6.0 0.001)
+    (check-within (candidate 1 2 10) -1 0.001)
+    (check-within (candidate 4 8 5) 8.18 0.001)
+    (check-within (candidate 2 2 2) 1.73 0.001)
+    (check-within (candidate 1 2 3) -1 0.001)
+    (check-within (candidate 10 5 7) 16.25 0.001)
+    (check-within (candidate 2 6 3) -1 0.001)
+    (check-within (candidate 1 1 1) 0.43 0.001)
+    (check-within (candidate 2 2 10) -1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755183891
+STDOUT: (empty)
+STDERR:
+/tmp/tmpcbyuwdrq.rkt:31:9: inexact: unbound identifier
+  in: inexact
+  location...:
+   /tmp/tmpcbyuwdrq.rkt:31:9
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given the lengths of the three sides of a triangle. Return the area of
+;; the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+;; Otherwise return -1
+;; Three sides make a valid triangle when the sum of any two sides is greater 
+;; than the third side.
+;; Example:
+;; >>> (triangle_area 3 4 5)
+;; 6.0
+;; >>> (triangle_area 1 2 10)
+;; -1
+
+;; Given the lengths of the three sides of a triangle. Return the area of
+;; the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+;; Otherwise return -1
+;; Three sides make a valid triangle when the sum of any two sides is greater 
+;; than the third side.
+;; Example:
+;; >>> (triangle_area 3 4 5)
+;; 6.0
+;; >>> (triangle_area 1 2 10)
+;; -1
+(define (triangle_area a b c)
+  (if (and (> (+ a b) c)
+           (> (+ a c) b)
+           (> (+ b c) a))
+      (let* ([s (/ (+ a b c) 2.0)]
+             [area (sqrt (* s (- s a) (- s b) (- s c)))])
+        (/ (round (* area 100.0)) 100.0))
+      -1))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate triangle_area))
+    (check-within (candidate 3 4 5) 6.0 0.001)
+    (check-within (candidate 1 2 10) -1 0.001)
+    (check-within (candidate 4 8 5) 8.18 0.001)
+    (check-within (candidate 2 2 2) 1.73 0.001)
+    (check-within (candidate 1 2 3) -1 0.001)
+    (check-within (candidate 10 5 7) 16.25 0.001)
+    (check-within (candidate 2 6 3) -1 0.001)
+    (check-within (candidate 1 1 1) 0.43 0.001)
+    (check-within (candidate 2 2 10) -1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183891
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given the lengths of the three sides of a triangle. Return the area of
+;; the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+;; Otherwise return -1
+;; Three sides make a valid triangle when the sum of any two sides is greater 
+;; than the third side.
+;; Example:
+;; >>> (triangle_area 3 4 5)
+;; 6.0
+;; >>> (triangle_area 1 2 10)
+;; -1
+
+;; Given the lengths of the three sides of a triangle. Return the area of
+;; the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+;; Otherwise return -1
+;; Three sides make a valid triangle when the sum of any two sides is greater 
+;; than the third side.
+;; Example:
+;; >>> (triangle_area 3 4 5)
+;; 6.0
+;; >>> (triangle_area 1 2 10)
+;; -1
+(define (triangle_area a b c)
+  (if (and (> (+ a b) c)
+           (> (+ a c) b)
+           (> (+ b c) a))
+      (let* ([s (/ (+ a b c) 2.0)]
+             [area (sqrt (* s (- s a) (- s b) (- s c)))])
+        (/ (round (* area 100.0)) 100.0))
+      -1))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate triangle_area))
+    (check-within (candidate 3 4 5) 6.0 0.001)
+    (check-within (candidate 1 2 10) -1 0.001)
+    (check-within (candidate 4 8 5) 8.18 0.001)
+    (check-within (candidate 2 2 2) 1.73 0.001)
+    (check-within (candidate 1 2 3) -1 0.001)
+    (check-within (candidate 10 5 7) 16.25 0.001)
+    (check-within (candidate 2 6 3) -1 0.001)
+    (check-within (candidate 1 1 1) 0.43 0.001)
+    (check-within (candidate 2 2 10) -1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183891
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 73 (RKT) - HumanEval_73_smallest_change
+================================================================================
+
+PROMPT:
+----------------------------------------
+#lang racket
+
+;; Given a list arr of integers, find the minimum number of elements that
+;; need to be changed to make the list palindromic. A palindromic list is a list that
+;; is read the same backwards and forwards. In one change, you can change one element to any other element.
+;; For example:
+;; >>> (smallest_change (list 1 2 3 5 4 7 9 6))
+;; 4
+;; >>> (smallest_change (list 1 2 3 4 3 2 2))
+;; 1
+;; >>> (smallest_change (list 1 2 3 2 1))
+;; 0
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate smallest_change))
+    (check-within (candidate (list 1 2 3 5 4 7 9 6)) 4 0.001)
+    (check-within (candidate (list 1 2 3 4 3 2 2)) 1 0.001)
+    (check-within (candidate (list 1 4 2)) 1 0.001)
+    (check-within (candidate (list 1 4 4 2)) 1 0.001)
+    (check-within (candidate (list 1 2 3 2 1)) 0 0.001)
+    (check-within (candidate (list 3 1 1 3)) 0 0.001)
+    (check-within (candidate (list 1)) 0 0.001)
+    (check-within (candidate (list 0 1)) 1 0.001)
+))
+
+(test-humaneval)
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a list arr of integers, find the minimum number of elements that
+;; need to be changed to make the list palindromic. A palindromic list is a list that
+;; is read the same backwards and forwards. In one change, you can change one element to any other element.
+;; For example:
+;; >>> (smallest_change (list 1 2 3 5 4 7 9 6))
+;; 4
+;; >>> (smallest_change (list 1 2 3 4 3 2 2))
+;; 1
+;; >>> (smallest_change (list 1 2 3 2 1))
+;; 0
+
+;; Given a list arr of integers, find the minimum number of elements that
+;; need to be changed to make the list palindromic. A palindromic list is a list that
+;; is read the same backwards and forwards. In one change, you can change one element to any other element.
+;; For example:
+;; >>> (smallest_change (list 1 2 3 5 4 7 9 6))
+;; 4
+;; >>> (smallest_change (list 1 2 3 4 3 2 2))
+;; 1
+;; >>> (smallest_change (list 1 2 3 2 1))
+;; 0
+(define (smallest_change arr)
+  (define n (length arr))
+  (define (helper i)
+    (cond
+      [(>= i (quotient n 2)) 0]                     ; no more pairs to check
+      [else
+       (if (equal? (list-ref arr i) (list-ref arr (- n 1 i)))
+           (helper (+ i 1))                         ; pair matches, no change needed
+           (+ 1 (helper (+ i 1))))]))              ; pair mismatches, one change needed
+  (helper 0))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate smallest_change))
+    (check-within (candidate (list 1 2 3 5 4 7 9 6)) 4 0.001)
+    (check-within (candidate (list 1 2 3 4 3 2 2)) 1 0.001)
+    (check-within (candidate (list 1 4 2)) 1 0.001)
+    (check-within (candidate (list 1 4 4 2)) 1 0.001)
+    (check-within (candidate (list 1 2 3 2 1)) 0 0.001)
+    (check-within (candidate (list 3 1 1 3)) 0 0.001)
+    (check-within (candidate (list 1)) 0 0.001)
+    (check-within (candidate (list 0 1)) 1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183893
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a list arr of integers, find the minimum number of elements that
+;; need to be changed to make the list palindromic. A palindromic list is a list that
+;; is read the same backwards and forwards. In one change, you can change one element to any other element.
+;; For example:
+;; >>> (smallest_change (list 1 2 3 5 4 7 9 6))
+;; 4
+;; >>> (smallest_change (list 1 2 3 4 3 2 2))
+;; 1
+;; >>> (smallest_change (list 1 2 3 2 1))
+;; 0
+
+;; Find the minimum number of elements that must be changed to make
+;; a list palindromic.  We simply count the mismatched symmetric pairs.
+(define (smallest_change arr)
+  (let loop ((front arr) (back (reverse arr)) (cnt 0))
+    (cond
+      ;; When either list is empty we have compared all pairs.
+      [(or (null? front) (null? back)) cnt]
+      ;; If the current pair matches, move on.
+      [(equal? (car front) (car back))
+       (loop (cdr front) (cdr back) cnt)]
+      ;; If they differ we need one change.
+      [else
+       (loop (cdr front) (cdr back) (+ cnt 1))])))
+
+;; Examples
+(displayln (smallest_change (list 1 2 3 5 4 7 9 6))) ; => 4
+(displayln (smallest_change (list 1 2 3 4 3 2 2))) ; => 1
+(displayln (smallest_change (list 1 2 3 2 1)))     ; => 0
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate smallest_change))
+    (check-within (candidate (list 1 2 3 5 4 7 9 6)) 4 0.001)
+    (check-within (candidate (list 1 2 3 4 3 2 2)) 1 0.001)
+    (check-within (candidate (list 1 4 2)) 1 0.001)
+    (check-within (candidate (list 1 4 4 2)) 1 0.001)
+    (check-within (candidate (list 1 2 3 2 1)) 0 0.001)
+    (check-within (candidate (list 3 1 1 3)) 0 0.001)
+    (check-within (candidate (list 1)) 0 0.001)
+    (check-within (candidate (list 0 1)) 1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: Exception
+Timestamp: 1755183893
+STDOUT:
+8
+2
+0
+STDERR:
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmp6oqmrcxq.rkt:37:4
+actual:     8
+expected:   4
+--------------------
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmp6oqmrcxq.rkt:38:4
+actual:     2
+expected:   1
+--------------------
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmp6oqmrcxq.rkt:39:4
+actual:     2
+expected:   1
+--------------------
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmp6oqmrcxq.rkt:40:4
+actual:     2
+expected:   1
+--------------------
+--------------------
+FAILURE
+name:       check-within
+location:   /tmp/tmp6oqmrcxq.rkt:44:4
+actual:     2
+expected:   1
+--------------------
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a list arr of integers, find the minimum number of elements that
+;; need to be changed to make the list palindromic. A palindromic list is a list that
+;; is read the same backwards and forwards. In one change, you can change one element to any other element.
+;; For example:
+;; >>> (smallest_change (list 1 2 3 5 4 7 9 6))
+;; 4
+;; >>> (smallest_change (list 1 2 3 4 3 2 2))
+;; 1
+;; >>> (smallest_change (list 1 2 3 2 1))
+;; 0
+
+;; Given a list arr of integers, find the minimum number of elements that
+;; need to be changed to make the list palindromic. A palindromic list is a list that
+;; is read the same backwards and forwards. In one change, you can change one element to any other element.
+;; For example:
+;; >>> (smallest_change (list 1 2 3 5 4 7 9 6))
+;; 4
+;; >>> (smallest_change (list 1 2 3 4 3 2 2))
+;; 1
+;; >>> (smallest_change (list 1 2 3 2 1))
+;; 0
+(define (smallest_change arr)
+  ;; Length of the input list
+  (define len (length arr))
+  ;; Number of pairs to compare (half of the list)
+  (define half (quotient len 2))
+  ;; Sum over all symmetric pairs: 1 if they differ, 0 otherwise
+  (for/sum ([i (in-range half)])
+    (if (not (= (list-ref arr i)
+                (list-ref arr (- len 1 i))))
+        1
+        0)))
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate smallest_change))
+    (check-within (candidate (list 1 2 3 5 4 7 9 6)) 4 0.001)
+    (check-within (candidate (list 1 2 3 4 3 2 2)) 1 0.001)
+    (check-within (candidate (list 1 4 2)) 1 0.001)
+    (check-within (candidate (list 1 4 4 2)) 1 0.001)
+    (check-within (candidate (list 1 2 3 2 1)) 0 0.001)
+    (check-within (candidate (list 3 1 1 3)) 0 0.001)
+    (check-within (candidate (list 1)) 0 0.001)
+    (check-within (candidate (list 0 1)) 1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183893
+STDOUT: (empty)
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+#lang racket
+
+;; Given a list arr of integers, find the minimum number of elements that
+;; need to be changed to make the list palindromic. A palindromic list is a list that
+;; is read the same backwards and forwards. In one change, you can change one element to any other element.
+;; For example:
+;; >>> (smallest_change (list 1 2 3 5 4 7 9 6))
+;; 4
+;; >>> (smallest_change (list 1 2 3 4 3 2 2))
+;; 1
+;; >>> (smallest_change (list 1 2 3 2 1))
+;; 0
+
+;; Find the minimum number of elements that need to be changed to make
+;; a list palindromic.
+;;
+;; A change consists of replacing one element with any other value.
+;; The optimal strategy is to compare each element with its symmetric
+;; counterpart and count mismatches. Each mismatch requires exactly one
+;; change (change either side to match the other).
+;;
+;; Examples:
+;; (smallest_change (list 1 2 3 5 4 7 9 6))   ; => 4
+;; (smallest_change (list 1 2 3 4 3 2 2))      ; => 1
+;; (smallest_change (list 1 2 3 2 1))          ; => 0
+
+(define (smallest_change arr)
+  (let* ([n (length arr)]
+         [half (quotient n 2)])               ; number of pairs to check
+    (for/fold ([cnt 0]) ([i (in-range half)])
+      (if (not (equal? (list-ref arr i)
+                       (list-ref arr (- n i 1))))
+          (+ cnt 1)
+          cnt))))
+
+;; Test cases
+(displayln (smallest_change (list 1 2 3 5 4 7 9 6))) ; 4
+(displayln (smallest_change (list 1 2 3 4 3 2 2)))   ; 1
+(displayln (smallest_change (list 1 2 3 2 1)))       ; 0
+(require rackunit)
+
+(define (test-humaneval) 
+
+  (let (( candidate smallest_change))
+    (check-within (candidate (list 1 2 3 5 4 7 9 6)) 4 0.001)
+    (check-within (candidate (list 1 2 3 4 3 2 2)) 1 0.001)
+    (check-within (candidate (list 1 4 2)) 1 0.001)
+    (check-within (candidate (list 1 4 4 2)) 1 0.001)
+    (check-within (candidate (list 1 2 3 2 1)) 0 0.001)
+    (check-within (candidate (list 3 1 1 3)) 0 0.001)
+    (check-within (candidate (list 1)) 0 0.001)
+    (check-within (candidate (list 0 1)) 1 0.001)
+))
+
+(test-humaneval)
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755183893
+STDOUT:
+4
+1
+0
+STDERR: (empty)
+--------------------

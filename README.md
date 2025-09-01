@@ -19,6 +19,18 @@ pip install triton kernels
 pip install -U "git+https://github.com/triton-lang/triton.git@f33bcbd4f1051d0d9ea3fdfc0b2e68f53ededfe4#subdirectory=python/triton_kernels"
 ```
 
+To use RAG, install:
+```bash
+pip install langchain
+pip install langchain-community
+pip install langchain-experimental
+
+pip install sentence-transformers
+pip install tiktoken>=0.7.0
+pip install pymupdf
+pip install faiss-gpu
+```
+
 ## Quick Start with Bash Automation Script
 
 Supported models: Qwen3-2507, Qwen3, GPT-OSS
@@ -29,14 +41,17 @@ The bash script provides a convenient wrapper around the evaluation pipeline wit
 ./scripts/run_eval.sh [OPTIONS]
 
 Options:
-  -m, --model         Model size (0.6B or 4B)
-  -t, --thinking      Thinking mode (nothing or think)
+  -m, --model         Model alias. Must be one of:
+                      'qwen-think'    (-> Qwen/Qwen3-4B-Thinking-2507)
+                      'qwen-instruct' (-> Qwen/Qwen3-4B-Instruct-2507)
+                      'gpt-oss'       (-> openai/gpt-oss-20b)
   -l, --lang          Programming language (jl, lua, ml, r, rkt)
   -x, --max-tokens    Maximum number of tokens (default: 1024)
   -h, --help          Display help message
 
+
 Example:
-./scripts/run_eval.sh -m 0.6B -t think -l rkt -x 2048
+./scripts/run_eval.sh -m qwen-think -l rkt -x 4096
 
 ```
 
@@ -46,9 +61,9 @@ You can just run as below to run generations of all language at once with specif
 chmod +x ./scripts/batch_run_eval.sh
 
 Example:
-./scripts/batch_run_eval.sh -m qwen-think -l rkt -x 4096
-./scripts/batch_run_eval.sh -m gpt-oss -l r -x 4096
-./scripts/batch_run_eval.sh -m qwen-instruct -l lua
+./scripts/batch_run_eval.sh qwen-think 4096
+./scripts/batch_run_eval.sh gpt-oss 4096
+./scripts/batch_run_eval.sh qwen-instruct
 
 ```
 
@@ -77,22 +92,11 @@ Options:
   -d, --dir       Directory of JSON files
 
 Example:
-./scripts/docker.sh -l r,rkt,ml -d ./before_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024
+./scripts/docker.sh -l r,rkt,ml -d ./after_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024
 
 ```
 
 After preprocessing, finally you can run evaluation. below is the code.
-```bash
-chmod +x ./scripts/pass_k.sh
-./scripts/pass_k.sh -d <result_base_dir>
-
-Example:
-./scripts/pass_k.sh -d ./after_proc_Qwen_Qwen3-4B-Thinking-2507_mt_4096/result
-
-```
-
-Or you can just run python file one by one.
-(There is only 1 option of MAX_TOKENS for no-thinking generation which is 1024.)
 
 ```bash
 Think(qwen_2507_4b):

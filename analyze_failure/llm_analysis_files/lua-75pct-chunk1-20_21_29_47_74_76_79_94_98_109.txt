@@ -1,0 +1,3022 @@
+As per my standing instructions, analyze each code-execution result provided. For every item, produce a structured report as follows.
+
+1) Status
+Status: "OK" (Success) or else (Failure)
+Evidence: include exit code, error status, and whether stderr is empty/non-empty (quote the first relevant line).
+
+If Failure (non-zero exit code, error status, or non-empty stderr)
+Root Cause Analysis
+Explain why it failed, grounded in the logs/trace.
+Point to the exact faulty locations (file and line numbers if available). Quote the minimal offending snippets.
+Recommended Fix (Minimal Patch)
+Provide brief code segments (3–7 lines each) that would correct the issue.
+If multiple faults exist, list fixes in order of impact.
+Final Answer
+Classify the ultimate source of failure as one of: faulty problem setting / wrong test case / incorrect code implementation.
+State it on a single line: Final Answer: <chosen category>.
+
+If Success (exit code 0 and empty stderr)
+Critical Correctness Review
+Do not assume success means correctness.
+Check if the code's logic truly matches the intended problem requirements, including edge cases and corner conditions.
+Identify any silent errors, logical flaws, or incompleteness that would still pass execution but fail semantically.
+If the implementation is sound, explain why it is correct. If not, explain the discrepancy clearly.
+Final Answer
+Explicitly confirm or reject correctness in one line: Final Answer: correct or incorrect (with a one-phrase justification if incorrect).
+
+General rules
+Be precise and concise. Don't invent behavior not evidenced by the logs or code.
+When line numbers aren't available, reference the closest identifiable code block.
+Prefer minimal fixes over refactors; include just enough context to apply the patch.
+
+CONTENT TO ANALYZE:
+
+================================================================================
+PROBLEM 20 (LUA) - HumanEval_20_find_closest_elements
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- From a supplied table of numbers (of length at least two) select and return two that are the closest to each
+-- other and return them in order (smaller number, larger number).
+-- >>> find_closest_elements({1.0, 2.0, 3.0, 4.0, 5.0, 2.2})
+-- {2.0, 2.2}
+-- >>> find_closest_elements({1.0, 2.0, 3.0, 4.0, 5.0, 2.0})
+-- {2.0, 2.0}
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = find_closest_elements
+    lu.assertEquals(candidate({1.0, 2.0, 3.9, 4.0, 5.0, 2.2}), {3.9, 4.0})
+    lu.assertEquals(candidate({1.0, 2.0, 5.9, 4.0, 5.0}), {5.0, 5.9})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0, 2.2}), {2.0, 2.2})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0, 2.0}), {2.0, 2.0})
+    lu.assertEquals(candidate({1.1, 2.2, 3.1, 4.1, 5.1}), {2.2, 3.1})
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- From a supplied table of numbers (of length at least two) select and return two that are the closest to each
+-- other and return them in order (smaller number, larger number).
+-- >>> find_closest_elements({1.0, 2.0, 3.0, 4.0, 5.0, 2.2})
+-- {2.0, 2.2}
+-- >>> find_closest_elements({1.0, 2.0, 3.0, 4.0, 5.0, 2.0})
+-- {2.0, 2.0}
+-- Find the two numbers that are closest to each other in a table
+-- and return them in ascending order.
+local function find_closest_elements(numbers)
+    local n = #numbers
+    if n < 2 then
+        error("At least two numbers are required")
+    end
+
+    -- Make a copy so we don't modify the original table
+    local sorted = {}
+    for i = 1, n do
+        sorted[i] = numbers[i]
+    end
+    table.sort(sorted)
+
+    local minDiff = math.huge
+    local bestPair = {sorted[1], sorted[2]}
+
+    for i = 2, n do
+        local diff = sorted[i] - sorted[i - 1]
+        if diff < minDiff then
+            minDiff = diff
+            bestPair[1] = sorted[i - 1]
+            bestPair[2] = sorted[i]
+        end
+    end
+
+    return bestPair
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = find_closest_elements
+    lu.assertEquals(candidate({1.0, 2.0, 3.9, 4.0, 5.0, 2.2}), {3.9, 4.0})
+    lu.assertEquals(candidate({1.0, 2.0, 5.9, 4.0, 5.0}), {5.0, 5.9})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0, 2.2}), {2.0, 2.2})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0, 2.0}), {2.0, 2.0})
+    lu.assertEquals(candidate({1.1, 2.2, 3.1, 4.1, 5.1}), {2.2, 3.1})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154466
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- From a supplied table of numbers (of length at least two) select and return two that are the closest to each
+-- other and return them in order (smaller number, larger number).
+-- >>> find_closest_elements({1.0, 2.0, 3.0, 4.0, 5.0, 2.2})
+-- {2.0, 2.2}
+-- >>> find_closest_elements({1.0, 2.0, 3.0, 4.0, 5.0, 2.0})
+-- {2.0, 2.0}
+-- Find the two numbers in `numbers` that are closest to each other.
+-- Returns a table with the two numbers in ascending order.
+local function find_closest_elements(numbers)
+    -- Ensure we have at least two numbers
+    assert(#numbers >= 2, "Input table must contain at least two numbers")
+
+    local best_i, best_j = 1, 2
+    local best_diff = math.abs(numbers[1] - numbers[2])
+
+    for i = 1, #numbers - 1 do
+        for j = i + 1, #numbers do
+            local diff = math.abs(numbers[i] - numbers[j])
+            if diff < best_diff then
+                best_diff = diff
+                best_i, best_j = i, j
+            end
+        end
+    end
+
+    local a, b = numbers[best_i], numbers[best_j]
+    if a > b then a, b = b, a end
+    return {a, b}
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = find_closest_elements
+    lu.assertEquals(candidate({1.0, 2.0, 3.9, 4.0, 5.0, 2.2}), {3.9, 4.0})
+    lu.assertEquals(candidate({1.0, 2.0, 5.9, 4.0, 5.0}), {5.0, 5.9})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0, 2.2}), {2.0, 2.2})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0, 2.0}), {2.0, 2.0})
+    lu.assertEquals(candidate({1.1, 2.2, 3.1, 4.1, 5.1}), {2.2, 3.1})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154466
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- From a supplied table of numbers (of length at least two) select and return two that are the closest to each
+-- other and return them in order (smaller number, larger number).
+-- >>> find_closest_elements({1.0, 2.0, 3.0, 4.0, 5.0, 2.2})
+-- {2.0, 2.2}
+-- >>> find_closest_elements({1.0, 2.0, 3.0, 4.0, 5.0, 2.0})
+-- {2.0, 2.0}
+local function find_closest_elements(numbers)
+    -- Create a copy so that the original table is not altered
+    local nums = {unpack(numbers)}
+    table.sort(nums)
+
+    local bestDiff = math.huge
+    local bestIdx = 1
+
+    for i = 1, #nums - 1 do
+        local diff = math.abs(nums[i + 1] - nums[i])
+        if diff < bestDiff then
+            bestDiff = diff
+            bestIdx = i
+        end
+    end
+
+    return {nums[bestIdx], nums[bestIdx + 1]}
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = find_closest_elements
+    lu.assertEquals(candidate({1.0, 2.0, 3.9, 4.0, 5.0, 2.2}), {3.9, 4.0})
+    lu.assertEquals(candidate({1.0, 2.0, 5.9, 4.0, 5.0}), {5.0, 5.9})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0, 2.2}), {2.0, 2.2})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0, 2.0}), {2.0, 2.0})
+    lu.assertEquals(candidate({1.1, 2.2, 3.1, 4.1, 5.1}), {2.2, 3.1})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755154466
+STDOUT:
+E
+Failed tests:
+-------------
+1) test_humaneval
+/tmp/tmp7v8r_gag.lua:9: attempt to call a nil value (global 'unpack')
+stack traceback:
+	/tmp/tmp7v8r_gag.lua:29: in function 'test_humaneval'
+
+Ran 1 tests in 0.001 seconds, 0 successes, 1 error
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- From a supplied table of numbers (of length at least two) select and return two that are the closest to each
+-- other and return them in order (smaller number, larger number).
+-- >>> find_closest_elements({1.0, 2.0, 3.0, 4.0, 5.0, 2.2})
+-- {2.0, 2.2}
+-- >>> find_closest_elements({1.0, 2.0, 3.0, 4.0, 5.0, 2.0})
+-- {2.0, 2.0}
+-- Find the two numbers that are closest to each other in a table.
+-- The function returns a new table containing the pair in ascending order.
+local function find_closest_elements(numbers)
+  -- Ensure the input has at least two elements
+  if #numbers < 2 then
+    error("At least two numbers are required")
+  end
+
+  -- Make a copy of the table and sort it
+  local sorted = {table.unpack(numbers)}
+  table.sort(sorted)
+
+  -- Initialize with the first adjacent pair
+  local best_i = 1
+  local best_diff = math.abs(sorted[2] - sorted[1])
+
+  -- Scan the sorted list for the smallest difference
+  for i = 2, #sorted - 1 do
+    local diff = sorted[i + 1] - sorted[i]
+    if diff < best_diff then
+      best_diff = diff
+      best_i = i
+    end
+  end
+
+  -- Return the pair in ascending order
+  return {sorted[best_i], sorted[best_i + 1]}
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = find_closest_elements
+    lu.assertEquals(candidate({1.0, 2.0, 3.9, 4.0, 5.0, 2.2}), {3.9, 4.0})
+    lu.assertEquals(candidate({1.0, 2.0, 5.9, 4.0, 5.0}), {5.0, 5.9})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0, 2.2}), {2.0, 2.2})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0, 2.0}), {2.0, 2.0})
+    lu.assertEquals(candidate({1.1, 2.2, 3.1, 4.1, 5.1}), {2.2, 3.1})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154466
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 21 (LUA) - HumanEval_21_rescale_to_unit
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Given table of numbers (of at least two elements), apply a linear transform to that table,
+-- such that the smallest number will become 0 and the largest will become 1
+-- >>> rescale_to_unit({1.0, 2.0, 3.0, 4.0, 5.0})
+-- {0.0, 0.25, 0.5, 0.75, 1.0}
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = rescale_to_unit
+    lu.assertEquals(candidate({2.0, 49.9}), {0.0, 1.0})
+    lu.assertEquals(candidate({100.0, 49.9}), {1.0, 0.0})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0}), {0.0, 0.25, 0.5, 0.75, 1.0})
+    lu.assertEquals(candidate({2.0, 1.0, 5.0, 3.0, 4.0}), {0.25, 0.0, 1.0, 0.5, 0.75})
+    lu.assertEquals(candidate({12.0, 11.0, 15.0, 13.0, 14.0}), {0.25, 0.0, 1.0, 0.5, 0.75})
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Given table of numbers (of at least two elements), apply a linear transform to that table,
+-- such that the smallest number will become 0 and the largest will become 1
+-- >>> rescale_to_unit({1.0, 2.0, 3.0, 4.0, 5.0})
+-- {0.0, 0.25, 0.5, 0.75, 1.0}
+-- rescale_to_unit.lua
+-- Apply a linear transform to a table of numbers so that the smallest becomes 0
+-- and the largest becomes 1.
+--
+-- Example:
+--   rescale_to_unit({1.0, 2.0, 3.0, 4.0, 5.0})
+--   --> {0.0, 0.25, 0.5, 0.75, 1.0}
+
+local function rescale_to_unit(numbers)
+  -- Find min and max in the input table
+  local min, max = numbers[1], numbers[1]
+  for i = 2, #numbers do
+    local v = numbers[i]
+    if v < min then min = v end
+    if v > max then max = v end
+  end
+
+  local range = max - min
+  local result = {}
+
+  -- If all values are the same, avoid division by zero
+  if range == 0 then
+    for i = 1, #numbers do
+      result[i] = 0
+    end
+    return result
+  end
+
+  -- Scale each value to [0, 1]
+  for i = 1, #numbers do
+    result[i] = (numbers[i] - min) / range
+  end
+
+  return result
+end
+
+-- Return the function for external use
+return rescale_to_unit
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = rescale_to_unit
+    lu.assertEquals(candidate({2.0, 49.9}), {0.0, 1.0})
+    lu.assertEquals(candidate({100.0, 49.9}), {1.0, 0.0})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0}), {0.0, 0.25, 0.5, 0.75, 1.0})
+    lu.assertEquals(candidate({2.0, 1.0, 5.0, 3.0, 4.0}), {0.25, 0.0, 1.0, 0.5, 0.75})
+    lu.assertEquals(candidate({12.0, 11.0, 15.0, 13.0, 14.0}), {0.25, 0.0, 1.0, 0.5, 0.75})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755154466
+STDOUT: (empty)
+STDERR:
+lua: /tmp/tmp6wm6ycjj.lua:43: <eof> expected near 'lu'
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Given table of numbers (of at least two elements), apply a linear transform to that table,
+-- such that the smallest number will become 0 and the largest will become 1
+-- >>> rescale_to_unit({1.0, 2.0, 3.0, 4.0, 5.0})
+-- {0.0, 0.25, 0.5, 0.75, 1.0}
+local function rescale_to_unit(numbers)
+  -- Find the minimum and maximum values in the table
+  local min = numbers[1]
+  local max = numbers[1]
+  for _, v in ipairs(numbers) do
+    if v < min then min = v end
+    if v > max then max = v end
+  end
+
+  -- Compute the range (must be non‑zero because the table has at least two elements)
+  local range = max - min
+
+  -- Build a new table with the rescaled values
+  local result = {}
+  for i, v in ipairs(numbers) do
+    result[i] = (v - min) / range
+  end
+
+  return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = rescale_to_unit
+    lu.assertEquals(candidate({2.0, 49.9}), {0.0, 1.0})
+    lu.assertEquals(candidate({100.0, 49.9}), {1.0, 0.0})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0}), {0.0, 0.25, 0.5, 0.75, 1.0})
+    lu.assertEquals(candidate({2.0, 1.0, 5.0, 3.0, 4.0}), {0.25, 0.0, 1.0, 0.5, 0.75})
+    lu.assertEquals(candidate({12.0, 11.0, 15.0, 13.0, 14.0}), {0.25, 0.0, 1.0, 0.5, 0.75})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154466
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Given table of numbers (of at least two elements), apply a linear transform to that table,
+-- such that the smallest number will become 0 and the largest will become 1
+-- >>> rescale_to_unit({1.0, 2.0, 3.0, 4.0, 5.0})
+-- {0.0, 0.25, 0.5, 0.75, 1.0}
+local function rescale_to_unit(numbers)
+  -- Find minimum and maximum values
+  local min, max = numbers[1], numbers[1]
+  for i = 2, #numbers do
+    local v = numbers[i]
+    if v < min then min = v end
+    if v > max then max = v end
+  end
+
+  -- Avoid division by zero when all values are identical
+  local range = max - min
+  if range == 0 then
+    local result = {}
+    for _ = 1, #numbers do
+      result[#result + 1] = 0
+    end
+    return result
+  end
+
+  -- Rescale each element
+  local result = {}
+  for i = 1, #numbers do
+    result[i] = (numbers[i] - min) / range
+  end
+
+  return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = rescale_to_unit
+    lu.assertEquals(candidate({2.0, 49.9}), {0.0, 1.0})
+    lu.assertEquals(candidate({100.0, 49.9}), {1.0, 0.0})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0}), {0.0, 0.25, 0.5, 0.75, 1.0})
+    lu.assertEquals(candidate({2.0, 1.0, 5.0, 3.0, 4.0}), {0.25, 0.0, 1.0, 0.5, 0.75})
+    lu.assertEquals(candidate({12.0, 11.0, 15.0, 13.0, 14.0}), {0.25, 0.0, 1.0, 0.5, 0.75})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154466
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Given table of numbers (of at least two elements), apply a linear transform to that table,
+-- such that the smallest number will become 0 and the largest will become 1
+-- >>> rescale_to_unit({1.0, 2.0, 3.0, 4.0, 5.0})
+-- {0.0, 0.25, 0.5, 0.75, 1.0}
+-- Rescales a table of numbers so that the minimum becomes 0 and the maximum becomes 1.
+-- If all values are equal, the function returns a table of zeros.
+local function rescale_to_unit(numbers)
+  local min, max = math.huge, -math.huge
+
+  -- Find min and max
+  for _, v in ipairs(numbers) do
+    if v < min then min = v end
+    if v > max then max = v end
+  end
+
+  local range = max - min
+  local result = {}
+
+  -- If all numbers are equal, avoid division by zero
+  if range == 0 then
+    for _ in ipairs(numbers) do
+      table.insert(result, 0)
+    end
+    return result
+  end
+
+  -- Scale each value
+  for _, v in ipairs(numbers) do
+    table.insert(result, (v - min) / range)
+  end
+
+  return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = rescale_to_unit
+    lu.assertEquals(candidate({2.0, 49.9}), {0.0, 1.0})
+    lu.assertEquals(candidate({100.0, 49.9}), {1.0, 0.0})
+    lu.assertEquals(candidate({1.0, 2.0, 3.0, 4.0, 5.0}), {0.0, 0.25, 0.5, 0.75, 1.0})
+    lu.assertEquals(candidate({2.0, 1.0, 5.0, 3.0, 4.0}), {0.25, 0.0, 1.0, 0.5, 0.75})
+    lu.assertEquals(candidate({12.0, 11.0, 15.0, 13.0, 14.0}), {0.25, 0.0, 1.0, 0.5, 0.75})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154466
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 29 (LUA) - HumanEval_29_filter_by_prefix
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Filter an input table of strings only for ones that start with a given prefix.
+-- >>> filter_by_prefix({}, 'a')
+-- {}
+-- >>> filter_by_prefix({'abc', 'bcd', 'cde', 'array'}, 'a')
+-- {'abc', 'array'}
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = filter_by_prefix
+    lu.assertEquals(candidate({}, 'john'), {})
+    lu.assertEquals(candidate({'xxx', 'asd', 'xxy', 'john doe', 'xxxAAA', 'xxx'}, 'xxx'), {'xxx', 'xxxAAA', 'xxx'})
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Filter an input table of strings only for ones that start with a given prefix.
+-- >>> filter_by_prefix({}, 'a')
+-- {}
+-- >>> filter_by_prefix({'abc', 'bcd', 'cde', 'array'}, 'a')
+-- {'abc', 'array'}
+-- Filter an input table of strings only for ones that start with a given prefix.
+-- >>> filter_by_prefix({}, 'a')
+-- {}
+-- >>> filter_by_prefix({'abc', 'bcd', 'cde', 'array'}, 'a')
+-- {'abc', 'array'}
+local function filter_by_prefix(strings, prefix)
+    local result = {}
+    local pref_len = #prefix
+
+    for _, str in ipairs(strings) do
+        if type(str) == 'string' and str:sub(1, pref_len) == prefix then
+            table.insert(result, str)
+        end
+    end
+
+    return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = filter_by_prefix
+    lu.assertEquals(candidate({}, 'john'), {})
+    lu.assertEquals(candidate({'xxx', 'asd', 'xxy', 'john doe', 'xxxAAA', 'xxx'}, 'xxx'), {'xxx', 'xxxAAA', 'xxx'})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154467
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Filter an input table of strings only for ones that start with a given prefix.
+-- >>> filter_by_prefix({}, 'a')
+-- {}
+-- >>> filter_by_prefix({'abc', 'bcd', 'cde', 'array'}, 'a')
+-- {'abc', 'array'}
+-- Filter an input table of strings only for ones that start with a given prefix.
+-- >>> filter_by_prefix({}, 'a')
+-- {}
+-- >>> filter_by_prefix({'abc', 'bcd', 'cde', 'array'}, 'a')
+-- {'abc', 'array'}
+local function filter_by_prefix(strings, prefix)
+    -- Ensure we have a table to work with
+    if type(strings) ~= "table" then
+        return {}
+    end
+
+    local result = {}
+    local prefix_len = #prefix
+
+    -- Iterate over the array part of the table
+    for _, s in ipairs(strings) do
+        if type(s) == "string" and s:sub(1, prefix_len) == prefix then
+            table.insert(result, s)
+        end
+    end
+
+    return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = filter_by_prefix
+    lu.assertEquals(candidate({}, 'john'), {})
+    lu.assertEquals(candidate({'xxx', 'asd', 'xxy', 'john doe', 'xxxAAA', 'xxx'}, 'xxx'), {'xxx', 'xxxAAA', 'xxx'})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154467
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Filter an input table of strings only for ones that start with a given prefix.
+-- >>> filter_by_prefix({}, 'a')
+-- {}
+-- >>> filter_by_prefix({'abc', 'bcd', 'cde', 'array'}, 'a')
+-- {'abc', 'array'}
+-- Filter an input table of strings only for ones that start with a given prefix.
+-- >>> filter_by_prefix({}, 'a')
+-- {}
+-- >>> filter_by_prefix({'abc', 'bcd', 'cde', 'array'}, 'a')
+-- {'abc', 'array'}
+local function filter_by_prefix(strings, prefix)
+  -- Create a new table that will hold the filtered strings.
+  local result = {}
+
+  -- Iterate over the input table. We accept both array‑style and set‑style tables.
+  for key, value in pairs(strings) do
+    -- Determine the actual string to test.
+    local s
+    if type(key) == "string" then
+      -- Set‑style table: key is the string, value is usually true.
+      s = key
+    else
+      -- Array‑style table: key is numeric, value is the string.
+      s = value
+    end
+
+    -- If the string starts with the given prefix, add it to the result set.
+    if type(s) == "string" and string.sub(s, 1, #prefix) == prefix then
+      result[s] = true
+    end
+  end
+
+  return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = filter_by_prefix
+    lu.assertEquals(candidate({}, 'john'), {})
+    lu.assertEquals(candidate({'xxx', 'asd', 'xxy', 'john doe', 'xxxAAA', 'xxx'}, 'xxx'), {'xxx', 'xxxAAA', 'xxx'})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755154467
+STDOUT:
+F
+Failed tests:
+-------------
+1) test_humaneval
+/tmp/tmpin_disob.lua:40: expected: {"xxx", "xxxAAA", "xxx"}
+actual: {xxx=true, xxxAAA=true}
+stack traceback:
+	/tmp/tmpin_disob.lua:40: in function 'test_humaneval'
+
+Ran 1 tests in 0.002 seconds, 0 successes, 1 failure
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Filter an input table of strings only for ones that start with a given prefix.
+-- >>> filter_by_prefix({}, 'a')
+-- {}
+-- >>> filter_by_prefix({'abc', 'bcd', 'cde', 'array'}, 'a')
+-- {'abc', 'array'}
+-- Filter an input table of strings only for ones that start with a given prefix.
+-- >>> filter_by_prefix({}, 'a')
+-- {}
+-- >>> filter_by_prefix({'abc', 'bcd', 'cde', 'array'}, 'a')
+-- {'abc', 'array'}
+
+local function filter_by_prefix(strings, prefix)
+    -- Ensure we have a table to work with
+    if type(strings) ~= "table" then
+        return {}
+    end
+
+    -- Prepare the result table
+    local result = {}
+
+    -- Length of the prefix for efficient comparison
+    local plen = #prefix
+
+    -- Iterate over the input table (assuming array-like structure)
+    for i, str in ipairs(strings) do
+        -- Guard against non-string elements
+        if type(str) == "string" then
+            -- Check if the string starts with the prefix
+            if str:sub(1, plen) == prefix then
+                table.insert(result, str)
+            end
+        end
+    end
+
+    return result
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = filter_by_prefix
+    lu.assertEquals(candidate({}, 'john'), {})
+    lu.assertEquals(candidate({'xxx', 'asd', 'xxy', 'john doe', 'xxxAAA', 'xxx'}, 'xxx'), {'xxx', 'xxxAAA', 'xxx'})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154467
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 47 (LUA) - HumanEval_47_median
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Return median of elements in the table l.
+-- >>> median({3, 1, 2, 4, 5})
+-- 3
+-- >>> median({-10, 4, 6, 1000, 10, 20})
+-- 15.0
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = median
+    lu.assertEquals(candidate({3, 1, 2, 4, 5}), 3)
+    lu.assertEquals(candidate({-10, 4, 6, 1000, 10, 20}), 8.0)
+    lu.assertEquals(candidate({5}), 5)
+    lu.assertEquals(candidate({6, 5}), 5.5)
+    lu.assertEquals(candidate({8, 1, 3, 9, 9, 2, 7}), 7)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Return median of elements in the table l.
+-- >>> median({3, 1, 2, 4, 5})
+-- 3
+-- >>> median({-10, 4, 6, 1000, 10, 20})
+-- 15.0
+-- Return median of elements in the table l.
+-- >>> median({3, 1, 2, 4, 5})
+-- 3
+-- >>> median({-10, 4, 6, 1000, 10, 20})
+-- 15.0
+local function median(l)
+    -- Guard against nil or empty table
+    if not l or #l == 0 then
+        return nil
+    end
+
+    -- Make a copy to avoid mutating the original table
+    local sorted = {}
+    for i = 1, #l do
+        sorted[i] = l[i]
+    end
+
+    table.sort(sorted)
+
+    local n = #sorted
+    if n % 2 == 1 then
+        -- Odd number of elements: middle one
+        return sorted[(n + 1) / 2]
+    else
+        -- Even number of elements: average of the two middle ones
+        local mid1 = sorted[n / 2]
+        local mid2 = sorted[n / 2 + 1]
+        return (mid1 + mid2) / 2.0
+    end
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = median
+    lu.assertEquals(candidate({3, 1, 2, 4, 5}), 3)
+    lu.assertEquals(candidate({-10, 4, 6, 1000, 10, 20}), 8.0)
+    lu.assertEquals(candidate({5}), 5)
+    lu.assertEquals(candidate({6, 5}), 5.5)
+    lu.assertEquals(candidate({8, 1, 3, 9, 9, 2, 7}), 7)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154469
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Return median of elements in the table l.
+-- >>> median({3, 1, 2, 4, 5})
+-- 3
+-- >>> median({-10, 4, 6, 1000, 10, 20})
+-- 15.0
+-- Return median of elements in the table l.
+-- >>> median({3, 1, 2, 4, 5})
+-- 3
+-- >>> median({-10, 4, 6, 1000, 10, 20})
+-- 15.0
+local function median(l)
+    if #l == 0 then
+        return nil  -- or error("empty table")
+    end
+
+    -- Make a copy to avoid mutating the caller's table
+    local sorted = {table.unpack(l)}
+    table.sort(sorted)
+
+    local n = #sorted
+    if n % 2 == 1 then
+        -- Odd number of elements – middle one is the median
+        return sorted[(n + 1) / 2]
+    else
+        -- Even number – average the two middle elements
+        return (sorted[n / 2] + sorted[n / 2 + 1]) / 2
+    end
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = median
+    lu.assertEquals(candidate({3, 1, 2, 4, 5}), 3)
+    lu.assertEquals(candidate({-10, 4, 6, 1000, 10, 20}), 8.0)
+    lu.assertEquals(candidate({5}), 5)
+    lu.assertEquals(candidate({6, 5}), 5.5)
+    lu.assertEquals(candidate({8, 1, 3, 9, 9, 2, 7}), 7)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154469
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Return median of elements in the table l.
+-- >>> median({3, 1, 2, 4, 5})
+-- 3
+-- >>> median({-10, 4, 6, 1000, 10, 20})
+-- 15.0
+-- Return median of elements in the table l.
+-- >>> median({3, 1, 2, 4, 5})
+-- 3
+-- >>> median({-10, 4, 6, 1000, 10, 20})
+-- 15.0
+local function median(l)
+    -- Make a shallow copy so we don't modify the original table
+    local sorted = {table.unpack(l)}
+    table.sort(sorted)
+
+    local n = #sorted
+    if n == 0 then
+        return nil  -- or error("median of empty table is undefined")
+    end
+
+    local mid = math.floor((n + 1) / 2)
+
+    if n % 2 == 1 then
+        -- Odd number of elements: return the middle one
+        return sorted[mid]
+    else
+        -- Even number of elements: average the two middle ones
+        return (sorted[mid] + sorted[mid + 1]) / 2
+    end
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = median
+    lu.assertEquals(candidate({3, 1, 2, 4, 5}), 3)
+    lu.assertEquals(candidate({-10, 4, 6, 1000, 10, 20}), 8.0)
+    lu.assertEquals(candidate({5}), 5)
+    lu.assertEquals(candidate({6, 5}), 5.5)
+    lu.assertEquals(candidate({8, 1, 3, 9, 9, 2, 7}), 7)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154469
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Return median of elements in the table l.
+-- >>> median({3, 1, 2, 4, 5})
+-- 3
+-- >>> median({-10, 4, 6, 1000, 10, 20})
+-- 15.0
+local function median(l)
+    local n = #l
+    if n == 0 then return nil end
+
+    -- Make a copy so we don't modify the original table
+    local sorted = {table.unpack(l)}
+    table.sort(sorted)
+
+    if n % 2 == 1 then
+        -- Odd number of elements – return the middle one
+        return sorted[(n + 1) // 2]
+    else
+        -- Even number of elements – average the two upper middle values
+        local mid1 = sorted[n // 2 + 1]
+        local mid2 = sorted[n // 2 + 2]
+        return (mid1 + mid2) / 2
+    end
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = median
+    lu.assertEquals(candidate({3, 1, 2, 4, 5}), 3)
+    lu.assertEquals(candidate({-10, 4, 6, 1000, 10, 20}), 8.0)
+    lu.assertEquals(candidate({5}), 5)
+    lu.assertEquals(candidate({6, 5}), 5.5)
+    lu.assertEquals(candidate({8, 1, 3, 9, 9, 2, 7}), 7)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755154469
+STDOUT:
+F
+Failed tests:
+-------------
+1) test_humaneval
+/tmp/tmpkgnxqbnx.lua:29: expected: 8, actual: 15
+stack traceback:
+	/tmp/tmpkgnxqbnx.lua:29: in function 'test_humaneval'
+
+Ran 1 tests in 0.002 seconds, 0 successes, 1 failure
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 74 (LUA) - HumanEval_74_total_match
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Write a function that accepts two tables of strings and returns the table that has 
+-- total number of chars in the all strings of the table less than the other table.
+-- if the two tables have the same number of chars, return the first table.
+-- Examples
+-- >>> total_match({}, {})
+-- {}
+-- >>> total_match({'hi', 'admin'}, {'hI', 'Hi'})
+-- {'hI', 'Hi'}
+-- >>> total_match({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'})
+-- {'hi', 'admin'}
+-- >>> total_match({'hi', 'admin'}, {'hI', 'hi', 'hi'})
+-- {'hI', 'hi', 'hi'}
+-- >>> total_match({'4'}, {'1', '2', '3', '4', '5'})
+-- {'4'}
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = total_match
+    lu.assertEquals(candidate({}, {}), {})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hi', 'hi'}), {'hi', 'hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'}), {'hi', 'admin'})
+    lu.assertEquals(candidate({'4'}, {'1', '2', '3', '4', '5'}), {'4'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'Hi'}), {'hI', 'Hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'hi', 'hi'}), {'hI', 'hi', 'hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'hi', 'hii'}), {'hi', 'admin'})
+    lu.assertEquals(candidate({}, {'this'}), {})
+    lu.assertEquals(candidate({'this'}, {}), {})
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Write a function that accepts two tables of strings and returns the table that has 
+-- total number of chars in the all strings of the table less than the other table.
+-- if the two tables have the same number of chars, return the first table.
+-- Examples
+-- >>> total_match({}, {})
+-- {}
+-- >>> total_match({'hi', 'admin'}, {'hI', 'Hi'})
+-- {'hI', 'Hi'}
+-- >>> total_match({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'})
+-- {'hi', 'admin'}
+-- >>> total_match({'hi', 'admin'}, {'hI', 'hi', 'hi'})
+-- {'hI', 'hi', 'hi'}
+-- >>> total_match({'4'}, {'1', '2', '3', '4', '5'})
+-- {'4'}
+-- Returns the table that has the smaller total number of characters in its strings.
+-- If both tables have the same total, the first table is returned.
+local function total_match(lst1, lst2)
+  -- Helper to compute the total length of all strings in a table
+  local function total_chars(tbl)
+    local sum = 0
+    for _, str in ipairs(tbl) do
+      -- Ensure we only count strings; ignore non-string entries
+      if type(str) == "string" then
+        sum = sum + #str
+      end
+    end
+    return sum
+  end
+
+  local sum1 = total_chars(lst1)
+  local sum2 = total_chars(lst2)
+
+  -- If sum1 is less than or equal to sum2, return the first table
+  if sum1 <= sum2 then
+    return lst1
+  else
+    return lst2
+  end
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = total_match
+    lu.assertEquals(candidate({}, {}), {})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hi', 'hi'}), {'hi', 'hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'}), {'hi', 'admin'})
+    lu.assertEquals(candidate({'4'}, {'1', '2', '3', '4', '5'}), {'4'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'Hi'}), {'hI', 'Hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'hi', 'hi'}), {'hI', 'hi', 'hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'hi', 'hii'}), {'hi', 'admin'})
+    lu.assertEquals(candidate({}, {'this'}), {})
+    lu.assertEquals(candidate({'this'}, {}), {})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154472
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Write a function that accepts two tables of strings and returns the table that has 
+-- total number of chars in the all strings of the table less than the other table.
+-- if the two tables have the same number of chars, return the first table.
+-- Examples
+-- >>> total_match({}, {})
+-- {}
+-- >>> total_match({'hi', 'admin'}, {'hI', 'Hi'})
+-- {'hI', 'Hi'}
+-- >>> total_match({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'})
+-- {'hi', 'admin'}
+-- >>> total_match({'hi', 'admin'}, {'hI', 'hi', 'hi'})
+-- {'hI', 'hi', 'hi'}
+-- >>> total_match({'4'}, {'1', '2', '3', '4', '5'})
+-- {'4'}
+-- Calculate the total number of characters in all strings of a table
+local function total_len(tbl)
+    local sum = 0
+    for _, str in pairs(tbl) do
+        sum = sum + #str
+    end
+    return sum
+end
+
+local function total_match(lst1, lst2)
+    local len1 = total_len(lst1)
+    local len2 = total_len(lst2)
+
+    -- Return the table with fewer total characters.
+    -- If equal, return the first table.
+    if len1 <= len2 then
+        return lst1
+    else
+        return lst2
+    end
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = total_match
+    lu.assertEquals(candidate({}, {}), {})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hi', 'hi'}), {'hi', 'hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'}), {'hi', 'admin'})
+    lu.assertEquals(candidate({'4'}, {'1', '2', '3', '4', '5'}), {'4'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'Hi'}), {'hI', 'Hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'hi', 'hi'}), {'hI', 'hi', 'hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'hi', 'hii'}), {'hi', 'admin'})
+    lu.assertEquals(candidate({}, {'this'}), {})
+    lu.assertEquals(candidate({'this'}, {}), {})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154472
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Write a function that accepts two tables of strings and returns the table that has 
+-- total number of chars in the all strings of the table less than the other table.
+-- if the two tables have the same number of chars, return the first table.
+-- Examples
+-- >>> total_match({}, {})
+-- {}
+-- >>> total_match({'hi', 'admin'}, {'hI', 'Hi'})
+-- {'hI', 'Hi'}
+-- >>> total_match({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'})
+-- {'hi', 'admin'}
+-- >>> total_match({'hi', 'admin'}, {'hI', 'hi', 'hi'})
+-- {'hI', 'hi', 'hi'}
+-- >>> total_match({'4'}, {'1', '2', '3', '4', '5'})
+-- {'4'}
+-- total_match.lua
+-- Returns the table with the smaller total number of characters.
+-- If both tables have the same total, the first table is returned.
+
+local function total_match(lst1, lst2)
+  -- Helper function to compute total length of strings in a table
+  local function total_length(tbl)
+    local sum = 0
+    for _, s in ipairs(tbl) do
+      sum = sum + #s
+    end
+    return sum
+  end
+
+  local len1 = total_length(lst1)
+  local len2 = total_length(lst2)
+
+  if len1 <= len2 then
+    return lst1
+  else
+    return lst2
+  end
+end
+
+-- Example usage (uncomment to test)
+-- print(vim.inspect(total_match({}, {}))) -- {}
+-- print(vim.inspect(total_match({'hi', 'admin'}, {'hI', 'Hi'}))) -- {'hI', 'Hi'}
+-- print(vim.inspect(total_match({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'}))) -- {'hi', 'admin'}
+-- print(vim.inspect(total_match({'hi', 'admin'}, {'hI', 'hi', 'hi'}))) -- {'hI', 'hi', 'hi'}
+-- print(vim.inspect(total_match({'4'}, {'1', '2', '3', '4', '5'}))) -- {'4'}
+
+return total_match
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = total_match
+    lu.assertEquals(candidate({}, {}), {})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hi', 'hi'}), {'hi', 'hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'}), {'hi', 'admin'})
+    lu.assertEquals(candidate({'4'}, {'1', '2', '3', '4', '5'}), {'4'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'Hi'}), {'hI', 'Hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'hi', 'hi'}), {'hI', 'hi', 'hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'hi', 'hii'}), {'hi', 'admin'})
+    lu.assertEquals(candidate({}, {'this'}), {})
+    lu.assertEquals(candidate({'this'}, {}), {})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755154472
+STDOUT: (empty)
+STDERR:
+lua: /tmp/tmp4dv3porq.lua:47: <eof> expected near 'lu'
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Write a function that accepts two tables of strings and returns the table that has 
+-- total number of chars in the all strings of the table less than the other table.
+-- if the two tables have the same number of chars, return the first table.
+-- Examples
+-- >>> total_match({}, {})
+-- {}
+-- >>> total_match({'hi', 'admin'}, {'hI', 'Hi'})
+-- {'hI', 'Hi'}
+-- >>> total_match({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'})
+-- {'hi', 'admin'}
+-- >>> total_match({'hi', 'admin'}, {'hI', 'hi', 'hi'})
+-- {'hI', 'hi', 'hi'}
+-- >>> total_match({'4'}, {'1', '2', '3', '4', '5'})
+-- {'4'}
+-- Returns the table with the smaller total number of characters in its strings.
+-- If both tables have the same total, the first table is returned.
+local function total_match(lst1, lst2)
+  -- Helper to compute the total length of all strings in a table.
+  local function total_chars(tbl)
+    local sum = 0
+    for _, str in pairs(tbl) do
+      sum = sum + #str
+    end
+    return sum
+  end
+
+  local sum1 = total_chars(lst1)
+  local sum2 = total_chars(lst2)
+
+  -- If the totals are equal, return the first table.
+  if sum1 <= sum2 then
+    return lst1
+  else
+    return lst2
+  end
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = total_match
+    lu.assertEquals(candidate({}, {}), {})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hi', 'hi'}), {'hi', 'hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hi', 'hi', 'admin', 'project'}), {'hi', 'admin'})
+    lu.assertEquals(candidate({'4'}, {'1', '2', '3', '4', '5'}), {'4'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'Hi'}), {'hI', 'Hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'hi', 'hi'}), {'hI', 'hi', 'hi'})
+    lu.assertEquals(candidate({'hi', 'admin'}, {'hI', 'hi', 'hii'}), {'hi', 'admin'})
+    lu.assertEquals(candidate({}, {'this'}), {})
+    lu.assertEquals(candidate({'this'}, {}), {})
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154472
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 76 (LUA) - HumanEval_76_is_simple_power
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Your task is to write a function that returns true if a number x is a simple
+-- power of n and false in other cases.
+-- x is a simple power of n if n**int=x
+-- For example:
+-- >>> is_simple_power(1, 4)
+-- true
+-- >>> is_simple_power(2, 2)
+-- true
+-- >>> is_simple_power(8, 2)
+-- true
+-- >>> is_simple_power(3, 2)
+-- false
+-- >>> is_simple_power(3, 1)
+-- false
+-- >>> is_simple_power(5, 3)
+-- false
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = is_simple_power
+    lu.assertEquals(candidate(16, 2), true)
+    lu.assertEquals(candidate(143214, 16), false)
+    lu.assertEquals(candidate(4, 2), true)
+    lu.assertEquals(candidate(9, 3), true)
+    lu.assertEquals(candidate(16, 4), true)
+    lu.assertEquals(candidate(24, 2), false)
+    lu.assertEquals(candidate(128, 4), false)
+    lu.assertEquals(candidate(12, 6), false)
+    lu.assertEquals(candidate(1, 1), true)
+    lu.assertEquals(candidate(1, 12), true)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Your task is to write a function that returns true if a number x is a simple
+-- power of n and false in other cases.
+-- x is a simple power of n if n**int=x
+-- For example:
+-- >>> is_simple_power(1, 4)
+-- true
+-- >>> is_simple_power(2, 2)
+-- true
+-- >>> is_simple_power(8, 2)
+-- true
+-- >>> is_simple_power(3, 2)
+-- false
+-- >>> is_simple_power(3, 1)
+-- false
+-- >>> is_simple_power(5, 3)
+-- false
+-- Returns true if `x` is a simple power of `n`, otherwise false.
+-- A simple power means there exists an integer k such that n^k == x.
+local function is_simple_power(x, n)
+    -- Special cases
+    if x == 1 then
+        -- 1 = n^0 for any n (except the undefined 0^0, but we treat 1 as a simple power)
+        return true
+    end
+
+    if n == 0 then
+        -- 0^k = 0 for k > 0
+        return x == 0
+    end
+
+    if n == 1 then
+        return x == 1
+    end
+
+    if n == -1 then
+        return x == 1 or x == -1
+    end
+
+    -- General case: iterate powers of n until we either match x or exceed it
+    local power = n
+    while true do
+        if power == x then
+            return true
+        end
+
+        -- If the power has already surpassed the target, we can stop
+        if (n > 1 and power > x) or (n < -1 and math.abs(power) > math.abs(x)) then
+            return false
+        end
+
+        power = power * n
+    end
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = is_simple_power
+    lu.assertEquals(candidate(16, 2), true)
+    lu.assertEquals(candidate(143214, 16), false)
+    lu.assertEquals(candidate(4, 2), true)
+    lu.assertEquals(candidate(9, 3), true)
+    lu.assertEquals(candidate(16, 4), true)
+    lu.assertEquals(candidate(24, 2), false)
+    lu.assertEquals(candidate(128, 4), false)
+    lu.assertEquals(candidate(12, 6), false)
+    lu.assertEquals(candidate(1, 1), true)
+    lu.assertEquals(candidate(1, 12), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154472
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Your task is to write a function that returns true if a number x is a simple
+-- power of n and false in other cases.
+-- x is a simple power of n if n**int=x
+-- For example:
+-- >>> is_simple_power(1, 4)
+-- true
+-- >>> is_simple_power(2, 2)
+-- true
+-- >>> is_simple_power(8, 2)
+-- true
+-- >>> is_simple_power(3, 2)
+-- false
+-- >>> is_simple_power(3, 1)
+-- false
+-- >>> is_simple_power(5, 3)
+-- false
+-- Returns true if `x` is a simple power of `n` (i.e. there exists an integer k ≥ 0
+-- such that n^k == x).  Returns false otherwise.
+--
+-- Rules:
+--   * n must be greater than 1 (base 1 is not allowed).
+--   * x must be a positive integer.  0 or negative values are not considered powers.
+--   * 1 is considered a power of any valid base (n^0).
+--
+-- Implementation uses repeated division by `n` to test whether `x` can be reduced
+-- to 1 while staying divisible by `n` at each step.
+local function is_simple_power(x, n)
+    -- Reject invalid bases and non‑positive numbers
+    if n <= 1 or x <= 0 then
+        return false
+    end
+
+    -- Repeatedly divide by n while the remainder is zero
+    while x % n == 0 do
+        x = x / n
+    end
+
+    -- If we've reduced to exactly 1, x was a power of n
+    return x == 1
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = is_simple_power
+    lu.assertEquals(candidate(16, 2), true)
+    lu.assertEquals(candidate(143214, 16), false)
+    lu.assertEquals(candidate(4, 2), true)
+    lu.assertEquals(candidate(9, 3), true)
+    lu.assertEquals(candidate(16, 4), true)
+    lu.assertEquals(candidate(24, 2), false)
+    lu.assertEquals(candidate(128, 4), false)
+    lu.assertEquals(candidate(12, 6), false)
+    lu.assertEquals(candidate(1, 1), true)
+    lu.assertEquals(candidate(1, 12), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755154472
+STDOUT:
+F
+Failed tests:
+-------------
+1) test_humaneval
+/tmp/tmpxasj499d.lua:53: expected: true, actual: false
+stack traceback:
+	/tmp/tmpxasj499d.lua:53: in function 'test_humaneval'
+
+Ran 1 tests in 0.001 seconds, 0 successes, 1 failure
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Your task is to write a function that returns true if a number x is a simple
+-- power of n and false in other cases.
+-- x is a simple power of n if n**int=x
+-- For example:
+-- >>> is_simple_power(1, 4)
+-- true
+-- >>> is_simple_power(2, 2)
+-- true
+-- >>> is_simple_power(8, 2)
+-- true
+-- >>> is_simple_power(3, 2)
+-- false
+-- >>> is_simple_power(3, 1)
+-- false
+-- >>> is_simple_power(5, 3)
+-- false
+-- Returns true if `x` is a simple power of `n` (i.e. n^k = x for some integer k ≥ 0),
+-- otherwise returns false.
+local function is_simple_power(x, n)
+    -- Basic type and value checks
+    if type(x) ~= "number" or type(n) ~= "number" then
+        return false
+    end
+
+    -- 1 is a power of any n
+    if x == 1 then
+        return true
+    end
+
+    -- n must be greater than 1 for any non‑trivial power
+    if n <= 1 then
+        return false
+    end
+
+    -- Repeatedly divide x by n while divisible
+    local current = x
+    while current % n == 0 do
+        current = current / n
+        if current == 1 then
+            return true
+        end
+    end
+
+    return false
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = is_simple_power
+    lu.assertEquals(candidate(16, 2), true)
+    lu.assertEquals(candidate(143214, 16), false)
+    lu.assertEquals(candidate(4, 2), true)
+    lu.assertEquals(candidate(9, 3), true)
+    lu.assertEquals(candidate(16, 4), true)
+    lu.assertEquals(candidate(24, 2), false)
+    lu.assertEquals(candidate(128, 4), false)
+    lu.assertEquals(candidate(12, 6), false)
+    lu.assertEquals(candidate(1, 1), true)
+    lu.assertEquals(candidate(1, 12), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154472
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Your task is to write a function that returns true if a number x is a simple
+-- power of n and false in other cases.
+-- x is a simple power of n if n**int=x
+-- For example:
+-- >>> is_simple_power(1, 4)
+-- true
+-- >>> is_simple_power(2, 2)
+-- true
+-- >>> is_simple_power(8, 2)
+-- true
+-- >>> is_simple_power(3, 2)
+-- false
+-- >>> is_simple_power(3, 1)
+-- false
+-- >>> is_simple_power(5, 3)
+-- false
+-- Returns true if `x` is a simple power of `n`, i.e. there exists an integer k
+-- such that n^k == x. Otherwise returns false.
+local function is_simple_power(x, n)
+    -- Handle the special case n == 1: only 1^k == 1 for any k.
+    if n == 1 then
+        return x == 1
+    end
+
+    -- Negative numbers, zero, or non‑positive bases cannot form a simple power
+    -- in the integer sense we care about.
+    if x < 1 or n < 1 then
+        return false
+    end
+
+    -- Repeatedly divide x by n while it is divisible.
+    while x > 1 and x % n == 0 do
+        x = x / n
+    end
+
+    -- If we end up with 1, x was exactly n^k.
+    return x == 1
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = is_simple_power
+    lu.assertEquals(candidate(16, 2), true)
+    lu.assertEquals(candidate(143214, 16), false)
+    lu.assertEquals(candidate(4, 2), true)
+    lu.assertEquals(candidate(9, 3), true)
+    lu.assertEquals(candidate(16, 4), true)
+    lu.assertEquals(candidate(24, 2), false)
+    lu.assertEquals(candidate(128, 4), false)
+    lu.assertEquals(candidate(12, 6), false)
+    lu.assertEquals(candidate(1, 1), true)
+    lu.assertEquals(candidate(1, 12), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154473
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 79 (LUA) - HumanEval_79_decimal_to_binary
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- You will be given a number in decimal form and your task is to convert it to
+-- binary format. The function should return a string, with each character representing a binary
+-- number. Each character in the string will be '0' or '1'.
+-- There will be an extra couple of characters 'db' at the beginning and at the end of the string.
+-- The extra characters are there to help with the format.
+-- Examples:
+-- >>> decimal_to_binary(15)
+-- 'db1111db'
+-- >>> decimal_to_binary(32)
+-- 'db100000db'
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = decimal_to_binary
+    lu.assertEquals(candidate(0), 'db0db')
+    lu.assertEquals(candidate(32), 'db100000db')
+    lu.assertEquals(candidate(103), 'db1100111db')
+    lu.assertEquals(candidate(15), 'db1111db')
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- You will be given a number in decimal form and your task is to convert it to
+-- binary format. The function should return a string, with each character representing a binary
+-- number. Each character in the string will be '0' or '1'.
+-- There will be an extra couple of characters 'db' at the beginning and at the end of the string.
+-- The extra characters are there to help with the format.
+-- Examples:
+-- >>> decimal_to_binary(15)
+-- 'db1111db'
+-- >>> decimal_to_binary(32)
+-- 'db100000db'
+local function decimal_to_binary(decimal)
+  -- Handle the special case of 0
+  if decimal == 0 then
+    return "db0db"
+  end
+
+  local binary = ""
+
+  -- Convert decimal to binary by repeatedly dividing by 2
+  while decimal > 0 do
+    local remainder = decimal % 2
+    binary = tostring(remainder) .. binary
+    decimal = math.floor(decimal / 2)
+  end
+
+  -- Add the required 'db' prefix and suffix
+  return "db" .. binary .. "db"
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = decimal_to_binary
+    lu.assertEquals(candidate(0), 'db0db')
+    lu.assertEquals(candidate(32), 'db100000db')
+    lu.assertEquals(candidate(103), 'db1100111db')
+    lu.assertEquals(candidate(15), 'db1111db')
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154473
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- You will be given a number in decimal form and your task is to convert it to
+-- binary format. The function should return a string, with each character representing a binary
+-- number. Each character in the string will be '0' or '1'.
+-- There will be an extra couple of characters 'db' at the beginning and at the end of the string.
+-- The extra characters are there to help with the format.
+-- Examples:
+-- >>> decimal_to_binary(15)
+-- 'db1111db'
+-- >>> decimal_to_binary(32)
+-- 'db100000db'
+-- Convert a decimal integer to a binary string wrapped in 'db' markers
+local function decimal_to_binary(decimal)
+  -- Handle the special case of 0
+  if decimal == 0 then
+    return "db0db"
+  end
+
+  local bits = {}          -- table to hold individual bits
+  local n = decimal
+
+  -- Extract bits from least‑significant to most‑significant
+  while n > 0 do
+    local bit = n % 2
+    table.insert(bits, 1, tostring(bit))  -- prepend to keep order
+    n = math.floor(n / 2)
+  end
+
+  -- Concatenate the bits into a single string
+  local binary_str = table.concat(bits)
+
+  -- Wrap with 'db' markers and return
+  return "db" .. binary_str .. "db"
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = decimal_to_binary
+    lu.assertEquals(candidate(0), 'db0db')
+    lu.assertEquals(candidate(32), 'db100000db')
+    lu.assertEquals(candidate(103), 'db1100111db')
+    lu.assertEquals(candidate(15), 'db1111db')
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154473
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- You will be given a number in decimal form and your task is to convert it to
+-- binary format. The function should return a string, with each character representing a binary
+-- number. Each character in the string will be '0' or '1'.
+-- There will be an extra couple of characters 'db' at the beginning and at the end of the string.
+-- The extra characters are there to help with the format.
+-- Examples:
+-- >>> decimal_to_binary(15)
+-- 'db1111db'
+-- >>> decimal_to_binary(32)
+-- 'db100000db'
+local function decimal_to_binary(decimal)
+    -- Validate input
+    if type(decimal) ~= "number" or decimal < 0 or decimal ~= math.floor(decimal) then
+        error("decimal_to_binary expects a non‑negative integer")
+    end
+
+    -- Convert the number to binary
+    local binary = string.format("%b", decimal)
+
+    -- Add the required 'db' markers
+    return "db" .. binary .. "db"
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = decimal_to_binary
+    lu.assertEquals(candidate(0), 'db0db')
+    lu.assertEquals(candidate(32), 'db100000db')
+    lu.assertEquals(candidate(103), 'db1100111db')
+    lu.assertEquals(candidate(15), 'db1111db')
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755154473
+STDOUT:
+E
+Failed tests:
+-------------
+1) test_humaneval
+/tmp/tmpvm4sk8wj.lua:18: invalid option '%b' to 'format'
+stack traceback:
+	/tmp/tmpvm4sk8wj.lua:18: in local 'candidate'
+	/tmp/tmpvm4sk8wj.lua:27: in function 'test_humaneval'
+
+Ran 1 tests in 0.002 seconds, 0 successes, 1 error
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- You will be given a number in decimal form and your task is to convert it to
+-- binary format. The function should return a string, with each character representing a binary
+-- number. Each character in the string will be '0' or '1'.
+-- There will be an extra couple of characters 'db' at the beginning and at the end of the string.
+-- The extra characters are there to help with the format.
+-- Examples:
+-- >>> decimal_to_binary(15)
+-- 'db1111db'
+-- >>> decimal_to_binary(32)
+-- 'db100000db'
+-- Convert a decimal number to a binary string with the required 'db' prefix and suffix
+local function decimal_to_binary(decimal)
+  -- Handle the special case of 0 explicitly
+  if decimal == 0 then
+    return 'db0db'
+  end
+
+  local bits = {}
+
+  -- Repeatedly divide by 2, recording the remainder (the binary digit)
+  while decimal > 0 do
+    local bit = decimal % 2
+    -- Insert the bit at the beginning to build the string in correct order
+    table.insert(bits, 1, bit)
+    decimal = math.floor(decimal / 2)
+  end
+
+  -- Concatenate the bits into a single string
+  local binary = table.concat(bits)
+
+  -- Add the required prefix and suffix
+  return 'db' .. binary .. 'db'
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = decimal_to_binary
+    lu.assertEquals(candidate(0), 'db0db')
+    lu.assertEquals(candidate(32), 'db100000db')
+    lu.assertEquals(candidate(103), 'db1100111db')
+    lu.assertEquals(candidate(15), 'db1111db')
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154473
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 94 (LUA) - HumanEval_94_skjkasdkd
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- You are given a table of integers.
+-- You need to find the largest prime value and return the sum of its digits.
+-- Examples:
+-- >>> skjkasdkd({0, 3, 2, 1, 3, 5, 7, 4, 5, 5, 5, 2, 181, 32, 4, 32, 3, 2, 32, 324, 4, 3})
+-- 10
+-- >>> skjkasdkd({1, 0, 1, 8, 2, 4597, 2, 1, 3, 40, 1, 2, 1, 2, 4, 2, 5, 1})
+-- 25
+-- >>> skjkasdkd({1, 3, 1, 32, 5107, 34, 83278, 109, 163, 23, 2323, 32, 30, 1, 9, 3})
+-- 13
+-- >>> skjkasdkd({0, 724, 32, 71, 99, 32, 6, 0, 5, 91, 83, 0, 5, 6})
+-- 11
+-- >>> skjkasdkd({0, 81, 12, 3, 1, 21})
+-- 3
+-- >>> skjkasdkd({0, 8, 1, 2, 1, 7})
+-- 7
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = skjkasdkd
+    lu.assertEquals(candidate({0, 3, 2, 1, 3, 5, 7, 4, 5, 5, 5, 2, 181, 32, 4, 32, 3, 2, 32, 324, 4, 3}), 10)
+    lu.assertEquals(candidate({1, 0, 1, 8, 2, 4597, 2, 1, 3, 40, 1, 2, 1, 2, 4, 2, 5, 1}), 25)
+    lu.assertEquals(candidate({1, 3, 1, 32, 5107, 34, 83278, 109, 163, 23, 2323, 32, 30, 1, 9, 3}), 13)
+    lu.assertEquals(candidate({0, 724, 32, 71, 99, 32, 6, 0, 5, 91, 83, 0, 5, 6}), 11)
+    lu.assertEquals(candidate({0, 81, 12, 3, 1, 21}), 3)
+    lu.assertEquals(candidate({0, 8, 1, 2, 1, 7}), 7)
+    lu.assertEquals(candidate({8191}), 19)
+    lu.assertEquals(candidate({8191, 123456, 127, 7}), 19)
+    lu.assertEquals(candidate({127, 97, 8192}), 10)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- You are given a table of integers.
+-- You need to find the largest prime value and return the sum of its digits.
+-- Examples:
+-- >>> skjkasdkd({0, 3, 2, 1, 3, 5, 7, 4, 5, 5, 5, 2, 181, 32, 4, 32, 3, 2, 32, 324, 4, 3})
+-- 10
+-- >>> skjkasdkd({1, 0, 1, 8, 2, 4597, 2, 1, 3, 40, 1, 2, 1, 2, 4, 2, 5, 1})
+-- 25
+-- >>> skjkasdkd({1, 3, 1, 32, 5107, 34, 83278, 109, 163, 23, 2323, 32, 30, 1, 9, 3})
+-- 13
+-- >>> skjkasdkd({0, 724, 32, 71, 99, 32, 6, 0, 5, 91, 83, 0, 5, 6})
+-- 11
+-- >>> skjkasdkd({0, 81, 12, 3, 1, 21})
+-- 3
+-- >>> skjkasdkd({0, 8, 1, 2, 1, 7})
+-- 7
+local function skjkasdkd(lst)
+    -- Helper: check if a number is prime
+    local function is_prime(n)
+        if n < 2 then return false end
+        if n == 2 or n == 3 then return true end
+        if n % 2 == 0 then return false end
+        local limit = math.floor(math.sqrt(n))
+        for i = 3, limit, 2 do
+            if n % i == 0 then
+                return false
+            end
+        end
+        return true
+    end
+
+    -- Find the largest prime in the list
+    local largest_prime = nil
+    for _, val in ipairs(lst) do
+        if is_prime(val) then
+            if not largest_prime or val > largest_prime then
+                largest_prime = val
+            end
+        end
+    end
+
+    -- If no prime found, return 0 (though the problem guarantees at least one prime)
+    if not largest_prime then
+        return 0
+    end
+
+    -- Sum the digits of the largest prime
+    local sum = 0
+    local n = largest_prime
+    while n > 0 do
+        sum = sum + (n % 10)
+        n = math.floor(n / 10)
+    end
+
+    return sum
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = skjkasdkd
+    lu.assertEquals(candidate({0, 3, 2, 1, 3, 5, 7, 4, 5, 5, 5, 2, 181, 32, 4, 32, 3, 2, 32, 324, 4, 3}), 10)
+    lu.assertEquals(candidate({1, 0, 1, 8, 2, 4597, 2, 1, 3, 40, 1, 2, 1, 2, 4, 2, 5, 1}), 25)
+    lu.assertEquals(candidate({1, 3, 1, 32, 5107, 34, 83278, 109, 163, 23, 2323, 32, 30, 1, 9, 3}), 13)
+    lu.assertEquals(candidate({0, 724, 32, 71, 99, 32, 6, 0, 5, 91, 83, 0, 5, 6}), 11)
+    lu.assertEquals(candidate({0, 81, 12, 3, 1, 21}), 3)
+    lu.assertEquals(candidate({0, 8, 1, 2, 1, 7}), 7)
+    lu.assertEquals(candidate({8191}), 19)
+    lu.assertEquals(candidate({8191, 123456, 127, 7}), 19)
+    lu.assertEquals(candidate({127, 97, 8192}), 10)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154475
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- You are given a table of integers.
+-- You need to find the largest prime value and return the sum of its digits.
+-- Examples:
+-- >>> skjkasdkd({0, 3, 2, 1, 3, 5, 7, 4, 5, 5, 5, 2, 181, 32, 4, 32, 3, 2, 32, 324, 4, 3})
+-- 10
+-- >>> skjkasdkd({1, 0, 1, 8, 2, 4597, 2, 1, 3, 40, 1, 2, 1, 2, 4, 2, 5, 1})
+-- 25
+-- >>> skjkasdkd({1, 3, 1, 32, 5107, 34, 83278, 109, 163, 23, 2323, 32, 30, 1, 9, 3})
+-- 13
+-- >>> skjkasdkd({0, 724, 32, 71, 99, 32, 6, 0, 5, 91, 83, 0, 5, 6})
+-- 11
+-- >>> skjkasdkd({0, 81, 12, 3, 1, 21})
+-- 3
+-- >>> skjkasdkd({0, 8, 1, 2, 1, 7})
+-- 7
+-- Find the largest prime number in the list and return the sum of its digits
+local function skjkasdkd(lst)
+    -- Helper function to test primality
+    local function is_prime(n)
+        if n < 2 then return false end
+        if n == 2 then return true end
+        if n % 2 == 0 then return false end
+        local limit = math.floor(math.sqrt(n))
+        for i = 3, limit, 2 do
+            if n % i == 0 then
+                return false
+            end
+        end
+        return true
+    end
+
+    local max_prime = nil
+    for _, val in ipairs(lst) do
+        if is_prime(val) then
+            if not max_prime or val > max_prime then
+                max_prime = val
+            end
+        end
+    end
+
+    -- If no prime found, return 0 (or you could raise an error)
+    if not max_prime then return 0 end
+
+    -- Sum the digits of the largest prime
+    local sum_digits = 0
+    for digit in tostring(max_prime) do
+        sum_digits = sum_digits + tonumber(digit)
+    end
+    return sum_digits
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = skjkasdkd
+    lu.assertEquals(candidate({0, 3, 2, 1, 3, 5, 7, 4, 5, 5, 5, 2, 181, 32, 4, 32, 3, 2, 32, 324, 4, 3}), 10)
+    lu.assertEquals(candidate({1, 0, 1, 8, 2, 4597, 2, 1, 3, 40, 1, 2, 1, 2, 4, 2, 5, 1}), 25)
+    lu.assertEquals(candidate({1, 3, 1, 32, 5107, 34, 83278, 109, 163, 23, 2323, 32, 30, 1, 9, 3}), 13)
+    lu.assertEquals(candidate({0, 724, 32, 71, 99, 32, 6, 0, 5, 91, 83, 0, 5, 6}), 11)
+    lu.assertEquals(candidate({0, 81, 12, 3, 1, 21}), 3)
+    lu.assertEquals(candidate({0, 8, 1, 2, 1, 7}), 7)
+    lu.assertEquals(candidate({8191}), 19)
+    lu.assertEquals(candidate({8191, 123456, 127, 7}), 19)
+    lu.assertEquals(candidate({127, 97, 8192}), 10)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755154475
+STDOUT:
+E
+Failed tests:
+-------------
+1) test_humaneval
+/tmp/tmpnrn88fin.lua:46: attempt to call a string value
+stack traceback:
+	/tmp/tmpnrn88fin.lua:55: in function 'test_humaneval'
+
+Ran 1 tests in 0.002 seconds, 0 successes, 1 error
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- You are given a table of integers.
+-- You need to find the largest prime value and return the sum of its digits.
+-- Examples:
+-- >>> skjkasdkd({0, 3, 2, 1, 3, 5, 7, 4, 5, 5, 5, 2, 181, 32, 4, 32, 3, 2, 32, 324, 4, 3})
+-- 10
+-- >>> skjkasdkd({1, 0, 1, 8, 2, 4597, 2, 1, 3, 40, 1, 2, 1, 2, 4, 2, 5, 1})
+-- 25
+-- >>> skjkasdkd({1, 3, 1, 32, 5107, 34, 83278, 109, 163, 23, 2323, 32, 30, 1, 9, 3})
+-- 13
+-- >>> skjkasdkd({0, 724, 32, 71, 99, 32, 6, 0, 5, 91, 83, 0, 5, 6})
+-- 11
+-- >>> skjkasdkd({0, 81, 12, 3, 1, 21})
+-- 3
+-- >>> skjkasdkd({0, 8, 1, 2, 1, 7})
+-- 7
+local function skjkasdkd(lst)
+  -- Helper function to check primality
+  local function isPrime(n)
+    if n < 2 then return false end
+    if n == 2 then return true end
+    if n % 2 == 0 then return false end
+    local sqrt = math.floor(math.sqrt(n))
+    for i = 3, sqrt, 2 do
+      if n % i == 0 then return false end
+    end
+    return true
+  end
+
+  -- Find the largest prime in the list
+  local maxPrime = nil
+  for _, v in ipairs(lst) do
+    if isPrime(v) then
+      if maxPrime == nil or v > maxPrime then
+        maxPrime = v
+      end
+    end
+  end
+
+  -- If no prime found, return 0 (or nil if preferred)
+  if not maxPrime then return 0 end
+
+  -- Sum the digits of the largest prime
+  local sum = 0
+  local num = maxPrime
+  while num > 0 do
+    sum = sum + (num % 10)
+    num = math.floor(num / 10)
+  end
+
+  return sum
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = skjkasdkd
+    lu.assertEquals(candidate({0, 3, 2, 1, 3, 5, 7, 4, 5, 5, 5, 2, 181, 32, 4, 32, 3, 2, 32, 324, 4, 3}), 10)
+    lu.assertEquals(candidate({1, 0, 1, 8, 2, 4597, 2, 1, 3, 40, 1, 2, 1, 2, 4, 2, 5, 1}), 25)
+    lu.assertEquals(candidate({1, 3, 1, 32, 5107, 34, 83278, 109, 163, 23, 2323, 32, 30, 1, 9, 3}), 13)
+    lu.assertEquals(candidate({0, 724, 32, 71, 99, 32, 6, 0, 5, 91, 83, 0, 5, 6}), 11)
+    lu.assertEquals(candidate({0, 81, 12, 3, 1, 21}), 3)
+    lu.assertEquals(candidate({0, 8, 1, 2, 1, 7}), 7)
+    lu.assertEquals(candidate({8191}), 19)
+    lu.assertEquals(candidate({8191, 123456, 127, 7}), 19)
+    lu.assertEquals(candidate({127, 97, 8192}), 10)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154475
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- You are given a table of integers.
+-- You need to find the largest prime value and return the sum of its digits.
+-- Examples:
+-- >>> skjkasdkd({0, 3, 2, 1, 3, 5, 7, 4, 5, 5, 5, 2, 181, 32, 4, 32, 3, 2, 32, 324, 4, 3})
+-- 10
+-- >>> skjkasdkd({1, 0, 1, 8, 2, 4597, 2, 1, 3, 40, 1, 2, 1, 2, 4, 2, 5, 1})
+-- 25
+-- >>> skjkasdkd({1, 3, 1, 32, 5107, 34, 83278, 109, 163, 23, 2323, 32, 30, 1, 9, 3})
+-- 13
+-- >>> skjkasdkd({0, 724, 32, 71, 99, 32, 6, 0, 5, 91, 83, 0, 5, 6})
+-- 11
+-- >>> skjkasdkd({0, 81, 12, 3, 1, 21})
+-- 3
+-- >>> skjkasdkd({0, 8, 1, 2, 1, 7})
+-- 7
+-- Find the largest prime number in a list and return the sum of its digits
+local function skjkasdkd(lst)
+    -- Helper: check if a number is prime
+    local function is_prime(n)
+        if n < 2 then return false end
+        if n == 2 or n == 3 then return true end
+        if n % 2 == 0 or n % 3 == 0 then return false end
+        local i = 5
+        while i * i <= n do
+            if n % i == 0 or n % (i + 2) == 0 then
+                return false
+            end
+            i = i + 6
+        end
+        return true
+    end
+
+    -- Helper: sum of decimal digits of a non‑negative integer
+    local function digit_sum(n)
+        local sum = 0
+        while n > 0 do
+            sum = sum + (n % 10)
+            n = math.floor(n / 10)
+        end
+        return sum
+    end
+
+    local max_prime = nil
+    for _, v in ipairs(lst) do
+        if is_prime(v) then
+            if max_prime == nil or v > max_prime then
+                max_prime = v
+            end
+        end
+    end
+
+    if max_prime == nil then
+        return 0  -- no prime found
+    else
+        return digit_sum(max_prime)
+    end
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = skjkasdkd
+    lu.assertEquals(candidate({0, 3, 2, 1, 3, 5, 7, 4, 5, 5, 5, 2, 181, 32, 4, 32, 3, 2, 32, 324, 4, 3}), 10)
+    lu.assertEquals(candidate({1, 0, 1, 8, 2, 4597, 2, 1, 3, 40, 1, 2, 1, 2, 4, 2, 5, 1}), 25)
+    lu.assertEquals(candidate({1, 3, 1, 32, 5107, 34, 83278, 109, 163, 23, 2323, 32, 30, 1, 9, 3}), 13)
+    lu.assertEquals(candidate({0, 724, 32, 71, 99, 32, 6, 0, 5, 91, 83, 0, 5, 6}), 11)
+    lu.assertEquals(candidate({0, 81, 12, 3, 1, 21}), 3)
+    lu.assertEquals(candidate({0, 8, 1, 2, 1, 7}), 7)
+    lu.assertEquals(candidate({8191}), 19)
+    lu.assertEquals(candidate({8191, 123456, 127, 7}), 19)
+    lu.assertEquals(candidate({127, 97, 8192}), 10)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154475
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 98 (LUA) - HumanEval_98_count_upper
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- Given a string s, count the number of uppercase vowels in even indices.
+-- For example:
+-- >>> count_upper('aBCdEf')
+-- 1
+-- >>> count_upper('abcdefg')
+-- 0
+-- >>> count_upper('dBBE')
+-- 0
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = count_upper
+    lu.assertEquals(candidate('aBCdEf'), 1)
+    lu.assertEquals(candidate('abcdefg'), 0)
+    lu.assertEquals(candidate('dBBE'), 0)
+    lu.assertEquals(candidate('B'), 0)
+    lu.assertEquals(candidate('U'), 1)
+    lu.assertEquals(candidate(''), 0)
+    lu.assertEquals(candidate('EEEE'), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- Given a string s, count the number of uppercase vowels in even indices.
+-- For example:
+-- >>> count_upper('aBCdEf')
+-- 1
+-- >>> count_upper('abcdefg')
+-- 0
+-- >>> count_upper('dBBE')
+-- 0
+local function count_upper(s)
+  local count = 0
+  local vowels = {A = true, E = true, I = true, O = true, U = true}
+
+  for i = 1, #s do
+    -- Lua strings are 1‑based, so (i-1) gives the 0‑based index
+    if ((i - 1) % 2) == 0 then
+      local c = s:sub(i, i)
+      if vowels[c] then
+        count = count + 1
+      end
+    end
+  end
+
+  return count
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = count_upper
+    lu.assertEquals(candidate('aBCdEf'), 1)
+    lu.assertEquals(candidate('abcdefg'), 0)
+    lu.assertEquals(candidate('dBBE'), 0)
+    lu.assertEquals(candidate('B'), 0)
+    lu.assertEquals(candidate('U'), 1)
+    lu.assertEquals(candidate(''), 0)
+    lu.assertEquals(candidate('EEEE'), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154475
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- Given a string s, count the number of uppercase vowels in even indices.
+-- For example:
+-- >>> count_upper('aBCdEf')
+-- 1
+-- >>> count_upper('abcdefg')
+-- 0
+-- >>> count_upper('dBBE')
+-- 0
+local function count_upper(s)
+    local count = 0
+    local vowels = {A=true, E=true, I=true, O=true, U=true}
+    for i = 1, #s do
+        local c = s:sub(i,i)
+        if ((i - 1) % 2 == 0) and c:match("%u") and vowels[c] then
+            count = count + 1
+        end
+    end
+    return count
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = count_upper
+    lu.assertEquals(candidate('aBCdEf'), 1)
+    lu.assertEquals(candidate('abcdefg'), 0)
+    lu.assertEquals(candidate('dBBE'), 0)
+    lu.assertEquals(candidate('B'), 0)
+    lu.assertEquals(candidate('U'), 1)
+    lu.assertEquals(candidate(''), 0)
+    lu.assertEquals(candidate('EEEE'), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154475
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- Given a string s, count the number of uppercase vowels in even indices.
+-- For example:
+-- >>> count_upper('aBCdEf')
+-- 1
+-- >>> count_upper('abcdefg')
+-- 0
+-- >>> count_upper('dBBE')
+-- 0
+-- Count the number of uppercase vowels that appear at even indices in a string.
+-- Even indices in Lua start at 2, 4, 6, ...
+local function count_upper(s)
+    local count = 0
+    local vowels = { A = true, E = true, I = true, O = true, U = true }
+
+    for i = 1, #s do
+        if i % 2 == 0 then          -- even index
+            local c = s:sub(i, i)   -- character at position i
+            if vowels[c] then
+                count = count + 1
+            end
+        end
+    end
+
+    return count
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = count_upper
+    lu.assertEquals(candidate('aBCdEf'), 1)
+    lu.assertEquals(candidate('abcdefg'), 0)
+    lu.assertEquals(candidate('dBBE'), 0)
+    lu.assertEquals(candidate('B'), 0)
+    lu.assertEquals(candidate('U'), 1)
+    lu.assertEquals(candidate(''), 0)
+    lu.assertEquals(candidate('EEEE'), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755154475
+STDOUT:
+F
+Failed tests:
+-------------
+1) test_humaneval
+/tmp/tmp4gmz_6av.lua:30: expected: 1, actual: 0
+stack traceback:
+	/tmp/tmp4gmz_6av.lua:30: in function 'test_humaneval'
+
+Ran 1 tests in 0.001 seconds, 0 successes, 1 failure
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- Given a string s, count the number of uppercase vowels in even indices.
+-- For example:
+-- >>> count_upper('aBCdEf')
+-- 1
+-- >>> count_upper('abcdefg')
+-- 0
+-- >>> count_upper('dBBE')
+-- 0
+-- Count the number of uppercase vowels that appear at even indices
+-- (0‑based indexing).  In Lua, string indices start at 1, so an even
+-- 0‑based index corresponds to an odd 1‑based index.
+local function count_upper(s)
+    local count = 0
+    for i = 1, #s do
+        -- 0‑based index is i-1; check if it is even
+        if (i - 1) % 2 == 0 then
+            local c = s:sub(i, i)
+            if c == 'A' or c == 'E' or c == 'I' or c == 'O' or c == 'U' then
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = count_upper
+    lu.assertEquals(candidate('aBCdEf'), 1)
+    lu.assertEquals(candidate('abcdefg'), 0)
+    lu.assertEquals(candidate('dBBE'), 0)
+    lu.assertEquals(candidate('B'), 0)
+    lu.assertEquals(candidate('U'), 1)
+    lu.assertEquals(candidate(''), 0)
+    lu.assertEquals(candidate('EEEE'), 2)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154475
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 109 (LUA) - HumanEval_109_move_one_ball
+================================================================================
+
+PROMPT:
+----------------------------------------
+-- We have a table 'arr' of N integers arr[1], arr[2], ..., arr[N].The
+-- numbers in the table will be randomly ordered. Your task is to determine if
+-- it is possible to get a table sorted in non-decreasing order by performing 
+-- the following operation on the given table:
+--     You are allowed to perform right shift operation any number of times.
+-- One right shift operation means shifting all elements of the table by one
+-- position in the right direction. The last element of the table will be moved to
+-- the starting position in the table i.e. 0th index. 
+-- If it is possible to obtain the sorted table by performing the above operation
+-- then return true else return false.
+-- If the given table is empty then return true.
+-- Note: The given table is guaranteed to have unique elements.
+-- For Example:
+-- >>> move_one_ball({3, 4, 5, 1, 2})
+-- true
+-- Explanation: By performin 2 right shift operations, non-decreasing order can
+--              be achieved for the given table.
+-- >>> move_one_ball({3, 5, 4, 1, 2})
+-- false
+-- Explanation:It is not possible to get non-decreasing order for the given
+--             table by performing any number of right shift operations.
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = move_one_ball
+    lu.assertEquals(candidate({3, 4, 5, 1, 2}), true)
+    lu.assertEquals(candidate({3, 5, 10, 1, 2}), true)
+    lu.assertEquals(candidate({4, 3, 1, 2}), false)
+    lu.assertEquals(candidate({3, 5, 4, 1, 2}), false)
+    lu.assertEquals(candidate({}), true)
+end
+
+os.exit(lu.LuaUnit.run())
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+-- We have a table 'arr' of N integers arr[1], arr[2], ..., arr[N].The
+-- numbers in the table will be randomly ordered. Your task is to determine if
+-- it is possible to get a table sorted in non-decreasing order by performing 
+-- the following operation on the given table:
+--     You are allowed to perform right shift operation any number of times.
+-- One right shift operation means shifting all elements of the table by one
+-- position in the right direction. The last element of the table will be moved to
+-- the starting position in the table i.e. 0th index. 
+-- If it is possible to obtain the sorted table by performing the above operation
+-- then return true else return false.
+-- If the given table is empty then return true.
+-- Note: The given table is guaranteed to have unique elements.
+-- For Example:
+-- >>> move_one_ball({3, 4, 5, 1, 2})
+-- true
+-- Explanation: By performin 2 right shift operations, non-decreasing order can
+--              be achieved for the given table.
+-- >>> move_one_ball({3, 5, 4, 1, 2})
+-- false
+-- Explanation:It is not possible to get non-decreasing order for the given
+--             table by performing any number of right shift operations.
+-- Check if a table can be sorted by only right‑shift (rotation) operations
+-- The table contains unique integers and may be empty.
+local function move_one_ball(arr)
+    local n = #arr
+    if n <= 1 then
+        return true
+    end
+
+    -- Find the index of the smallest element (the start of the sorted rotation)
+    local min_idx = 1
+    for i = 2, n do
+        if arr[i] < arr[min_idx] then
+            min_idx = i
+        end
+    end
+
+    -- Build the rotated array starting from the smallest element
+    for i = 1, n do
+        local src = (min_idx + i - 2) % n + 1
+        arr[i] = arr[src]
+    end
+
+    -- Check that the resulting array is sorted in non‑decreasing order
+    for i = 1, n - 1 do
+        if arr[i] > arr[i + 1] then
+            return false
+        end
+    end
+
+    return true
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = move_one_ball
+    lu.assertEquals(candidate({3, 4, 5, 1, 2}), true)
+    lu.assertEquals(candidate({3, 5, 10, 1, 2}), true)
+    lu.assertEquals(candidate({4, 3, 1, 2}), false)
+    lu.assertEquals(candidate({3, 5, 4, 1, 2}), false)
+    lu.assertEquals(candidate({}), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 1
+Status: Exception
+Timestamp: 1755154476
+STDOUT:
+F
+Failed tests:
+-------------
+1) test_humaneval
+/tmp/tmp5czuqeb7.lua:57: expected: true, actual: false
+stack traceback:
+	/tmp/tmp5czuqeb7.lua:57: in function 'test_humaneval'
+
+Ran 1 tests in 0.002 seconds, 0 successes, 1 failure
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+-- We have a table 'arr' of N integers arr[1], arr[2], ..., arr[N].The
+-- numbers in the table will be randomly ordered. Your task is to determine if
+-- it is possible to get a table sorted in non-decreasing order by performing 
+-- the following operation on the given table:
+--     You are allowed to perform right shift operation any number of times.
+-- One right shift operation means shifting all elements of the table by one
+-- position in the right direction. The last element of the table will be moved to
+-- the starting position in the table i.e. 0th index. 
+-- If it is possible to obtain the sorted table by performing the above operation
+-- then return true else return false.
+-- If the given table is empty then return true.
+-- Note: The given table is guaranteed to have unique elements.
+-- For Example:
+-- >>> move_one_ball({3, 4, 5, 1, 2})
+-- true
+-- Explanation: By performin 2 right shift operations, non-decreasing order can
+--              be achieved for the given table.
+-- >>> move_one_ball({3, 5, 4, 1, 2})
+-- false
+-- Explanation:It is not possible to get non-decreasing order for the given
+--             table by performing any number of right shift operations.
+local function move_one_ball(arr)
+    -- Empty array is always considered sorted
+    local n = #arr
+    if n == 0 then
+        return true
+    end
+
+    -- Create a sorted copy of the array
+    local sorted = {table.unpack(arr)}
+    table.sort(sorted)
+
+    -- Find the position of the first element of the original array
+    -- in the sorted array. This will be the rotation offset.
+    local offset = nil
+    for i = 1, n do
+        if sorted[i] == arr[1] then
+            offset = i
+            break
+        end
+    end
+
+    -- If the first element is not found (should not happen with unique elements),
+    -- the array cannot be a rotation of the sorted array.
+    if not offset then
+        return false
+    end
+
+    -- Verify that every element matches the expected rotated position
+    for i = 1, n do
+        local expected_index = (offset + i - 2) % n + 1
+        if arr[i] ~= sorted[expected_index] then
+            return false
+        end
+    end
+
+    return true
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = move_one_ball
+    lu.assertEquals(candidate({3, 4, 5, 1, 2}), true)
+    lu.assertEquals(candidate({3, 5, 10, 1, 2}), true)
+    lu.assertEquals(candidate({4, 3, 1, 2}), false)
+    lu.assertEquals(candidate({3, 5, 4, 1, 2}), false)
+    lu.assertEquals(candidate({}), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154476
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+-- We have a table 'arr' of N integers arr[1], arr[2], ..., arr[N].The
+-- numbers in the table will be randomly ordered. Your task is to determine if
+-- it is possible to get a table sorted in non-decreasing order by performing 
+-- the following operation on the given table:
+--     You are allowed to perform right shift operation any number of times.
+-- One right shift operation means shifting all elements of the table by one
+-- position in the right direction. The last element of the table will be moved to
+-- the starting position in the table i.e. 0th index. 
+-- If it is possible to obtain the sorted table by performing the above operation
+-- then return true else return false.
+-- If the given table is empty then return true.
+-- Note: The given table is guaranteed to have unique elements.
+-- For Example:
+-- >>> move_one_ball({3, 4, 5, 1, 2})
+-- true
+-- Explanation: By performin 2 right shift operations, non-decreasing order can
+--              be achieved for the given table.
+-- >>> move_one_ball({3, 5, 4, 1, 2})
+-- false
+-- Explanation:It is not possible to get non-decreasing order for the given
+--             table by performing any number of right shift operations.
+-- Returns true if the array can be sorted by a cyclic right shift,
+-- otherwise returns false.  Empty or single‑element arrays are considered
+-- already sorted.
+local function move_one_ball(arr)
+    local n = #arr
+    if n <= 1 then
+        return true
+    end
+
+    local breakCount = 0
+    for i = 1, n - 1 do
+        if arr[i] > arr[i + 1] then
+            breakCount = breakCount + 1
+        end
+    end
+
+    -- No break means the array is already sorted (0 shifts)
+    if breakCount == 0 then
+        return true
+    end
+
+    -- Exactly one break: check the wrap‑around condition
+    if breakCount == 1 then
+        return arr[n] <= arr[1]
+    end
+
+    -- More than one break → impossible
+    return false
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = move_one_ball
+    lu.assertEquals(candidate({3, 4, 5, 1, 2}), true)
+    lu.assertEquals(candidate({3, 5, 10, 1, 2}), true)
+    lu.assertEquals(candidate({4, 3, 1, 2}), false)
+    lu.assertEquals(candidate({3, 5, 4, 1, 2}), false)
+    lu.assertEquals(candidate({}), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154476
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+-- We have a table 'arr' of N integers arr[1], arr[2], ..., arr[N].The
+-- numbers in the table will be randomly ordered. Your task is to determine if
+-- it is possible to get a table sorted in non-decreasing order by performing 
+-- the following operation on the given table:
+--     You are allowed to perform right shift operation any number of times.
+-- One right shift operation means shifting all elements of the table by one
+-- position in the right direction. The last element of the table will be moved to
+-- the starting position in the table i.e. 0th index. 
+-- If it is possible to obtain the sorted table by performing the above operation
+-- then return true else return false.
+-- If the given table is empty then return true.
+-- Note: The given table is guaranteed to have unique elements.
+-- For Example:
+-- >>> move_one_ball({3, 4, 5, 1, 2})
+-- true
+-- Explanation: By performin 2 right shift operations, non-decreasing order can
+--              be achieved for the given table.
+-- >>> move_one_ball({3, 5, 4, 1, 2})
+-- false
+-- Explanation:It is not possible to get non-decreasing order for the given
+--             table by performing any number of right shift operations.
+-- Check if the array can become sorted by only right‑shift rotations
+local function move_one_ball(arr)
+    -- Empty table is trivially sorted
+    if #arr == 0 then
+        return true
+    end
+
+    -- Make a copy of the array and sort it
+    local sorted = {}
+    for i = 1, #arr do
+        sorted[i] = arr[i]
+    end
+    table.sort(sorted)  -- ascending order
+
+    -- Find the position in the sorted array that matches arr[1]
+    local startIdx = 1
+    for i = 1, #sorted do
+        if sorted[i] == arr[1] then
+            startIdx = i
+            break
+        end
+    end
+
+    -- Verify that the remaining elements match a rotation of the sorted array
+    for j = 1, #arr do
+        local expected = sorted[((startIdx + j - 2) % #arr) + 1]
+        if arr[j] ~= expected then
+            return false
+        end
+    end
+
+    return true
+end
+lu = require('luaunit')
+
+function test_humaneval()
+local candidate = move_one_ball
+    lu.assertEquals(candidate({3, 4, 5, 1, 2}), true)
+    lu.assertEquals(candidate({3, 5, 10, 1, 2}), true)
+    lu.assertEquals(candidate({4, 3, 1, 2}), false)
+    lu.assertEquals(candidate({3, 5, 4, 1, 2}), false)
+    lu.assertEquals(candidate({}), true)
+end
+
+os.exit(lu.LuaUnit.run())
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154476
+STDOUT:
+.
+Ran 1 tests in 0.000 seconds, 1 success, 0 failures
+OK
+STDERR: (empty)
+--------------------

@@ -1,0 +1,1230 @@
+================================================================================
+DETAILED ANALYSIS: UNIVERSAL ZERO ACCURACY CASES - OCAML
+================================================================================
+
+These 16 questions achieved 0% accuracy across ALL 5 languages.
+Analysis focuses on OCaml implementations with generated code examples.
+Configuration: DIRECT
+
+============================================================
+QUESTION #1: HumanEval_116_sort_array
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**In this Kata, you have to sort a list of non-negative integers according to
+   * number of ones in their binary representation in ascending order.
+   * For similar number of ones, sort based on decimal value.
+   * It must be implemented like this:
+   * >>> sort_array [1; 5; 2; 3; 4]
+   * [1; 2; 3; 4; 5]
+   * >>> sort_array [(~2); (~3); (~4); (~5); (~6)]
+   * [(~6); (~5); (~4); (~3); (~2)]
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = sort_array in
+  (assert ((candidate [1; 5; 2; 3; 4]) = [1; 2; 4; 3; 5]));
+  (assert ((candidate [(~2); (~3); (~4); (~5); (~6)]) = [(~4); (~2); (~6); (~5); (~3)]));
+  (assert ((candidate [1; 0; 2; 3; 4]) = [0; 1; 2; 4; 3]));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - SyntaxError_exit_2: 4 times
+  Common error types:
+    - Syntax error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let sort_array (arr : int list) : int list =
+    let count_ones n =
+      let rec count ones n =
+        if n = 0 then ones
+        else count (ones + (n land 1)) (n lsr 1)
+      in
+      count 0 n
+    in
+    List.sort (fun a b ->
+      let ones_a = count_ones a in
+      let ones_b = count_ones b in
+      if ones_a = ones_b then a - b else ones_a - ones_b
+  ... (truncated)
+
+Status: SyntaxError
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let sort_array (arr : int list) : int list =
+    let count_ones n =
+      let rec count acc i =
+        if i = 0 then acc
+        else count (acc + (if n land (1 lsl i) <> 0 then 1 else 0)) (i - 1)
+      in
+      count 0 (31) (* Count bits up to 31 bits for non-negative integers *)
+    in
+    List.sort (fun a b ->
+      let ones_a = count_ones a in
+      let ones_b = count_ones b in
+      if ones_a = ones_b then a - b else ones_a - ones_b
+  ... (truncated)
+
+Status: SyntaxError
+Exit Code: 2
+
+
+============================================================
+QUESTION #2: HumanEval_129_minPath
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Given a grid with N rows and N columns (N >= 2) and a positive integer k, 
+   * each cell of the grid contains a value. Every integer in the range [1, N * N]
+   * inclusive appears exactly once on the cells of the grid.
+   * You have to find the minimum path of length k in the grid. You can start
+   * from any cell, and in each step you can move to any of the neighbor cells,
+   * in other words, you can go to cells which share an edge with you current
+   * cell.
+   * Please note that a path of length k means visiting exactly k cells (not
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = minPath in
+  (assert ((candidate [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] 3) = [1; 2; 1]));
+  (assert ((candidate [[5; 9; 3]; [4; 1; 6]; [7; 8; 2]] 1) = [1]));
+  (assert ((candidate [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]; [13; 14; 15; 16]] 4) = [1; 2; 1; 2]));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_2: 4 times
+  Common error types:
+    - Other error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let minPath (grid : int list list) (k : int) : int list =
+    let n = List.length grid in
+    let rec dfs row col path visited remaining =
+      if remaining = 0 then
+        path
+      else
+        let neighbors = 
+          let neighbors = ref [] in
+          if row > 0 then neighbors := (row - 1, col) :: !neighbors;
+          if row < n - 1 then neighbors := (row + 1, col) :: !neighbors;
+          if col > 0 then neighbors := (row, col - 1) :: !neighbors;
+          if col < n - 1 then neighbors := (row, col + 1) :: !neighbors;
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let minPath (grid : int list list) (k : int) : int list =
+    let n = List.length grid in
+    let rec dfs row col path visited =
+      if List.length path = k then
+        path
+      else
+        let neighbors = 
+          let dirs = [(-1, 0); (1, 0); (0, -1); (0, 1)] in
+          List.filter_map (fun (dr, dc) ->
+            let nr = row + dr in
+            let nc = col + dc in
+            if nr >= 0 && nr < n && nc >= 0 && nc < n then
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+
+============================================================
+QUESTION #3: HumanEval_130_tri
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Everyone knows Fibonacci sequence, it was studied deeply by mathematicians in 
+   * the last couple centuries. However, what people don't know is Tribonacci sequence.
+   * Tribonacci sequence is defined by the recurrence:
+   * tri(1) = 3
+   * tri(n) = 1 + n / 2, if n is even.
+   * tri(n) =  tri(n - 1) + tri(n - 2) + tri(n + 1), if n is odd.
+   * For example:
+   * tri(2) = 1 + (2 / 2) = 2
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = tri in
+  (assert ((candidate 3) = [1; 3; 2; 8]));
+  (assert ((candidate 4) = [1; 3; 2; 8; 3]));
+  (assert ((candidate 5) = [1; 3; 2; 8; 3; 15]));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_2: 4 times
+  Common error types:
+    - Other error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let tri (n : int) : int list =
+    if n < 0 then []
+    else
+      let rec build_sequence acc i =
+        if i > n then acc
+        else
+          let current =
+            if i mod 2 = 0 then 1 + (i / 2)
+            else
+              let prev1 = List.nth (List.rev acc) (i - 2) in
+              let prev2 = List.nth (List.rev acc) (i - 3) in
+              let next = List.nth (List.rev acc) (i - 1) in
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let tri (n : int) : int list =
+    let rec build_sequence i acc =
+      if i > n then acc
+      else
+        let current =
+          if i mod 2 = 0 then 1 + i / 2
+          else
+            let prev1 = List.nth acc (i - 1) in
+            let prev2 = List.nth acc (i - 2) in
+            let next = List.nth acc (i + 1) in
+            prev1 + prev2 + next
+        in
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+
+============================================================
+QUESTION #4: HumanEval_132_is_nested
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Create a function that takes a string as input which contains only square brackets.
+   * The function should return true if and only if there is a valid subsequence of brackets 
+   * where at least one bracket in the subsequence is nested.
+   * >>> is_nested "[[]]"
+   * true
+   * >>> is_nested "[]]]]]]][[[[[]"
+   * false
+   * >>> is_nested "[][]"
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = is_nested in
+  (assert ((candidate "[[]]") = true));
+  (assert ((candidate "[]]]]]]][[[[[]") = false));
+  (assert ((candidate "[][]") = false));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_2: 3 times
+    - AssertionError_exit_2: 1 times
+  Common error types:
+    - Other error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let is_nested (string : string) : bool =
+    let open String in
+    let len = length string in
+    let rec loop i depth max_depth =
+      if i >= len then
+        max_depth > 1
+      else
+        match get string i with
+        | '[' -> 
+            let new_depth = depth + 1 in
+            loop (i + 1) new_depth (max_depth max_depth new_depth)
+        | ']' ->
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let is_nested (string : string) : bool =
+    let open String in
+    let rec loop i depth has_nested =
+      if i >= length string then
+        has_nested
+      else
+        match get string i with
+        | '[' ->
+            let new_depth = depth + 1 in
+            loop (i + 1) new_depth (has_nested || new_depth > 1)
+        | ']' ->
+            if depth = 0 then
+  ... (truncated)
+
+Status: AssertionError
+Exit Code: 2
+
+
+============================================================
+QUESTION #5: HumanEval_134_check_if_last_char_is_a_letter
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Create a function that returns true if the last character
+   * of a given string is an alphabetical character and is not
+   * a part of a word, and false otherwise.
+   * Note: "word" is a group of characters separated by space.
+   * Examples:
+   * >>> check_if_last_char_is_a_letter "apple pie"
+   * false
+   * >>> check_if_last_char_is_a_letter "apple pi e"
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = check_if_last_char_is_a_letter in
+  (assert ((candidate "apple") = false));
+  (assert ((candidate "apple pi e") = true));
+  (assert ((candidate "eeeee") = false));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_2: 4 times
+  Common error types:
+    - Other error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let check_if_last_char_is_a_letter (txt : string) : bool =
+    if txt = "" then
+      false
+    else
+      let last_char = String.get txt (String.length txt - 1) in
+      let is_alpha = Char.is_alphabetic last_char in
+      let is_last_char_separated = 
+        match String.rsplit txt with
+        | [] -> false
+        | [first] -> false
+        | _ ->
+            let words = String.split ~on:' ' txt in
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let check_if_last_char_is_a_letter (txt : string) : bool =
+    if txt = "" then
+      false
+    else
+      let last_char = String.get txt (String.length txt - 1) in
+      let is_alphabetic = Char.is_alphabetic last_char in
+      if not is_alphabetic then
+        false
+      else
+        let last_word_start = 
+          let len = String.length txt in
+          let i = len - 1 in
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+
+============================================================
+QUESTION #6: HumanEval_135_can_arrange
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Create a function which returns the largest index of an element which
+   * is not greater than or equal to the element immediately preceding it. If
+   * no such element exists then return -1. The given list will not contain
+   * duplicate values.
+   * Examples:
+   * >>> can_arrange [1; 2; 4; 3; 5]
+   * 3
+   * >>> can_arrange [1; 2; 3]
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = can_arrange in
+  (assert ((candidate [1; 2; 4; 3; 5]) = 3));
+  (assert ((candidate [1; 2; 4; 5]) = (~1)));
+  (assert ((candidate [1; 4; 2; 5; 6; 7; 8; 9; 10]) = 2));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - SyntaxError_exit_2: 4 times
+  Common error types:
+    - Syntax error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let can_arrange (arr : int list) : int =
+    match arr with
+    | [] -> -1
+    | [x] -> -1
+    | _ ->
+        let rec find_index i acc =
+          if i >= List.length arr - 1 then
+            -1
+          else if List.nth arr i < List.nth arr (i + 1) then
+            find_index (i + 1) acc
+          else
+            i
+  ... (truncated)
+
+Status: SyntaxError
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let can_arrange (arr : int list) : int =
+    match arr with
+    | [] | [_] -> -1
+    | _ ->
+        let rec loop i acc =
+          if i >= List.length arr - 1 then
+            -1
+          else if List.nth arr i < List.nth arr (i + 1) then
+            loop (i + 1) acc
+          else
+            i
+        in
+  ... (truncated)
+
+Status: SyntaxError
+Exit Code: 2
+
+
+============================================================
+QUESTION #7: HumanEval_145_order_by_points
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Write a function which sorts the given list of integers
+   * in ascending order according to the sum of their digits.
+   * Note: if there are several items with similar sum of their digits,
+   * order them based on their index in original list.
+   * For example:
+   * >>> order_by_points [1; 11; (~1); (~11); (~12)]
+   * [(~1); (~11); 1; (~12); 11]
+   * >>> order_by_points []
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = order_by_points in
+  (assert ((candidate [1; 11; (~1); (~11); (~12)]) = [(~1); (~11); 1; (~12); 11]));
+  (assert ((candidate [1234; 423; 463; 145; 2; 423; 423; 53; 6; 37; 3457; 3; 56; 0; 46]) = [0; 2; 3; 6; 53; 423; 423; 423; 1234; 145; 37; 46; 56; 463; 3457]));
+  (assert ((candidate []) = []));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - SyntaxError_exit_2: 4 times
+  Common error types:
+    - Syntax error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let order_by_points (nums : int list) : int list =
+    let sum_of_digits n =
+      let rec sum_digits n acc =
+        if n <= 0 then acc
+        else sum_digits (n / 10) (acc + (n mod 10))
+      in
+      if n < 0 then -sum_digits (-n) 0
+      else sum_digits n 0
+    in
+    let compare_by_points a b =
+      let sum_a = sum_of_digits a in
+      let sum_b = sum_of_digits b in
+  ... (truncated)
+
+Status: SyntaxError
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let order_by_points (nums : int list) : int list =
+    let sum_of_digits n =
+      let rec sum_digits acc = function
+        | 0 -> acc
+        | n when n < 0 -> sum_digits acc (-n)
+        | n -> sum_digits (acc + n mod 10) (n / 10)
+      in
+      sum_digits 0 n
+    in
+    let compare_items a b =
+      let sum_a = sum_of_digits a in
+      let sum_b = sum_of_digits b in
+  ... (truncated)
+
+Status: SyntaxError
+Exit Code: 2
+
+
+============================================================
+QUESTION #8: HumanEval_160_do_algebra
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Given two lists operator, and operand. The first list has basic algebra operations, and 
+   * the second list is a list of integers. Use the two given lists to build the algebric 
+   * expression and return the evaluation of this expression.
+   * The basic algebra operations:
+   * Addition ( + ) 
+   * Subtraction ( - ) 
+   * Multiplication ( * ) 
+   * Floor division ( // ) 
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = do_algebra in
+  (assert ((candidate ["**"; "*"; "+"] [2; 3; 4; 5]) = 37));
+  (assert ((candidate ["+"; "*"; "-"] [2; 3; 4; 5]) = 9));
+  (assert ((candidate ["//"; "*"] [7; 3; 4]) = 8));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_2: 4 times
+  Common error types:
+    - Other error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let do_algebra (operator : string list) (operand : int list) : int =
+    let rec evaluate acc operators operands =
+      match operators, operands with
+      | [], [_] -> acc + List.last operands
+      | [], _ -> acc
+      | op :: ops, x :: xs ->
+          let result =
+            match op with
+            | "+" -> acc + x
+            | "-" -> acc - x
+            | "*" -> acc * x
+            | "//" -> acc / x
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let do_algebra (operator : string list) (operand : int list) : int =
+    let rec eval acc ops ops_list =
+      match ops_list with
+      | [] -> acc
+      | op :: ops' ->
+          let next_op = List.hd ops' in
+          let next_operand = List.hd (List.tl ops') in
+          let result =
+            match op with
+            | "+" -> acc + next_operand
+            | "-" -> acc - next_operand
+            | "*" -> acc * next_operand
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+
+============================================================
+QUESTION #9: HumanEval_162_string_to_md5
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Given a string 'text', return its md5 hash equivalent string.
+   * If 'text' is an empty string, return None.
+   * >>> string_to_md5 "Hello world"
+   * Some("3e25960a79dbc69b674cd4ec67a72c62")
+  *)
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = string_to_md5 in
+  (assert ((candidate "Hello world") = Some("3e25960a79dbc69b674cd4ec67a72c62")));
+  (assert ((candidate "") = Some(None)));
+  (assert ((candidate "A B C") = Some("0ef78513b0cb8cef12743f5aeb35f888")));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_2: 4 times
+  Common error types:
+    - Other error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let string_to_md5 (text : string) : string option =
+    if text = "" then
+      None
+    else
+      Some (Digest.to_string (Digest.string text))
+   let candidate = string_to_md5 in
+    (assert ((candidate "Hello world") = Some("3e25960a79dbc69b674cd4ec67a72c62")));
+    (assert ((candidate "") = Some(None)));
+    (assert ((candidate "A B C") = Some("0ef78513b0cb8cef12743f5aeb35f888")));
+    (assert ((candidate "password") = Some("5f4dcc3b5aa765d61d8327deb882cf99")));
+    ()
+
+Status: Exception
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let string_to_md5 (text : string) : string option =
+    if text = "" then
+      None
+    else
+      Some (Md5.hash_string text)
+   let candidate = string_to_md5 in
+    (assert ((candidate "Hello world") = Some("3e25960a79dbc69b674cd4ec67a72c62")));
+    (assert ((candidate "") = Some(None)));
+    (assert ((candidate "A B C") = Some("0ef78513b0cb8cef12743f5aeb35f888")));
+    (assert ((candidate "password") = Some("5f4dcc3b5aa765d61d8327deb882cf99")));
+    ()
+
+Status: Exception
+Exit Code: 2
+
+
+============================================================
+QUESTION #10: HumanEval_163_generate_integers
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Given two positive integers a and b, return the even digits between a
+   * and b, in ascending order.
+   * For example:
+   * >>> generate_integers 2 8
+   * [2; 4; 6; 8]
+   * >>> generate_integers 8 2
+   * [2; 4; 6; 8]
+   * >>> generate_integers 10 14
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = generate_integers in
+  (assert ((candidate 2 10) = [2; 4; 6; 8]));
+  (assert ((candidate 10 2) = [2; 4; 6; 8]));
+  (assert ((candidate 132 2) = [2; 4; 6; 8]));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - AssertionError_exit_2: 4 times
+  Common error types:
+    - Other error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let generate_integers (a : int) (b : int) : int list =
+    let min_val = min a b in
+    let max_val = max a b in
+    let rec collect_even_from n result =
+      if n > max_val then result
+      else if n mod 2 = 0 then collect_even_from (n + 1) (n :: result)
+      else collect_even_from (n + 1) result
+    in
+    List.rev (collect_even_from min_val [])
+   let candidate = generate_integers in
+    (assert ((candidate 2 10) = [2; 4; 6; 8]));
+    (assert ((candidate 10 2) = [2; 4; 6; 8]));
+  ... (truncated)
+
+Status: AssertionError
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let generate_integers (a : int) (b : int) : int list =
+    let min_val = min a b in
+    let max_val = max a b in
+    let rec collect_even_from n result =
+      if n > max_val then result
+      else if n mod 2 = 0 then collect_even_from (n + 1) (n :: result)
+      else collect_even_from (n + 1) result
+    in
+    List.rev (collect_even_from min_val [])
+   let candidate = generate_integers in
+    (assert ((candidate 2 10) = [2; 4; 6; 8]));
+    (assert ((candidate 10 2) = [2; 4; 6; 8]));
+  ... (truncated)
+
+Status: AssertionError
+Exit Code: 2
+
+
+============================================================
+QUESTION #11: HumanEval_37_sort_even
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**This function takes a list l and returns a list l' such that
+   * l' is identical to l in the odd indicies, while its values at the even indicies are equal
+   * to the values of the even indicies of l, but sorted.
+   * >>> sort_even [1; 2; 3]
+   * [1; 2; 3]
+   * >>> sort_even [5; 6; 3; 4]
+   * [3; 6; 5; 4]
+  *)
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = sort_even in
+  (assert ((candidate [1; 2; 3]) = [1; 2; 3]));
+  (assert ((candidate [5; 3; (~5); 2; (~3); 3; 9; 0; 123; 1; (~10)]) = [(~10); 3; (~5); 2; (~3); 3; 5; 0; 9; 1; 123]));
+  (assert ((candidate [5; 8; (~12); 4; 23; 2; 3; 11; 12; (~10)]) = [(~12); 8; 3; 4; 5; 2; 12; 11; 23; (~10)]));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - SyntaxError_exit_2: 4 times
+  Common error types:
+    - Syntax error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let sort_even (l : int list) : int list =
+    let rec extract_even lst acc =
+      match lst with
+      | [] -> List.rev acc
+      | h :: t ->
+          extract_even t (h :: acc)
+    in
+    let even_elements = extract_even l [] in
+    let sorted_evens = List.sort compare even_elements in
+    let rec build_result lst even_idx sorted_evens acc =
+      match lst, sorted_evens with
+      | [], [], _ -> List.rev acc
+  ... (truncated)
+
+Status: SyntaxError
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let sort_even (l : int list) : int list =
+    let rec extract_even_indices lst acc =
+      match lst with
+      | [] -> List.rev acc
+      | h :: t ->
+          if List.length acc mod 2 = 0 then
+            extract_even_indices t (h :: acc)
+          else
+            extract_even_indices t acc
+    in
+    let even_values = extract_even_indices l [] in
+    let sorted_evens = List.sort compare even_values in
+  ... (truncated)
+
+Status: SyntaxError
+Exit Code: 2
+
+
+============================================================
+QUESTION #12: HumanEval_54_same_chars
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Check if two words have the same characters.
+   * >>> same_chars "eabcdzzzz" "dddzzzzzzzddeddabc"
+   * true
+   * >>> same_chars "abcd" "dddddddabc"
+   * true
+   * >>> same_chars "dddddddabc" "abcd"
+   * true
+   * >>> same_chars "eabcd" "dddddddabc"
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = same_chars in
+  (assert ((candidate "eabcdzzzz" "dddzzzzzzzddeddabc") = true));
+  (assert ((candidate "abcd" "dddddddabc") = true));
+  (assert ((candidate "dddddddabc" "abcd") = true));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_2: 4 times
+  Common error types:
+    - Other error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let same_chars (s0 : string) (s1 : string) : bool =
+    let rec count_chars s acc =
+      match s with
+      | "" -> acc
+      | c :: cs ->
+          let count = acc |> List.find_opt (fun (ch, count) -> ch = c) |> function
+            | Some (ch, count) -> (ch, count + 1)
+            | None -> (c, 1) in
+          count_chars cs (count :: acc) in
+    let count0 = count_chars s0 [] in
+    let count1 = count_chars s1 [] in
+    List.equal (fun (c1, count1) (c2, count2) -> c1 = c2 && count1 = count2) count0 count1
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let same_chars (s0 : string) (s1 : string) : bool =
+    let rec count_chars s acc =
+      match s with
+      | "" -> acc
+      | c :: cs ->
+          let new_acc = 
+            match acc with
+            | [] -> [(c, 1)]
+            | (ch, count) :: rest when ch = c -> (c, count + 1) :: rest
+            | (ch, count) :: rest -> (ch, count) :: rest
+          in
+          count_chars cs new_acc
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+
+============================================================
+QUESTION #13: HumanEval_68_pluck
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**"Given a list representing a branch of a tree that has non-negative integer nodes
+   * your task is to pluck one of the nodes and return it.
+   * The plucked node should be the node with the smallest even value.
+   * If multiple nodes with the same smallest even value are found return the node that has smallest index.
+   * The plucked node should be returned in a list, [ smalest_value, its index ],
+   * If there are no even values or the given list is empty, return [].
+   * Example 1:
+   * >>> pluck [4; 2; 3]
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = pluck in
+  (assert ((candidate [4; 2; 3]) = [2; 1]));
+  (assert ((candidate [1; 2; 3]) = [2; 1]));
+  (assert ((candidate []) = []));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_2: 4 times
+  Common error types:
+    - Other error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let pluck (arr : int list) : int list =
+    match arr with
+    | [] -> []
+    | _ ->
+        let rec find_smallest_even lst idx acc =
+          match lst with
+          | [] -> acc
+          | h :: t ->
+              if h mod 2 = 0 then
+                find_smallest_even t (idx + 1) (if acc = [] then (h, idx) else
+                  if h < snd acc then (h, idx) else acc)
+              else
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let pluck (arr : int list) : int list =
+    match arr with
+    | [] -> []
+    | _ ->
+        let rec find_smallest_even lst acc =
+          match lst with
+          | [] -> acc
+          | head :: tail ->
+              if head mod 2 = 0 then
+                find_smallest_even tail (if acc = [] then (head, 0) else
+                  let (val_, idx) = acc in
+                  if head < val_ then (head, lst |> List.position (fun x -> x = head) |> snd) 
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+
+============================================================
+QUESTION #14: HumanEval_84_solve
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Given a positive integer N, return the total sum of its digits in binary.
+   * Example
+   * >>> solve 1000
+   * "1"
+   * >>> solve 150
+   * "110"
+   * >>> solve 147
+   * "1100"
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = solve in
+  (assert ((candidate 1000) = "1"));
+  (assert ((candidate 150) = "110"));
+  (assert ((candidate 147) = "1100"));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_2: 4 times
+  Common error types:
+    - Other error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let solve (N : int) : string =
+    let rec sum_digits n =
+      if n = 0 then 0
+      else (n mod 10) + sum_digits (n / 10)
+    in
+    let total_sum = sum_digits N in
+    let rec to_binary n =
+      if n = 0 then "0"
+      else if n = 1 then "1"
+      else let rec helper acc n =
+               if n = 0 then acc
+               else helper (string_of_int (n mod 2) ^ acc) (n / 2)
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let solve (N : int) : string =
+    let rec sum_digits n acc =
+      if n = 0 then acc
+      else sum_digits (n / 10) (acc + (n mod 10))
+    in
+    let digit_sum = sum_digits N 0 in
+    let rec to_binary n =
+      if n = 0 then "0"
+      else if n = 1 then "1"
+      else let rec helper n result =
+             if n = 0 then result
+             else helper (n / 2) (string_of_int (n mod 2) ^ result)
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+
+============================================================
+QUESTION #15: HumanEval_91_is_bored
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**You'll be given a string of words, and your task is to count the number
+   * of boredoms. A boredom is a sentence that starts with the word "I".
+   * Sentences are delimited by '.', '?' or '!'.
+   * For example:
+   * >>> is_bored "Hello world"
+   * 0
+   * >>> is_bored "The sky is blue. The sun is shining. I love this weather"
+   * 1
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = is_bored in
+  (assert ((candidate "Hello world") = 0));
+  (assert ((candidate "Is the sky blue?") = 0));
+  (assert ((candidate "I love It !") = 1));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_2: 3 times
+    - SyntaxError_exit_2: 1 times
+  Common error types:
+    - Other error: 3 times
+    - Syntax error: 1 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let is_bored (s : string) : int =
+    let words = String.split_on_char ' ' s in
+    let rec count_boredoms i acc =
+      if i >= Array.length words then acc
+      else
+        let word = Array.get words i in
+        let is_i = word = "I" in
+        let is_sentence_end = 
+          match i + 1 with
+          | n when n < Array.length words ->
+              let next_word = Array.get words (i + 1) in
+              String.contains next_word "."
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let is_bored (s : string) : int =
+    let words = String.split_on_char ' ' s in
+    let sentences = 
+      let rec split_sentences acc i =
+        if i >= Array.length words then acc
+        else
+          let word = words.(i) in
+          if word = "I" then
+            let next = i + 1 in
+            let sentence_start = next in
+            let sentence_end = 
+              let rec find_next_delimiter j =
+  ... (truncated)
+
+Status: Exception
+Exit Code: 2
+
+
+============================================================
+QUESTION #16: HumanEval_92_any_int
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  (**Create a function that takes 3 numbers.
+   * Returns true if one of the numbers is equal to the sum of the other two, and all numbers are integers.
+   * Returns false in any other cases.
+   * Examples
+   * >>> any_int 5 2 7
+   * true
+   * >>> any_int 3 2 2
+   * false
+
+TEST CASES:
+-----------
+  let assertions =
+  let candidate = any_int in
+  (assert ((candidate 2.0 3.0 1.0) = true));
+  (assert ((candidate 2.5 2.0 3.0) = false));
+  (assert ((candidate 1.5 5.0 3.5) = false));
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - SyntaxError_exit_2: 4 times
+  Common error types:
+    - Syntax error: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  let any_int (x : float) (y : float) (z : float) : bool =
+    (* Check if all numbers are integers *)
+    let is_integer n =
+      abs_float (n -. float_of_int (int_of_float n)) < 1e-10
+    in
+    (* Check if all three numbers are integers *)
+    if not (is_integer x || is_integer y || is_integer z) then
+      false
+    else
+      (* Check if one number is equal to the sum of the other two *)
+      (x = y +. z) || (y = x +. z) || (z = x +. y)
+   let candidate = any_int in
+  ... (truncated)
+
+Status: SyntaxError
+Exit Code: 2
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  let any_int (x : float) (y : float) (z : float) : bool =
+    (* Check if all numbers are integers *)
+    let is_integer n =
+      abs_float (n -. float_of_int (int_of_float n)) < 1e-10
+    in
+    (* Check if all three numbers are integers *)
+    if not (is_integer x || is_integer y || is_integer z) then
+      false
+    else
+      (* Check if one number is equal to the sum of the other two *)
+      (x = y +. z) || (y = x +. z) || (z = x +. y)
+   let candidate = any_int in
+  ... (truncated)
+
+Status: SyntaxError
+Exit Code: 2
+
+
+================================================================================
+OVERALL PATTERNS AND INSIGHTS - OCAML
+================================================================================
+
+Common issues observed across these universal failing questions:
+
+1. OCaml-specific syntax issues:
+   - Pattern matching syntax errors
+   - Type inference problems
+   - List manipulation and recursion issues
+
+2. Logic errors:
+   - Incorrect algorithm implementation
+   - Off-by-one errors in loops
+   - Misunderstanding of problem requirements
+
+3. Edge case handling:
+   - Poor handling of empty collections
+   - Incorrect handling of special input values
+   - Missing validation for boundary conditions
+
+These patterns suggest the LLM needs better training on:
+- Modern OCaml syntax and idioms
+- Algorithm implementation in OCaml
+- Edge case handling and input validation
+- Language-specific data structure manipulation

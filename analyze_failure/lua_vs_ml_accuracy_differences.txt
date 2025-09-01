@@ -1,0 +1,572 @@
+LUA vs OCAML ACCURACY DIFFERENCES
+============================================================
+Problems where Lua performed better than OCaml, sorted by accuracy difference
+
+Summary:
+Total problems where Lua > OCaml: 72
+Largest difference: 1.000
+Smallest difference: 0.250
+Average difference: 0.681
+
+Detailed Results:
+--------------------
+
+ 1. HumanEval_43_pairs_sum_to_zero.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_43_pairs_sum_to_zero
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+    
+    -> negative used as ~ instead of - ...
+
+
+ 2. HumanEval_57_monotonic.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_57_monotonic
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+    -> negative used as ~ instead of - ...
+
+
+ 3. HumanEval_66_digitSum.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_66_digitSum
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+    -> it is not valid OCaml syntax. 
+    It appears to be written in F#, a different language from the ML family that shares some similarities with OCaml
+    but has a different standard library and syntax rules.
+
+
+ 4. HumanEval_70_strange_sort_list.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_70_strange_sort_list
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+    -> negative used as ~ instead of - ...
+
+
+ 5. HumanEval_77_iscube.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_77_iscube
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+    -> negative used as ~ instead of - ...
+
+
+ 6. HumanEval_146_specialFilter.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_146_specialFilter
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+    -> negative used as ~ instead of - ...
+
+
+ 7. HumanEval_102_choose_num.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_102_choose_num
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+    -> it is not valid OCaml syntax. 
+    It appears to be written in F#, a different language from the ML family that shares some similarities with OCaml
+    but has a different standard library and syntax rules.
+
+
+ 8. HumanEval_99_closest_integer.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_99_closest_integer
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+    -> negative used as ~ instead of - ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+ 9. HumanEval_12_longest.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_12_longest
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+10. HumanEval_69_search.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_69_search
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+11. HumanEval_161_solve.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_161_solve
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+12. HumanEval_107_even_odd_palindrome.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_107_even_odd_palindrome
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+13. HumanEval_65_circular_shift.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_65_circular_shift
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+14. HumanEval_97_multiply.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_97_multiply
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+15. HumanEval_30_get_positive.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_30_get_positive
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+16. HumanEval_71_triangle_area.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_71_triangle_area
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+17. HumanEval_51_remove_vowels.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_51_remove_vowels
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+18. HumanEval_152_compare.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_152_compare
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+19. HumanEval_3_below_zero.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_3_below_zero
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+20. HumanEval_114_minSubArraySum.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_114_minSubArraySum
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+21. HumanEval_108_count_nums.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_108_count_nums
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+22. HumanEval_150_x_or_y.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_150_x_or_y
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+23. HumanEval_111_histogram.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_111_histogram
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+24. HumanEval_40_triples_sum_to_zero.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_40_triples_sum_to_zero
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+25. HumanEval_67_fruit_distribution.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_67_fruit_distribution
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+26. HumanEval_112_reverse_delete.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_112_reverse_delete
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+27. HumanEval_155_even_odd_count.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_155_even_odd_count
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+28. HumanEval_90_next_smallest.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_90_next_smallest
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+29. HumanEval_35_max_element.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_35_max_element
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+30. HumanEval_49_modp.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_49_modp
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+31. HumanEval_105_by_length.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_105_by_length
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+32. HumanEval_84_solve.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.000 | Difference: +1.000
+    Problem: HumanEval_84_solve
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 0/4 passed
+
+33. HumanEval_4_mean_absolute_deviation.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.250 | Difference: +0.750
+    Problem: HumanEval_4_mean_absolute_deviation
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 1/4 passed
+
+34. HumanEval_120_maximum.results.json.gz
+    Accuracy: Lua 0.750 | OCaml 0.000 | Difference: +0.750
+    Problem: HumanEval_120_maximum
+    Description: No description
+    Lua results: 3/4 passed
+    OCaml results: 0/4 passed
+
+35. HumanEval_122_add_elements.results.json.gz
+    Accuracy: Lua 0.750 | OCaml 0.000 | Difference: +0.750
+    Problem: HumanEval_122_add_elements
+    Description: No description
+    Lua results: 3/4 passed
+    OCaml results: 0/4 passed
+
+36. HumanEval_135_can_arrange.results.json.gz
+    Accuracy: Lua 0.750 | OCaml 0.000 | Difference: +0.750
+    Problem: HumanEval_135_can_arrange
+    Description: No description
+    Lua results: 3/4 passed
+    OCaml results: 0/4 passed
+
+37. HumanEval_47_median.results.json.gz
+    Accuracy: Lua 0.750 | OCaml 0.000 | Difference: +0.750
+    Problem: HumanEval_47_median
+    Description: No description
+    Lua results: 3/4 passed
+    OCaml results: 0/4 passed
+
+38. HumanEval_153_Strongest_Extension.results.json.gz
+    Accuracy: Lua 0.750 | OCaml 0.000 | Difference: +0.750
+    Problem: HumanEval_153_Strongest_Extension
+    Description: No description
+    Lua results: 3/4 passed
+    OCaml results: 0/4 passed
+
+39. HumanEval_117_select_words.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.250 | Difference: +0.750
+    Problem: HumanEval_117_select_words
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 1/4 passed
+
+    -> Ocaml doesn't have Char.is_alpha
+
+
+
+40. HumanEval_48_is_palindrome.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.250 | Difference: +0.750
+    Problem: HumanEval_48_is_palindrome
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 1/4 passed
+
+    -> Ocaml doesn't have Str.rev
+
+
+
+
+41. HumanEval_91_is_bored.results.json.gz
+    Accuracy: Lua 0.500 | OCaml 0.000 | Difference: +0.500
+    Problem: HumanEval_91_is_bored
+    Description: No description
+    Lua results: 2/4 passed
+    OCaml results: 0/4 passed
+
+42. HumanEval_156_int_to_mini_roman.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.500 | Difference: +0.500
+    Problem: HumanEval_156_int_to_mini_roman
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 2/4 passed
+
+43. HumanEval_151_double_the_difference.results.json.gz
+    Accuracy: Lua 0.500 | OCaml 0.000 | Difference: +0.500
+    Problem: HumanEval_151_double_the_difference
+    Description: No description
+    Lua results: 2/4 passed
+    OCaml results: 0/4 passed
+
+44. HumanEval_19_sort_numbers.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.500 | Difference: +0.500
+    Problem: HumanEval_19_sort_numbers
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 2/4 passed
+
+45. HumanEval_39_prime_fib.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.500 | Difference: +0.500
+    Problem: HumanEval_39_prime_fib
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 2/4 passed
+
+46. HumanEval_101_words_string.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.500 | Difference: +0.500
+    Problem: HumanEval_101_words_string
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 2/4 passed
+
+47. HumanEval_1_separate_paren_groups.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.500 | Difference: +0.500
+    Problem: HumanEval_1_separate_paren_groups
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 2/4 passed
+
+48. HumanEval_93_encode.results.json.gz
+    Accuracy: Lua 0.500 | OCaml 0.000 | Difference: +0.500
+    Problem: HumanEval_93_encode
+    Description: No description
+    Lua results: 2/4 passed
+    OCaml results: 0/4 passed
+
+49. HumanEval_92_any_int.results.json.gz
+    Accuracy: Lua 0.500 | OCaml 0.000 | Difference: +0.500
+    Problem: HumanEval_92_any_int
+    Description: No description
+    Lua results: 2/4 passed
+    OCaml results: 0/4 passed
+
+50. HumanEval_134_check_if_last_char_is_a_letter.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.500 | Difference: +0.500
+    Problem: HumanEval_134_check_if_last_char_is_a_letter
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 2/4 passed
+
+51. HumanEval_44_change_base.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.500 | Difference: +0.500
+    Problem: HumanEval_44_change_base
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 2/4 passed
+
+52. HumanEval_27_flip_case.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.500 | Difference: +0.500
+    Problem: HumanEval_27_flip_case
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 2/4 passed
+
+53. HumanEval_129_minPath.results.json.gz
+    Accuracy: Lua 0.500 | OCaml 0.250 | Difference: +0.250
+    Problem: HumanEval_129_minPath
+    Description: No description
+    Lua results: 2/4 passed
+    OCaml results: 1/4 passed
+
+54. HumanEval_20_find_closest_elements.results.json.gz
+    Accuracy: Lua 0.750 | OCaml 0.500 | Difference: +0.250
+    Problem: HumanEval_20_find_closest_elements
+    Description: No description
+    Lua results: 3/4 passed
+    OCaml results: 2/4 passed
+
+55. HumanEval_85_add.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_85_add
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+56. HumanEval_124_valid_date.results.json.gz
+    Accuracy: Lua 0.750 | OCaml 0.500 | Difference: +0.250
+    Problem: HumanEval_124_valid_date
+    Description: No description
+    Lua results: 3/4 passed
+    OCaml results: 2/4 passed
+
+    -> lua why..?
+    -> Ocaml standard Libraury X
+
+57. HumanEval_128_prod_signs.results.json.gz
+    Accuracy: Lua 0.250 | OCaml 0.000 | Difference: +0.250
+    Problem: HumanEval_128_prod_signs
+    Description: No description
+    Lua results: 1/4 passed
+    OCaml results: 0/4 passed
+
+58. HumanEval_54_same_chars.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_54_same_chars
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+59. HumanEval_10_make_palindrome.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_10_make_palindrome
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+60. HumanEval_115_max_fill.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_115_max_fill
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+61. HumanEval_5_intersperse.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_5_intersperse
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+62. HumanEval_104_unique_digits.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_104_unique_digits
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+63. HumanEval_154_cycpattern_check.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_154_cycpattern_check
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+64. HumanEval_7_filter_by_substring.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_7_filter_by_substring
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+65. HumanEval_0_has_close_elements.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_0_has_close_elements
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+66. HumanEval_46_fib4.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_46_fib4
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+67. HumanEval_95_check_dict_case.results.json.gz
+    Accuracy: Lua 0.250 | OCaml 0.000 | Difference: +0.250
+    Problem: HumanEval_95_check_dict_case
+    Description: No description
+    Lua results: 1/4 passed
+    OCaml results: 0/4 passed
+
+68. HumanEval_63_fibfib.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_63_fibfib
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+69. HumanEval_62_derivative.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_62_derivative
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+70. HumanEval_133_sum_squares.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_133_sum_squares
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+
+71. HumanEval_127_intersection.results.json.gz
+    Accuracy: Lua 0.250 | OCaml 0.000 | Difference: +0.250
+    Problem: HumanEval_127_intersection
+    Description: No description
+    Lua results: 1/4 passed
+    OCaml results: 0/4 passed
+
+72. HumanEval_119_match_parens.results.json.gz
+    Accuracy: Lua 1.000 | OCaml 0.750 | Difference: +0.250
+    Problem: HumanEval_119_match_parens
+    Description: No description
+    Lua results: 4/4 passed
+    OCaml results: 3/4 passed
+

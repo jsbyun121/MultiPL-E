@@ -1,0 +1,2882 @@
+As per my standing instructions, analyze each code-execution result provided. For every item, produce a structured report as follows.
+
+1) Status
+Status: "OK" (Success) or else (Failure)
+Evidence: include exit code, error status, and whether stderr is empty/non-empty (quote the first relevant line).
+
+If Failure (non-zero exit code, error status, or non-empty stderr)
+Root Cause Analysis
+Explain why it failed, grounded in the logs/trace.
+Point to the exact faulty locations (file and line numbers if available). Quote the minimal offending snippets.
+Recommended Fix (Minimal Patch)
+Provide brief code segments (3–7 lines each) that would correct the issue.
+If multiple faults exist, list fixes in order of impact.
+Final Answer
+Classify the ultimate source of failure as one of: faulty problem setting / wrong test case / incorrect code implementation.
+State it on a single line: Final Answer: <chosen category>.
+
+If Success (exit code 0 and empty stderr)
+Critical Correctness Review
+Do not assume success means correctness.
+Check if the code's logic truly matches the intended problem requirements, including edge cases and corner conditions.
+Identify any silent errors, logical flaws, or incompleteness that would still pass execution but fail semantically.
+If the implementation is sound, explain why it is correct. If not, explain the discrepancy clearly.
+Final Answer
+Explicitly confirm or reject correctness in one line: Final Answer: correct or incorrect (with a one-phrase justification if incorrect).
+
+General rules
+Be precise and concise. Don't invent behavior not evidenced by the logs or code.
+When line numbers aren't available, reference the closest identifiable code block.
+Prefer minimal fixes over refactors; include just enough context to apply the patch.
+
+CONTENT TO ANALYZE:
+
+================================================================================
+PROBLEM 114 (JL) - HumanEval_114_minSubArraySum
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""Given a vector of integers nums, find the minimum sum of any non-empty sub-vector
+of nums.
+Example
+>>> minSubArraySum([2, 3, 4, 1, 2, 4])
+1
+>>> minSubArraySum([-1, -2, -3])
+-6"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = minSubArraySum;
+	@test(candidate([2, 3, 4, 1, 2, 4]) == 1)
+	@test(candidate([-1, -2, -3]) == -6)
+	@test(candidate([-1, -2, -3, 2, -10]) == -14)
+	@test(candidate([-9999999999999999]) == -9999999999999999)
+	@test(candidate([0, 10, 20, 1000000]) == 0)
+	@test(candidate([-1, -2, -3, 10, -5]) == -6)
+	@test(candidate([100, -1, -2, -3, 10, -5]) == -6)
+	@test(candidate([10, 11, 13, 8, 3, 4]) == 3)
+	@test(candidate([100, -33, 32, -1, 0, -2]) == -33)
+	@test(candidate([-10]) == -10)
+	@test(candidate([7]) == 7)
+	@test(candidate([1, -1]) == -1)
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""Given a vector of integers nums, find the minimum sum of any non-empty sub-vector
+of nums.
+Example
+>>> minSubArraySum([2, 3, 4, 1, 2, 4])
+1
+>>> minSubArraySum([-1, -2, -3])
+-6"""
+function minSubArraySum(nums::Vector{Int64})::Int64
+    # Handle empty input gracefully (though the problem assumes non‑empty)
+    if isempty(nums)
+        error("Input vector must be non‑empty")
+    end
+
+    # Initialize the current minimum and the global minimum with the first element
+    current_min = nums[1]
+    global_min  = nums[1]
+
+    # Iterate over the remaining elements
+    for x in nums[2:end]
+        # Update the current minimum: either start a new sub‑array at x
+        # or extend the previous sub‑array by adding x
+        current_min = min(x, current_min + x)
+        # Update the global minimum if a new lower sum is found
+        global_min = min(global_min, current_min)
+    end
+
+    return global_min
+end
+using Test
+
+@testset begin
+
+candidate = minSubArraySum;
+	@test(candidate([2, 3, 4, 1, 2, 4]) == 1)
+	@test(candidate([-1, -2, -3]) == -6)
+	@test(candidate([-1, -2, -3, 2, -10]) == -14)
+	@test(candidate([-9999999999999999]) == -9999999999999999)
+	@test(candidate([0, 10, 20, 1000000]) == 0)
+	@test(candidate([-1, -2, -3, 10, -5]) == -6)
+	@test(candidate([100, -1, -2, -3, 10, -5]) == -6)
+	@test(candidate([10, 11, 13, 8, 3, 4]) == 3)
+	@test(candidate([100, -33, 32, -1, 0, -2]) == -33)
+	@test(candidate([-10]) == -10)
+	@test(candidate([7]) == 7)
+	@test(candidate([1, -1]) == -1)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154755
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   12     12  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""Given a vector of integers nums, find the minimum sum of any non-empty sub-vector
+of nums.
+Example
+>>> minSubArraySum([2, 3, 4, 1, 2, 4])
+1
+>>> minSubArraySum([-1, -2, -3])
+-6"""
+function minSubArraySum(nums::Vector{Int64})::Int64
+    @assert !isempty(nums) "Input vector must be non-empty"
+
+    current_min = nums[1]
+    best_min    = nums[1]
+
+    for i in 2:length(nums)
+        x = nums[i]
+        current_min = min(x, current_min + x)
+        best_min    = min(best_min, current_min)
+    end
+
+    return best_min
+end
+using Test
+
+@testset begin
+
+candidate = minSubArraySum;
+	@test(candidate([2, 3, 4, 1, 2, 4]) == 1)
+	@test(candidate([-1, -2, -3]) == -6)
+	@test(candidate([-1, -2, -3, 2, -10]) == -14)
+	@test(candidate([-9999999999999999]) == -9999999999999999)
+	@test(candidate([0, 10, 20, 1000000]) == 0)
+	@test(candidate([-1, -2, -3, 10, -5]) == -6)
+	@test(candidate([100, -1, -2, -3, 10, -5]) == -6)
+	@test(candidate([10, 11, 13, 8, 3, 4]) == 3)
+	@test(candidate([100, -33, 32, -1, 0, -2]) == -33)
+	@test(candidate([-10]) == -10)
+	@test(candidate([7]) == 7)
+	@test(candidate([1, -1]) == -1)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154755
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   12     12  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""Given a vector of integers nums, find the minimum sum of any non-empty sub-vector
+of nums.
+Example
+>>> minSubArraySum([2, 3, 4, 1, 2, 4])
+1
+>>> minSubArraySum([-1, -2, -3])
+-6"""
+function minSubArraySum(nums::Vector{Int64})::Int64
+    @assert !isempty(nums) "Input vector must be non-empty."
+    current_min = nums[1]
+    global_min = nums[1]
+    for i in 2:length(nums)
+        x = nums[i]
+        current_min = min(x, current_min + x)
+        global_min = min(global_min, current_min)
+    end
+    return global_min
+end
+using Test
+
+@testset begin
+
+candidate = minSubArraySum;
+	@test(candidate([2, 3, 4, 1, 2, 4]) == 1)
+	@test(candidate([-1, -2, -3]) == -6)
+	@test(candidate([-1, -2, -3, 2, -10]) == -14)
+	@test(candidate([-9999999999999999]) == -9999999999999999)
+	@test(candidate([0, 10, 20, 1000000]) == 0)
+	@test(candidate([-1, -2, -3, 10, -5]) == -6)
+	@test(candidate([100, -1, -2, -3, 10, -5]) == -6)
+	@test(candidate([10, 11, 13, 8, 3, 4]) == 3)
+	@test(candidate([100, -33, 32, -1, 0, -2]) == -33)
+	@test(candidate([-10]) == -10)
+	@test(candidate([7]) == 7)
+	@test(candidate([1, -1]) == -1)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154755
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   12     12  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""Given a vector of integers nums, find the minimum sum of any non-empty sub-vector
+of nums.
+Example
+>>> minSubArraySum([2, 3, 4, 1, 2, 4])
+1
+>>> minSubArraySum([-1, -2, -3])
+-6"""
+function minSubArraySum(nums::Vector{Int64})::Int64
+    # Handle empty input defensively (though the problem states non‑empty)
+    isempty(nums) && error("Input vector must be non‑empty")
+
+    # Initialize with the first element
+    current_min = nums[1]
+    best_min = nums[1]
+
+    # Iterate through the rest of the vector
+    for x in nums[2:end]
+        # Either start a new sub‑array at x or extend the current one
+        current_min = min(x, current_min + x)
+        # Update the best (minimum) sum found so far
+        best_min = min(best_min, current_min)
+    end
+
+    return best_min
+end
+using Test
+
+@testset begin
+
+candidate = minSubArraySum;
+	@test(candidate([2, 3, 4, 1, 2, 4]) == 1)
+	@test(candidate([-1, -2, -3]) == -6)
+	@test(candidate([-1, -2, -3, 2, -10]) == -14)
+	@test(candidate([-9999999999999999]) == -9999999999999999)
+	@test(candidate([0, 10, 20, 1000000]) == 0)
+	@test(candidate([-1, -2, -3, 10, -5]) == -6)
+	@test(candidate([100, -1, -2, -3, 10, -5]) == -6)
+	@test(candidate([10, 11, 13, 8, 3, 4]) == 3)
+	@test(candidate([100, -33, 32, -1, 0, -2]) == -33)
+	@test(candidate([-10]) == -10)
+	@test(candidate([7]) == 7)
+	@test(candidate([1, -1]) == -1)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154755
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   12     12  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 117 (JL) - HumanEval_117_select_words
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""Given a string s and a natural number n, you have been tasked to implement 
+a function that returns a vector of all words from string s that contain exactly 
+n consonants, in order these words appear in the string s.
+If the string s is empty then the function should return an empty vector.
+Note: you may assume the input string contains only letters and spaces.
+Examples:
+>>> select_words("Mary had a little lamb", 4)
+["little"]
+>>> select_words("Mary had a little lamb", 3)
+["Mary", "lamb"]
+>>> select_words("simple white space", 2)
+[]
+>>> select_words("Hello world", 4)
+["world"]
+>>> select_words("Uncle sam", 3)
+["Uncle"]"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = select_words;
+	@test(candidate("Mary had a little lamb", 4) == ["little"])
+	@test(candidate("Mary had a little lamb", 3) == ["Mary", "lamb"])
+	@test(candidate("simple white space", 2) == Vector{String}([]))
+	@test(candidate("Hello world", 4) == ["world"])
+	@test(candidate("Uncle sam", 3) == ["Uncle"])
+	@test(candidate("", 4) == Vector{String}([]))
+	@test(candidate("a b c d e f", 1) == ["b", "c", "d", "f"])
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""Given a string s and a natural number n, you have been tasked to implement 
+a function that returns a vector of all words from string s that contain exactly 
+n consonants, in order these words appear in the string s.
+If the string s is empty then the function should return an empty vector.
+Note: you may assume the input string contains only letters and spaces.
+Examples:
+>>> select_words("Mary had a little lamb", 4)
+["little"]
+>>> select_words("Mary had a little lamb", 3)
+["Mary", "lamb"]
+>>> select_words("simple white space", 2)
+[]
+>>> select_words("Hello world", 4)
+["world"]
+>>> select_words("Uncle sam", 3)
+["Uncle"]"""
+function select_words(s::String, n::Int64)::Vector{String}
+    # Return an empty vector if the input string is empty
+    isempty(s) && return String[]
+
+    # Helper: determine if a character is a consonant
+    is_consonant(ch::Char) = isletter(ch) && !(lowercase(ch) in ['a', 'e', 'i', 'o', 'u'])
+
+    # Split the string into words (split on whitespace)
+    words = split(s)
+
+    # Collect words that have exactly `n` consonants
+    result = String[]
+    for w in words
+        cnt = count(is_consonant, w)
+        if cnt == n
+            push!(result, w)
+        end
+    end
+
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = select_words;
+	@test(candidate("Mary had a little lamb", 4) == ["little"])
+	@test(candidate("Mary had a little lamb", 3) == ["Mary", "lamb"])
+	@test(candidate("simple white space", 2) == Vector{String}([]))
+	@test(candidate("Hello world", 4) == ["world"])
+	@test(candidate("Uncle sam", 3) == ["Uncle"])
+	@test(candidate("", 4) == Vector{String}([]))
+	@test(candidate("a b c d e f", 1) == ["b", "c", "d", "f"])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154765
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""Given a string s and a natural number n, you have been tasked to implement 
+a function that returns a vector of all words from string s that contain exactly 
+n consonants, in order these words appear in the string s.
+If the string s is empty then the function should return an empty vector.
+Note: you may assume the input string contains only letters and spaces.
+Examples:
+>>> select_words("Mary had a little lamb", 4)
+["little"]
+>>> select_words("Mary had a little lamb", 3)
+["Mary", "lamb"]
+>>> select_words("simple white space", 2)
+[]
+>>> select_words("Hello world", 4)
+["world"]
+>>> select_words("Uncle sam", 3)
+["Uncle"]"""
+function select_words(s::String, n::Int64)::Vector{String}
+    # Split the string on whitespace – handles empty strings gracefully.
+    words = split(s)
+
+    # Set of vowel characters (lower‑case only; we convert each char to lower case).
+    vowels = Set(['a', 'e', 'i', 'o', 'u'])
+
+    # Collect words that have exactly `n` consonants.
+    result = String[]
+    for w in words
+        consonant_count = 0
+        for ch in w
+            # Only count letters that are not vowels.
+            if !in(lowercase(ch), vowels)
+                consonant_count += 1
+            end
+        end
+        if consonant_count == n
+            push!(result, w)
+        end
+    end
+
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = select_words;
+	@test(candidate("Mary had a little lamb", 4) == ["little"])
+	@test(candidate("Mary had a little lamb", 3) == ["Mary", "lamb"])
+	@test(candidate("simple white space", 2) == Vector{String}([]))
+	@test(candidate("Hello world", 4) == ["world"])
+	@test(candidate("Uncle sam", 3) == ["Uncle"])
+	@test(candidate("", 4) == Vector{String}([]))
+	@test(candidate("a b c d e f", 1) == ["b", "c", "d", "f"])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154765
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""Given a string s and a natural number n, you have been tasked to implement 
+a function that returns a vector of all words from string s that contain exactly 
+n consonants, in order these words appear in the string s.
+If the string s is empty then the function should return an empty vector.
+Note: you may assume the input string contains only letters and spaces.
+Examples:
+>>> select_words("Mary had a little lamb", 4)
+["little"]
+>>> select_words("Mary had a little lamb", 3)
+["Mary", "lamb"]
+>>> select_words("simple white space", 2)
+[]
+>>> select_words("Hello world", 4)
+["world"]
+>>> select_words("Uncle sam", 3)
+["Uncle"]"""
+function select_words(s::String, n::Int64)::Vector{String}
+    # Return an empty vector if the input string is empty
+    if isempty(s)
+        return String[]
+    end
+
+    # Split the string into words (splits on any whitespace)
+    words = split(s)
+
+    # Set of vowel characters for quick lookup
+    vowels = Set(['a','e','i','o','u','A','E','I','O','U'])
+
+    # Result vector
+    result = String[]
+
+    # Iterate over each word
+    for w in words
+        # Count consonants: characters that are not vowels
+        consonant_count = sum(c -> !(c in vowels), collect(w))
+        if consonant_count == n
+            push!(result, w)
+        end
+    end
+
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = select_words;
+	@test(candidate("Mary had a little lamb", 4) == ["little"])
+	@test(candidate("Mary had a little lamb", 3) == ["Mary", "lamb"])
+	@test(candidate("simple white space", 2) == Vector{String}([]))
+	@test(candidate("Hello world", 4) == ["world"])
+	@test(candidate("Uncle sam", 3) == ["Uncle"])
+	@test(candidate("", 4) == Vector{String}([]))
+	@test(candidate("a b c d e f", 1) == ["b", "c", "d", "f"])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154765
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""Given a string s and a natural number n, you have been tasked to implement 
+a function that returns a vector of all words from string s that contain exactly 
+n consonants, in order these words appear in the string s.
+If the string s is empty then the function should return an empty vector.
+Note: you may assume the input string contains only letters and spaces.
+Examples:
+>>> select_words("Mary had a little lamb", 4)
+["little"]
+>>> select_words("Mary had a little lamb", 3)
+["Mary", "lamb"]
+>>> select_words("simple white space", 2)
+[]
+>>> select_words("Hello world", 4)
+["world"]
+>>> select_words("Uncle sam", 3)
+["Uncle"]"""
+function select_words(s::String, n::Int64)::Vector{String}
+    # Result container
+    result = String[]
+
+    # If the string is empty or contains only whitespace, return empty vector
+    # (split on whitespace will already give an empty array in this case)
+    for word in split(s)
+        # Count consonants in the word
+        consonant_count = sum(c -> isletter(c) && !(c in "aeiouAEIOU"), word)
+        if consonant_count == n
+            push!(result, word)
+        end
+    end
+
+    return result
+end
+using Test
+
+@testset begin
+
+candidate = select_words;
+	@test(candidate("Mary had a little lamb", 4) == ["little"])
+	@test(candidate("Mary had a little lamb", 3) == ["Mary", "lamb"])
+	@test(candidate("simple white space", 2) == Vector{String}([]))
+	@test(candidate("Hello world", 4) == ["world"])
+	@test(candidate("Uncle sam", 3) == ["Uncle"])
+	@test(candidate("", 4) == Vector{String}([]))
+	@test(candidate("a b c d e f", 1) == ["b", "c", "d", "f"])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154765
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.2s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 120 (JL) - HumanEval_120_maximum
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""Given a vector arr of integers and a positive integer k, return a sorted vector 
+of length k with the maximum k numbers in arr.
+Example 1:
+>>> maximum([-3, -4, 5], 3)
+[-4, -3, 5]
+Example 2:
+>>> maximum([4, -4, 4], 2)
+[4, 4]
+Example 3:
+>>> maximum([-3, 2, 1, 2, -1, -2, 1], 1)
+[2]
+Note:
+    1. The length of the vector will be in the range of [1, 1000].
+    2. The elements in the vector will be in the range of [-1000, 1000].
+    3. 0 <= k <= len(arr)"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = maximum;
+	@test(candidate([-3, -4, 5], 3) == [-4, -3, 5])
+	@test(candidate([4, -4, 4], 2) == [4, 4])
+	@test(candidate([-3, 2, 1, 2, -1, -2, 1], 1) == [2])
+	@test(candidate([123, -123, 20, 0, 1, 2, -3], 3) == [2, 20, 123])
+	@test(candidate([-123, 20, 0, 1, 2, -3], 4) == [0, 1, 2, 20])
+	@test(candidate([5, 15, 0, 3, -13, -8, 0], 7) == [-13, -8, 0, 0, 3, 5, 15])
+	@test(candidate([-1, 0, 2, 5, 3, -10], 2) == [3, 5])
+	@test(candidate([1, 0, 5, -7], 1) == [5])
+	@test(candidate([4, -4], 2) == [-4, 4])
+	@test(candidate([-10, 10], 2) == [-10, 10])
+	@test(candidate([1, 2, 3, -23, 243, -400, 0], 0) == Vector{Int64}([]))
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""Given a vector arr of integers and a positive integer k, return a sorted vector 
+of length k with the maximum k numbers in arr.
+Example 1:
+>>> maximum([-3, -4, 5], 3)
+[-4, -3, 5]
+Example 2:
+>>> maximum([4, -4, 4], 2)
+[4, 4]
+Example 3:
+>>> maximum([-3, 2, 1, 2, -1, -2, 1], 1)
+[2]
+Note:
+    1. The length of the vector will be in the range of [1, 1000].
+    2. The elements in the vector will be in the range of [-1000, 1000].
+    3. 0 <= k <= len(arr)"""
+function maximum(arr::Vector{Int64}, k::Int64)::Vector{Int64}
+    # If k is zero, return an empty vector
+    if k == 0
+        return Int64[]
+    end
+
+    # Sort the array in descending order to pick the largest k elements
+    sorted_desc = sort(arr, rev=true)
+
+    # Take the first k elements (the largest ones)
+    topk = sorted_desc[1:k]
+
+    # Return them sorted in ascending order as required
+    return sort(topk)
+end
+using Test
+
+@testset begin
+
+candidate = maximum;
+	@test(candidate([-3, -4, 5], 3) == [-4, -3, 5])
+	@test(candidate([4, -4, 4], 2) == [4, 4])
+	@test(candidate([-3, 2, 1, 2, -1, -2, 1], 1) == [2])
+	@test(candidate([123, -123, 20, 0, 1, 2, -3], 3) == [2, 20, 123])
+	@test(candidate([-123, 20, 0, 1, 2, -3], 4) == [0, 1, 2, 20])
+	@test(candidate([5, 15, 0, 3, -13, -8, 0], 7) == [-13, -8, 0, 0, 3, 5, 15])
+	@test(candidate([-1, 0, 2, 5, 3, -10], 2) == [3, 5])
+	@test(candidate([1, 0, 5, -7], 1) == [5])
+	@test(candidate([4, -4], 2) == [-4, 4])
+	@test(candidate([-10, 10], 2) == [-10, 10])
+	@test(candidate([1, 2, 3, -23, 243, -400, 0], 0) == Vector{Int64}([]))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154772
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   11     11  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""Given a vector arr of integers and a positive integer k, return a sorted vector 
+of length k with the maximum k numbers in arr.
+Example 1:
+>>> maximum([-3, -4, 5], 3)
+[-4, -3, 5]
+Example 2:
+>>> maximum([4, -4, 4], 2)
+[4, 4]
+Example 3:
+>>> maximum([-3, 2, 1, 2, -1, -2, 1], 1)
+[2]
+Note:
+    1. The length of the vector will be in the range of [1, 1000].
+    2. The elements in the vector will be in the range of [-1000, 1000].
+    3. 0 <= k <= len(arr)"""
+function maximum(arr::Vector{Int64}, k::Int64)::Vector{Int64}
+    # If no elements are requested, return an empty vector
+    if k == 0
+        return Int64[]
+    end
+
+    # 1. Sort the array in descending order and pick the first k elements
+    topk = sort(arr, rev=true)[1:k]
+
+    # 2. Return those k elements sorted in ascending order
+    return sort(topk)
+end
+using Test
+
+@testset begin
+
+candidate = maximum;
+	@test(candidate([-3, -4, 5], 3) == [-4, -3, 5])
+	@test(candidate([4, -4, 4], 2) == [4, 4])
+	@test(candidate([-3, 2, 1, 2, -1, -2, 1], 1) == [2])
+	@test(candidate([123, -123, 20, 0, 1, 2, -3], 3) == [2, 20, 123])
+	@test(candidate([-123, 20, 0, 1, 2, -3], 4) == [0, 1, 2, 20])
+	@test(candidate([5, 15, 0, 3, -13, -8, 0], 7) == [-13, -8, 0, 0, 3, 5, 15])
+	@test(candidate([-1, 0, 2, 5, 3, -10], 2) == [3, 5])
+	@test(candidate([1, 0, 5, -7], 1) == [5])
+	@test(candidate([4, -4], 2) == [-4, 4])
+	@test(candidate([-10, 10], 2) == [-10, 10])
+	@test(candidate([1, 2, 3, -23, 243, -400, 0], 0) == Vector{Int64}([]))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154772
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   11     11  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""Given a vector arr of integers and a positive integer k, return a sorted vector 
+of length k with the maximum k numbers in arr.
+Example 1:
+>>> maximum([-3, -4, 5], 3)
+[-4, -3, 5]
+Example 2:
+>>> maximum([4, -4, 4], 2)
+[4, 4]
+Example 3:
+>>> maximum([-3, 2, 1, 2, -1, -2, 1], 1)
+[2]
+Note:
+    1. The length of the vector will be in the range of [1, 1000].
+    2. The elements in the vector will be in the range of [-1000, 1000].
+    3. 0 <= k <= len(arr)"""
+function maximum(arr::Vector{Int64}, k::Int64)::Vector{Int64}
+    # If k is zero, return an empty vector
+    if k == 0
+        return Int64[]
+    end
+
+    # Take the k largest elements
+    # Sort in descending order and pick the first k
+    top_k = sort(arr, rev=true)[1:k]
+
+    # Return them sorted in ascending order
+    return sort(top_k)
+end
+using Test
+
+@testset begin
+
+candidate = maximum;
+	@test(candidate([-3, -4, 5], 3) == [-4, -3, 5])
+	@test(candidate([4, -4, 4], 2) == [4, 4])
+	@test(candidate([-3, 2, 1, 2, -1, -2, 1], 1) == [2])
+	@test(candidate([123, -123, 20, 0, 1, 2, -3], 3) == [2, 20, 123])
+	@test(candidate([-123, 20, 0, 1, 2, -3], 4) == [0, 1, 2, 20])
+	@test(candidate([5, 15, 0, 3, -13, -8, 0], 7) == [-13, -8, 0, 0, 3, 5, 15])
+	@test(candidate([-1, 0, 2, 5, 3, -10], 2) == [3, 5])
+	@test(candidate([1, 0, 5, -7], 1) == [5])
+	@test(candidate([4, -4], 2) == [-4, 4])
+	@test(candidate([-10, 10], 2) == [-10, 10])
+	@test(candidate([1, 2, 3, -23, 243, -400, 0], 0) == Vector{Int64}([]))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154772
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   11     11  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""Given a vector arr of integers and a positive integer k, return a sorted vector 
+of length k with the maximum k numbers in arr.
+Example 1:
+>>> maximum([-3, -4, 5], 3)
+[-4, -3, 5]
+Example 2:
+>>> maximum([4, -4, 4], 2)
+[4, 4]
+Example 3:
+>>> maximum([-3, 2, 1, 2, -1, -2, 1], 1)
+[2]
+Note:
+    1. The length of the vector will be in the range of [1, 1000].
+    2. The elements in the vector will be in the range of [-1000, 1000].
+    3. 0 <= k <= len(arr)"""
+function maximum(arr::Vector{Int64}, k::Int64)::Vector{Int64}
+    # If k is zero, return an empty vector
+    if k == 0
+        return Int64[]
+    end
+
+    # Sort the array in descending order and take the first k elements
+    topk = sort(arr, rev=true)[1:k]
+
+    # Return the selected elements sorted in ascending order
+    return sort(topk)
+end
+using Test
+
+@testset begin
+
+candidate = maximum;
+	@test(candidate([-3, -4, 5], 3) == [-4, -3, 5])
+	@test(candidate([4, -4, 4], 2) == [4, 4])
+	@test(candidate([-3, 2, 1, 2, -1, -2, 1], 1) == [2])
+	@test(candidate([123, -123, 20, 0, 1, 2, -3], 3) == [2, 20, 123])
+	@test(candidate([-123, 20, 0, 1, 2, -3], 4) == [0, 1, 2, 20])
+	@test(candidate([5, 15, 0, 3, -13, -8, 0], 7) == [-13, -8, 0, 0, 3, 5, 15])
+	@test(candidate([-1, 0, 2, 5, 3, -10], 2) == [3, 5])
+	@test(candidate([1, 0, 5, -7], 1) == [5])
+	@test(candidate([4, -4], 2) == [-4, 4])
+	@test(candidate([-10, 10], 2) == [-10, 10])
+	@test(candidate([1, 2, 3, -23, 243, -400, 0], 0) == Vector{Int64}([]))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154772
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   11     11  0.2s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 121 (JL) - HumanEval_121_solution
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""Given a non-empty vector of integers, return the sum of all of the odd elements that are in even positions.
+Examples
+>>> solution([5, 8, 7, 1])
+12
+>>> solution([3, 3, 3, 3, 3])
+9
+>>> solution([30, 13, 24, 321])
+0"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = solution;
+	@test(candidate([5, 8, 7, 1]) == 12)
+	@test(candidate([3, 3, 3, 3, 3]) == 9)
+	@test(candidate([30, 13, 24, 321]) == 0)
+	@test(candidate([5, 9]) == 5)
+	@test(candidate([2, 4, 8]) == 0)
+	@test(candidate([30, 13, 23, 32]) == 23)
+	@test(candidate([3, 13, 2, 9]) == 3)
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""Given a non-empty vector of integers, return the sum of all of the odd elements that are in even positions.
+Examples
+>>> solution([5, 8, 7, 1])
+12
+>>> solution([3, 3, 3, 3, 3])
+9
+>>> solution([30, 13, 24, 321])
+0"""
+function solution(lst::Vector{Int64})::Int64
+    total = 0::Int64
+    for (i, val) in enumerate(lst)
+        # i is 1‑based; subtract 1 to get the 0‑based position
+        if isodd(val) && ((i - 1) % 2 == 0)
+            total += val
+        end
+    end
+    return total
+end
+using Test
+
+@testset begin
+
+candidate = solution;
+	@test(candidate([5, 8, 7, 1]) == 12)
+	@test(candidate([3, 3, 3, 3, 3]) == 9)
+	@test(candidate([30, 13, 24, 321]) == 0)
+	@test(candidate([5, 9]) == 5)
+	@test(candidate([2, 4, 8]) == 0)
+	@test(candidate([30, 13, 23, 32]) == 23)
+	@test(candidate([3, 13, 2, 9]) == 3)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154774
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""Given a non-empty vector of integers, return the sum of all of the odd elements that are in even positions.
+Examples
+>>> solution([5, 8, 7, 1])
+12
+>>> solution([3, 3, 3, 3, 3])
+9
+>>> solution([30, 13, 24, 321])
+0"""
+function solution(lst::Vector{Int64})::Int64
+    total = 0
+    # Julia indices start at 1, so indices 1,3,5,... correspond to even
+    # positions in 0‑based indexing.
+    for i in 1:2:length(lst)
+        val = lst[i]
+        if isodd(val)
+            total += val
+        end
+    end
+    return total
+end
+using Test
+
+@testset begin
+
+candidate = solution;
+	@test(candidate([5, 8, 7, 1]) == 12)
+	@test(candidate([3, 3, 3, 3, 3]) == 9)
+	@test(candidate([30, 13, 24, 321]) == 0)
+	@test(candidate([5, 9]) == 5)
+	@test(candidate([2, 4, 8]) == 0)
+	@test(candidate([30, 13, 23, 32]) == 23)
+	@test(candidate([3, 13, 2, 9]) == 3)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154774
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""Given a non-empty vector of integers, return the sum of all of the odd elements that are in even positions.
+Examples
+>>> solution([5, 8, 7, 1])
+12
+>>> solution([3, 3, 3, 3, 3])
+9
+>>> solution([30, 13, 24, 321])
+0"""
+function solution(lst::Vector{Int64})::Int64
+    # Pick every element at an even 0‑based index (i.e., 1‑based indices 1,3,5,…)
+    even_pos_elements = lst[1:2:end]
+    # Sum only the odd values among those elements
+    return sum(x for x in even_pos_elements if isodd(x))
+end
+using Test
+
+@testset begin
+
+candidate = solution;
+	@test(candidate([5, 8, 7, 1]) == 12)
+	@test(candidate([3, 3, 3, 3, 3]) == 9)
+	@test(candidate([30, 13, 24, 321]) == 0)
+	@test(candidate([5, 9]) == 5)
+	@test(candidate([2, 4, 8]) == 0)
+	@test(candidate([30, 13, 23, 32]) == 23)
+	@test(candidate([3, 13, 2, 9]) == 3)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154774
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""Given a non-empty vector of integers, return the sum of all of the odd elements that are in even positions.
+Examples
+>>> solution([5, 8, 7, 1])
+12
+>>> solution([3, 3, 3, 3, 3])
+9
+>>> solution([30, 13, 24, 321])
+0"""
+function solution(lst::Vector{Int64})::Int64
+    # Sum elements at 0‑indexed even positions (i.e., 1‑based odd indices)
+    # that are odd numbers.
+    total = zero(Int64)
+    for i in 1:2:length(lst)          # i = 1,3,5,...
+        val = lst[i]
+        if isodd(val)
+            total += val
+        end
+    end
+    return total
+end
+using Test
+
+@testset begin
+
+candidate = solution;
+	@test(candidate([5, 8, 7, 1]) == 12)
+	@test(candidate([3, 3, 3, 3, 3]) == 9)
+	@test(candidate([30, 13, 24, 321]) == 0)
+	@test(candidate([5, 9]) == 5)
+	@test(candidate([2, 4, 8]) == 0)
+	@test(candidate([30, 13, 23, 32]) == 23)
+	@test(candidate([3, 13, 2, 9]) == 3)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154774
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 123 (JL) - HumanEval_123_get_odd_collatz
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""Given a positive integer n, return a sorted vector that has the odd numbers in collatz sequence.
+The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+as follows: start with any positive integer n. Then each term is obtained from the 
+previous term as follows: if the previous term is even, the next term is one half of 
+the previous term. If the previous term is odd, the next term is 3 times the previous
+term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+Note: 
+    1. Collatz(1) is [1].
+    2. returned vector sorted in increasing order.
+For example:
+get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+>>> get_odd_collatz(5)
+[1, 5]"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = get_odd_collatz;
+	@test(candidate(14) == [1, 5, 7, 11, 13, 17])
+	@test(candidate(5) == [1, 5])
+	@test(candidate(12) == [1, 3, 5])
+	@test(candidate(1) == [1])
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""Given a positive integer n, return a sorted vector that has the odd numbers in collatz sequence.
+The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+as follows: start with any positive integer n. Then each term is obtained from the 
+previous term as follows: if the previous term is even, the next term is one half of 
+the previous term. If the previous term is odd, the next term is 3 times the previous
+term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+Note: 
+    1. Collatz(1) is [1].
+    2. returned vector sorted in increasing order.
+For example:
+get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+>>> get_odd_collatz(5)
+[1, 5]"""
+# Returns a sorted vector of the odd numbers that appear in the Collatz sequence of `n`.
+#
+# Example:
+#   get_odd_collatz(5)  # → [1, 5]
+#
+function get_odd_collatz(n::Int64)::Vector{Int64}
+    # Ensure `n` is positive (the problem statement guarantees this, but we guard anyway)
+    @assert n > 0 "n must be a positive integer"
+
+    odd_nums = Int64[]
+    current = n
+
+    while true
+        # Record the current number if it is odd
+        if isodd(current)
+            push!(odd_nums, current)
+        end
+
+        # Stop when we reach the terminal value 1
+        if current == 1
+            break
+        end
+
+        # Apply the Collatz rule to get the next term
+        current = isodd(current) ? 3 * current + 1 : div(current, 2)
+    end
+
+    sort!(odd_nums)          # Return the odd numbers in increasing order
+    return odd_nums
+end
+using Test
+
+@testset begin
+
+candidate = get_odd_collatz;
+	@test(candidate(14) == [1, 5, 7, 11, 13, 17])
+	@test(candidate(5) == [1, 5])
+	@test(candidate(12) == [1, 3, 5])
+	@test(candidate(1) == [1])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154779
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    4      4  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""Given a positive integer n, return a sorted vector that has the odd numbers in collatz sequence.
+The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+as follows: start with any positive integer n. Then each term is obtained from the 
+previous term as follows: if the previous term is even, the next term is one half of 
+the previous term. If the previous term is odd, the next term is 3 times the previous
+term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+Note: 
+    1. Collatz(1) is [1].
+    2. returned vector sorted in increasing order.
+For example:
+get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+>>> get_odd_collatz(5)
+[1, 5]"""
+function get_odd_collatz(n::Int64)::Vector{Int64}
+    # Ensure the input is a positive integer
+    @assert n > 0 "Input must be a positive integer."
+
+    odds = Int64[]          # Array to store odd numbers
+    current = n
+
+    while true
+        # If the current number is odd, record it
+        if isodd(current)
+            push!(odds, current)
+        end
+
+        # Terminate when the sequence reaches 1
+        if current == 1
+            break
+        end
+
+        # Apply the Collatz rule
+        if iseven(current)
+            current = div(current, 2)
+        else
+            current = 3 * current + 1
+        end
+    end
+
+    # Return the sorted list of odd numbers
+    sort!(odds)
+    return odds
+end
+using Test
+
+@testset begin
+
+candidate = get_odd_collatz;
+	@test(candidate(14) == [1, 5, 7, 11, 13, 17])
+	@test(candidate(5) == [1, 5])
+	@test(candidate(12) == [1, 3, 5])
+	@test(candidate(1) == [1])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154779
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    4      4  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""Given a positive integer n, return a sorted vector that has the odd numbers in collatz sequence.
+The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+as follows: start with any positive integer n. Then each term is obtained from the 
+previous term as follows: if the previous term is even, the next term is one half of 
+the previous term. If the previous term is odd, the next term is 3 times the previous
+term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+Note: 
+    1. Collatz(1) is [1].
+    2. returned vector sorted in increasing order.
+For example:
+get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+>>> get_odd_collatz(5)
+[1, 5]"""
+function get_odd_collatz(n::Int64)::Vector{Int64}
+    odds = Int64[]          # vector to hold odd numbers
+    current = n
+
+    while true
+        # If the current number is odd, store it
+        if isodd(current)
+            push!(odds, current)
+        end
+
+        # Stop when we reach 1 (the sequence terminates here)
+        if current == 1
+            break
+        end
+
+        # Apply the Collatz rule
+        if iseven(current)
+            current = div(current, 2)
+        else
+            current = 3 * current + 1
+        end
+    end
+
+    # Return the odd numbers sorted in increasing order
+    sort!(odds)
+    return odds
+end
+using Test
+
+@testset begin
+
+candidate = get_odd_collatz;
+	@test(candidate(14) == [1, 5, 7, 11, 13, 17])
+	@test(candidate(5) == [1, 5])
+	@test(candidate(12) == [1, 3, 5])
+	@test(candidate(1) == [1])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154779
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    4      4  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""Given a positive integer n, return a sorted vector that has the odd numbers in collatz sequence.
+The Collatz conjecture is a conjecture in mathematics that concerns a sequence defined
+as follows: start with any positive integer n. Then each term is obtained from the 
+previous term as follows: if the previous term is even, the next term is one half of 
+the previous term. If the previous term is odd, the next term is 3 times the previous
+term plus 1. The conjecture is that no matter what value of n, the sequence will always reach 1.
+Note: 
+    1. Collatz(1) is [1].
+    2. returned vector sorted in increasing order.
+For example:
+get_odd_collatz(5) returns [1, 5] # The collatz sequence for 5 is [5, 16, 8, 4, 2, 1], so the odd numbers are only 1, and 5.
+>>> get_odd_collatz(5)
+[1, 5]"""
+# Returns a sorted vector containing all odd numbers that appear in the
+# Collatz sequence starting from `n`.  The sequence stops when it reaches 1.
+#
+# Example:
+#   get_odd_collatz(5)  # -> [1, 5]
+#
+function get_odd_collatz(n::Int64)::Vector{Int64}
+    @assert n > 0 "n must be a positive integer"
+
+    # Use a set to avoid duplicates and keep the numbers sorted afterwards
+    odd_set = Set{Int64}()
+    current = n
+
+    while true
+        if isodd(current)
+            push!(odd_set, current)
+        end
+
+        # Stop when we reach 1 (the sequence ends there)
+        if current == 1
+            break
+        end
+
+        # Next term in the Collatz sequence
+        current = iseven(current) ? current ÷ 2 : 3 * current + 1
+    end
+
+    # Convert to a sorted vector
+    return sort(collect(odd_set))
+end
+using Test
+
+@testset begin
+
+candidate = get_odd_collatz;
+	@test(candidate(14) == [1, 5, 7, 11, 13, 17])
+	@test(candidate(5) == [1, 5])
+	@test(candidate(12) == [1, 3, 5])
+	@test(candidate(1) == [1])
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154779
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    4      4  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 126 (JL) - HumanEval_126_is_sorted
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""Given a vector of numbers, return whether or not they are sorted
+in ascending order. If vector has more than 1 duplicate of the same
+number, return false. Assume no negative numbers and only integers.
+Examples
+>>> is_sorted([5])
+true
+>>> is_sorted([1, 2, 3, 4, 5])
+true
+>>> is_sorted([1, 3, 2, 4, 5])
+false
+>>> is_sorted([1, 2, 3, 4, 5, 6])
+true
+>>> is_sorted([1, 2, 3, 4, 5, 6, 7])
+true
+>>> is_sorted([1, 3, 2, 4, 5, 6, 7])
+false
+>>> is_sorted([1, 2, 2, 3, 3, 4])
+true
+>>> is_sorted([1, 2, 2, 2, 3, 4])
+false"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = is_sorted;
+	@test(candidate([5]) == true)
+	@test(candidate([1, 2, 3, 4, 5]) == true)
+	@test(candidate([1, 3, 2, 4, 5]) == false)
+	@test(candidate([1, 2, 3, 4, 5, 6]) == true)
+	@test(candidate([1, 2, 3, 4, 5, 6, 7]) == true)
+	@test(candidate([1, 3, 2, 4, 5, 6, 7]) == false)
+	@test(candidate(Vector{Int64}([])) == true)
+	@test(candidate([1]) == true)
+	@test(candidate([3, 2, 1]) == false)
+	@test(candidate([1, 2, 2, 2, 3, 4]) == false)
+	@test(candidate([1, 2, 3, 3, 3, 4]) == false)
+	@test(candidate([1, 2, 2, 3, 3, 4]) == true)
+	@test(candidate([1, 2, 3, 4]) == true)
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""Given a vector of numbers, return whether or not they are sorted
+in ascending order. If vector has more than 1 duplicate of the same
+number, return false. Assume no negative numbers and only integers.
+Examples
+>>> is_sorted([5])
+true
+>>> is_sorted([1, 2, 3, 4, 5])
+true
+>>> is_sorted([1, 3, 2, 4, 5])
+false
+>>> is_sorted([1, 2, 3, 4, 5, 6])
+true
+>>> is_sorted([1, 2, 3, 4, 5, 6, 7])
+true
+>>> is_sorted([1, 3, 2, 4, 5, 6, 7])
+false
+>>> is_sorted([1, 2, 2, 3, 3, 4])
+true
+>>> is_sorted([1, 2, 2, 2, 3, 4])
+false"""
+function is_sorted(lst::Vector{Int64})::Bool
+    # Empty list is trivially sorted
+    isempty(lst) && return true
+
+    prev = lst[1]          # last seen value
+    dup_cnt = 1            # how many times the current value has appeared consecutively
+
+    for i in 2:length(lst)
+        x = lst[i]
+
+        # Not sorted if we encounter a smaller number
+        if x < prev
+            return false
+        elseif x == prev
+            # Count consecutive duplicates
+            dup_cnt += 1
+            if dup_cnt > 2          # more than one duplicate → false
+                return false
+            end
+        else
+            # New value – reset duplicate counter
+            dup_cnt = 1
+            prev = x
+        end
+    end
+
+    return true
+end
+using Test
+
+@testset begin
+
+candidate = is_sorted;
+	@test(candidate([5]) == true)
+	@test(candidate([1, 2, 3, 4, 5]) == true)
+	@test(candidate([1, 3, 2, 4, 5]) == false)
+	@test(candidate([1, 2, 3, 4, 5, 6]) == true)
+	@test(candidate([1, 2, 3, 4, 5, 6, 7]) == true)
+	@test(candidate([1, 3, 2, 4, 5, 6, 7]) == false)
+	@test(candidate(Vector{Int64}([])) == true)
+	@test(candidate([1]) == true)
+	@test(candidate([3, 2, 1]) == false)
+	@test(candidate([1, 2, 2, 2, 3, 4]) == false)
+	@test(candidate([1, 2, 3, 3, 3, 4]) == false)
+	@test(candidate([1, 2, 2, 3, 3, 4]) == true)
+	@test(candidate([1, 2, 3, 4]) == true)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154790
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   13     13  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""Given a vector of numbers, return whether or not they are sorted
+in ascending order. If vector has more than 1 duplicate of the same
+number, return false. Assume no negative numbers and only integers.
+Examples
+>>> is_sorted([5])
+true
+>>> is_sorted([1, 2, 3, 4, 5])
+true
+>>> is_sorted([1, 3, 2, 4, 5])
+false
+>>> is_sorted([1, 2, 3, 4, 5, 6])
+true
+>>> is_sorted([1, 2, 3, 4, 5, 6, 7])
+true
+>>> is_sorted([1, 3, 2, 4, 5, 6, 7])
+false
+>>> is_sorted([1, 2, 2, 3, 3, 4])
+true
+>>> is_sorted([1, 2, 2, 2, 3, 4])
+false"""
+function is_sorted(lst::Vector{Int64})::Bool
+    # Empty or single‑element vectors are trivially sorted
+    length(lst) <= 1 && return true
+
+    # 1. Check for duplicate counts
+    counts = Dict{Int64,Int}()
+    for x in lst
+        counts[x] = get(counts, x, 0) + 1
+        if counts[x] > 2          # more than two occurrences → false
+            return false
+        end
+    end
+
+    # 2. Check that the vector is non‑decreasing
+    for i in 1:length(lst)-1
+        if lst[i] > lst[i+1]
+            return false
+        end
+    end
+
+    return true
+end
+using Test
+
+@testset begin
+
+candidate = is_sorted;
+	@test(candidate([5]) == true)
+	@test(candidate([1, 2, 3, 4, 5]) == true)
+	@test(candidate([1, 3, 2, 4, 5]) == false)
+	@test(candidate([1, 2, 3, 4, 5, 6]) == true)
+	@test(candidate([1, 2, 3, 4, 5, 6, 7]) == true)
+	@test(candidate([1, 3, 2, 4, 5, 6, 7]) == false)
+	@test(candidate(Vector{Int64}([])) == true)
+	@test(candidate([1]) == true)
+	@test(candidate([3, 2, 1]) == false)
+	@test(candidate([1, 2, 2, 2, 3, 4]) == false)
+	@test(candidate([1, 2, 3, 3, 3, 4]) == false)
+	@test(candidate([1, 2, 2, 3, 3, 4]) == true)
+	@test(candidate([1, 2, 3, 4]) == true)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154790
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   13     13  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""Given a vector of numbers, return whether or not they are sorted
+in ascending order. If vector has more than 1 duplicate of the same
+number, return false. Assume no negative numbers and only integers.
+Examples
+>>> is_sorted([5])
+true
+>>> is_sorted([1, 2, 3, 4, 5])
+true
+>>> is_sorted([1, 3, 2, 4, 5])
+false
+>>> is_sorted([1, 2, 3, 4, 5, 6])
+true
+>>> is_sorted([1, 2, 3, 4, 5, 6, 7])
+true
+>>> is_sorted([1, 3, 2, 4, 5, 6, 7])
+false
+>>> is_sorted([1, 2, 2, 3, 3, 4])
+true
+>>> is_sorted([1, 2, 2, 2, 3, 4])
+false"""
+function is_sorted(lst::Vector{Int64})::Bool
+    # Empty or single‑element vectors are trivially sorted
+    if length(lst) <= 1
+        return true
+    end
+
+    prev = lst[1]          # last seen value
+    dup_count = 1          # how many times `prev` has appeared consecutively
+
+    for i in 2:length(lst)
+        curr = lst[i]
+
+        # Check ascending order
+        if curr < prev
+            return false
+        end
+
+        # Count duplicates of the current value
+        if curr == prev
+            dup_count += 1
+            if dup_count > 2          # more than one duplicate
+                return false
+            end
+        else
+            dup_count = 1              # reset count for a new value
+        end
+
+        prev = curr
+    end
+
+    return true
+end
+using Test
+
+@testset begin
+
+candidate = is_sorted;
+	@test(candidate([5]) == true)
+	@test(candidate([1, 2, 3, 4, 5]) == true)
+	@test(candidate([1, 3, 2, 4, 5]) == false)
+	@test(candidate([1, 2, 3, 4, 5, 6]) == true)
+	@test(candidate([1, 2, 3, 4, 5, 6, 7]) == true)
+	@test(candidate([1, 3, 2, 4, 5, 6, 7]) == false)
+	@test(candidate(Vector{Int64}([])) == true)
+	@test(candidate([1]) == true)
+	@test(candidate([3, 2, 1]) == false)
+	@test(candidate([1, 2, 2, 2, 3, 4]) == false)
+	@test(candidate([1, 2, 3, 3, 3, 4]) == false)
+	@test(candidate([1, 2, 2, 3, 3, 4]) == true)
+	@test(candidate([1, 2, 3, 4]) == true)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154790
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   13     13  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""Given a vector of numbers, return whether or not they are sorted
+in ascending order. If vector has more than 1 duplicate of the same
+number, return false. Assume no negative numbers and only integers.
+Examples
+>>> is_sorted([5])
+true
+>>> is_sorted([1, 2, 3, 4, 5])
+true
+>>> is_sorted([1, 3, 2, 4, 5])
+false
+>>> is_sorted([1, 2, 3, 4, 5, 6])
+true
+>>> is_sorted([1, 2, 3, 4, 5, 6, 7])
+true
+>>> is_sorted([1, 3, 2, 4, 5, 6, 7])
+false
+>>> is_sorted([1, 2, 2, 3, 3, 4])
+true
+>>> is_sorted([1, 2, 2, 2, 3, 4])
+false"""
+# Returns true if the vector is sorted in non‑decreasing order
+# and no element appears more than twice.
+function is_sorted(lst::Vector{Int64})::Bool
+    # Empty or single‑element vectors are trivially sorted
+    if length(lst) <= 1
+        return true
+    end
+
+    prev = lst[1]
+    dup_count = 1   # count of the current value (at least one)
+
+    for i in 2:length(lst)
+        cur = lst[i]
+
+        # Check ascending order
+        if cur < prev
+            return false
+        end
+
+        # Count duplicates of the current value
+        if cur == prev
+            dup_count += 1
+            if dup_count > 2          # more than one duplicate
+                return false
+            end
+        else
+            # New value: reset duplicate counter
+            dup_count = 1
+            prev = cur
+        end
+    end
+
+    return true
+end
+using Test
+
+@testset begin
+
+candidate = is_sorted;
+	@test(candidate([5]) == true)
+	@test(candidate([1, 2, 3, 4, 5]) == true)
+	@test(candidate([1, 3, 2, 4, 5]) == false)
+	@test(candidate([1, 2, 3, 4, 5, 6]) == true)
+	@test(candidate([1, 2, 3, 4, 5, 6, 7]) == true)
+	@test(candidate([1, 3, 2, 4, 5, 6, 7]) == false)
+	@test(candidate(Vector{Int64}([])) == true)
+	@test(candidate([1]) == true)
+	@test(candidate([3, 2, 1]) == false)
+	@test(candidate([1, 2, 2, 2, 3, 4]) == false)
+	@test(candidate([1, 2, 3, 3, 3, 4]) == false)
+	@test(candidate([1, 2, 2, 3, 3, 4]) == true)
+	@test(candidate([1, 2, 3, 4]) == true)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154790
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   13     13  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 131 (JL) - HumanEval_131_digits
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""Given a positive integer n, return the product of the odd digits.
+Return 0 if all digits are even.
+For example:
+>>> digits(1)
+1
+>>> digits(4)
+0
+>>> digits(235)
+15"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = digits;
+	@test(candidate(5) == 5)
+	@test(candidate(54) == 5)
+	@test(candidate(120) == 1)
+	@test(candidate(5014) == 5)
+	@test(candidate(98765) == 315)
+	@test(candidate(5576543) == 2625)
+	@test(candidate(2468) == 0)
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""Given a positive integer n, return the product of the odd digits.
+Return 0 if all digits are even.
+For example:
+>>> digits(1)
+1
+>>> digits(4)
+0
+>>> digits(235)
+15"""
+function digits(n::Int64)::Int64
+    prod = 1
+    found = false
+    while n > 0
+        d = n % 10
+        if isodd(d)
+            prod *= d
+            found = true
+        end
+        n ÷= 10
+    end
+    return found ? prod : 0
+end
+using Test
+
+@testset begin
+
+candidate = digits;
+	@test(candidate(5) == 5)
+	@test(candidate(54) == 5)
+	@test(candidate(120) == 1)
+	@test(candidate(5014) == 5)
+	@test(candidate(98765) == 315)
+	@test(candidate(5576543) == 2625)
+	@test(candidate(2468) == 0)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154807
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""Given a positive integer n, return the product of the odd digits.
+Return 0 if all digits are even.
+For example:
+>>> digits(1)
+1
+>>> digits(4)
+0
+>>> digits(235)
+15"""
+function digits(n::Int64)::Int64
+    if n == 0
+        return 0
+    end
+
+    prod = 1
+    odd_found = false
+
+    while n > 0
+        d = n % 10
+        if d % 2 == 1
+            prod *= d
+            odd_found = true
+        end
+        n ÷= 10
+    end
+
+    return odd_found ? prod : 0
+end
+using Test
+
+@testset begin
+
+candidate = digits;
+	@test(candidate(5) == 5)
+	@test(candidate(54) == 5)
+	@test(candidate(120) == 1)
+	@test(candidate(5014) == 5)
+	@test(candidate(98765) == 315)
+	@test(candidate(5576543) == 2625)
+	@test(candidate(2468) == 0)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154807
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""Given a positive integer n, return the product of the odd digits.
+Return 0 if all digits are even.
+For example:
+>>> digits(1)
+1
+>>> digits(4)
+0
+>>> digits(235)
+15"""
+function digits(n::Int64)::Int64
+    prod = 1
+    has_odd = false
+    while n > 0
+        d = n % 10
+        if isodd(d)
+            prod *= d
+            has_odd = true
+        end
+        n ÷= 10
+    end
+    return has_odd ? prod : 0
+end
+using Test
+
+@testset begin
+
+candidate = digits;
+	@test(candidate(5) == 5)
+	@test(candidate(54) == 5)
+	@test(candidate(120) == 1)
+	@test(candidate(5014) == 5)
+	@test(candidate(98765) == 315)
+	@test(candidate(5576543) == 2625)
+	@test(candidate(2468) == 0)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154807
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""Given a positive integer n, return the product of the odd digits.
+Return 0 if all digits are even.
+For example:
+>>> digits(1)
+1
+>>> digits(4)
+0
+>>> digits(235)
+15"""
+# Returns the product of all odd digits in `n`.
+# If `n` contains no odd digits, returns 0.
+function digits(n::Int64)::Int64
+    # Handle the special case where n is 0 (no odd digits)
+    if n == 0
+        return 0
+    end
+
+    prod = 1            # Product accumulator
+    has_odd = false     # Flag to check if any odd digit was found
+
+    while n > 0
+        digit = n % 10
+        if digit % 2 == 1          # Odd digit
+            prod *= digit
+            has_odd = true
+        end
+        n ÷= 10                    # Remove the last digit
+    end
+
+    return has_odd ? prod : 0
+end
+using Test
+
+@testset begin
+
+candidate = digits;
+	@test(candidate(5) == 5)
+	@test(candidate(54) == 5)
+	@test(candidate(120) == 1)
+	@test(candidate(5014) == 5)
+	@test(candidate(98765) == 315)
+	@test(candidate(5576543) == 2625)
+	@test(candidate(2468) == 0)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154807
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |    7      7  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 133 (JL) - HumanEval_133_sum_squares
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""You are given a vector of numbers.
+You need to return the sum of squared numbers in the given vector,
+round each element in the vector to the upper int(Ceiling) first.
+Examples:
+>>> lst([1.0, 2.0, 3.0])
+14
+>>> lst([1.0, 4.0, 9.0])
+98
+>>> lst([1.0, 3.0, 5.0, 7.0])
+84
+>>> lst([1.4, 4.2, 0.0])
+29
+>>> lst([-2.4, 1.0, 1.0])
+6"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = sum_squares;
+	@test(candidate([1.0, 2.0, 3.0]) == 14)
+	@test(candidate([1.0, 2.0, 3.0]) == 14)
+	@test(candidate([1.0, 3.0, 5.0, 7.0]) == 84)
+	@test(candidate([1.4, 4.2, 0.0]) == 29)
+	@test(candidate([-2.4, 1.0, 1.0]) == 6)
+	@test(candidate([100.0, 1.0, 15.0, 2.0]) == 10230)
+	@test(candidate([10000.0, 10000.0]) == 200000000)
+	@test(candidate([-1.4, 4.6, 6.3]) == 75)
+	@test(candidate([-1.4, 17.9, 18.9, 19.9]) == 1086)
+	@test(candidate([0.0]) == 0)
+	@test(candidate([-1.0]) == 1)
+	@test(candidate([-1.0, 1.0, 0.0]) == 2)
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""You are given a vector of numbers.
+You need to return the sum of squared numbers in the given vector,
+round each element in the vector to the upper int(Ceiling) first.
+Examples:
+>>> lst([1.0, 2.0, 3.0])
+14
+>>> lst([1.0, 4.0, 9.0])
+98
+>>> lst([1.0, 3.0, 5.0, 7.0])
+84
+>>> lst([1.4, 4.2, 0.0])
+29
+>>> lst([-2.4, 1.0, 1.0])
+6"""
+function sum_squares(lst::Vector{Float64})::Int64
+    total = 0
+    for x in lst
+        y = ceil(Int, x)          # round each element up to the nearest integer
+        total += y * y            # add the squared value
+    end
+    return Int64(total)          # ensure the result is an Int64
+end
+using Test
+
+@testset begin
+
+candidate = sum_squares;
+	@test(candidate([1.0, 2.0, 3.0]) == 14)
+	@test(candidate([1.0, 2.0, 3.0]) == 14)
+	@test(candidate([1.0, 3.0, 5.0, 7.0]) == 84)
+	@test(candidate([1.4, 4.2, 0.0]) == 29)
+	@test(candidate([-2.4, 1.0, 1.0]) == 6)
+	@test(candidate([100.0, 1.0, 15.0, 2.0]) == 10230)
+	@test(candidate([10000.0, 10000.0]) == 200000000)
+	@test(candidate([-1.4, 4.6, 6.3]) == 75)
+	@test(candidate([-1.4, 17.9, 18.9, 19.9]) == 1086)
+	@test(candidate([0.0]) == 0)
+	@test(candidate([-1.0]) == 1)
+	@test(candidate([-1.0, 1.0, 0.0]) == 2)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154812
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   12     12  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""You are given a vector of numbers.
+You need to return the sum of squared numbers in the given vector,
+round each element in the vector to the upper int(Ceiling) first.
+Examples:
+>>> lst([1.0, 2.0, 3.0])
+14
+>>> lst([1.0, 4.0, 9.0])
+98
+>>> lst([1.0, 3.0, 5.0, 7.0])
+84
+>>> lst([1.4, 4.2, 0.0])
+29
+>>> lst([-2.4, 1.0, 1.0])
+6"""
+function sum_squares(lst::Vector{Float64})::Int64
+    total = 0
+    for x in lst
+        c = ceil(Int, x)   # round up to the nearest integer
+        total += c * c     # square and add to the sum
+    end
+    return Int64(total)
+end
+using Test
+
+@testset begin
+
+candidate = sum_squares;
+	@test(candidate([1.0, 2.0, 3.0]) == 14)
+	@test(candidate([1.0, 2.0, 3.0]) == 14)
+	@test(candidate([1.0, 3.0, 5.0, 7.0]) == 84)
+	@test(candidate([1.4, 4.2, 0.0]) == 29)
+	@test(candidate([-2.4, 1.0, 1.0]) == 6)
+	@test(candidate([100.0, 1.0, 15.0, 2.0]) == 10230)
+	@test(candidate([10000.0, 10000.0]) == 200000000)
+	@test(candidate([-1.4, 4.6, 6.3]) == 75)
+	@test(candidate([-1.4, 17.9, 18.9, 19.9]) == 1086)
+	@test(candidate([0.0]) == 0)
+	@test(candidate([-1.0]) == 1)
+	@test(candidate([-1.0, 1.0, 0.0]) == 2)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154812
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   12     12  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""You are given a vector of numbers.
+You need to return the sum of squared numbers in the given vector,
+round each element in the vector to the upper int(Ceiling) first.
+Examples:
+>>> lst([1.0, 2.0, 3.0])
+14
+>>> lst([1.0, 4.0, 9.0])
+98
+>>> lst([1.0, 3.0, 5.0, 7.0])
+84
+>>> lst([1.4, 4.2, 0.0])
+29
+>>> lst([-2.4, 1.0, 1.0])
+6"""
+function sum_squares(lst::Vector{Float64})::Int64
+    return Int64(sum(ceil.(Int, lst).^2))
+end
+using Test
+
+@testset begin
+
+candidate = sum_squares;
+	@test(candidate([1.0, 2.0, 3.0]) == 14)
+	@test(candidate([1.0, 2.0, 3.0]) == 14)
+	@test(candidate([1.0, 3.0, 5.0, 7.0]) == 84)
+	@test(candidate([1.4, 4.2, 0.0]) == 29)
+	@test(candidate([-2.4, 1.0, 1.0]) == 6)
+	@test(candidate([100.0, 1.0, 15.0, 2.0]) == 10230)
+	@test(candidate([10000.0, 10000.0]) == 200000000)
+	@test(candidate([-1.4, 4.6, 6.3]) == 75)
+	@test(candidate([-1.4, 17.9, 18.9, 19.9]) == 1086)
+	@test(candidate([0.0]) == 0)
+	@test(candidate([-1.0]) == 1)
+	@test(candidate([-1.0, 1.0, 0.0]) == 2)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154812
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   12     12  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""You are given a vector of numbers.
+You need to return the sum of squared numbers in the given vector,
+round each element in the vector to the upper int(Ceiling) first.
+Examples:
+>>> lst([1.0, 2.0, 3.0])
+14
+>>> lst([1.0, 4.0, 9.0])
+98
+>>> lst([1.0, 3.0, 5.0, 7.0])
+84
+>>> lst([1.4, 4.2, 0.0])
+29
+>>> lst([-2.4, 1.0, 1.0])
+6"""
+function sum_squares(lst::Vector{Float64})::Int64
+    # Sum the squares of the ceiling of each element.
+    return sum(ceil(Int, x)^2 for x in lst)
+end
+using Test
+
+@testset begin
+
+candidate = sum_squares;
+	@test(candidate([1.0, 2.0, 3.0]) == 14)
+	@test(candidate([1.0, 2.0, 3.0]) == 14)
+	@test(candidate([1.0, 3.0, 5.0, 7.0]) == 84)
+	@test(candidate([1.4, 4.2, 0.0]) == 29)
+	@test(candidate([-2.4, 1.0, 1.0]) == 6)
+	@test(candidate([100.0, 1.0, 15.0, 2.0]) == 10230)
+	@test(candidate([10000.0, 10000.0]) == 200000000)
+	@test(candidate([-1.4, 4.6, 6.3]) == 75)
+	@test(candidate([-1.4, 17.9, 18.9, 19.9]) == 1086)
+	@test(candidate([0.0]) == 0)
+	@test(candidate([-1.0]) == 1)
+	@test(candidate([-1.0, 1.0, 0.0]) == 2)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154812
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   12     12  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 134 (JL) - HumanEval_134_check_if_last_char_is_a_letter
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""Create a function that returns true if the last character
+of a given string is an alphabetical character and is not
+a part of a word, and false otherwise.
+Note: "word" is a group of characters separated by space.
+Examples:
+>>> check_if_last_char_is_a_letter("apple pie")
+false
+>>> check_if_last_char_is_a_letter("apple pi e")
+true
+>>> check_if_last_char_is_a_letter("apple pi e ")
+false
+>>> check_if_last_char_is_a_letter("")
+false"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = check_if_last_char_is_a_letter;
+	@test(candidate("apple") == false)
+	@test(candidate("apple pi e") == true)
+	@test(candidate("eeeee") == false)
+	@test(candidate("A") == true)
+	@test(candidate("Pumpkin pie ") == false)
+	@test(candidate("Pumpkin pie 1") == false)
+	@test(candidate("") == false)
+	@test(candidate("eeeee e ") == false)
+	@test(candidate("apple pie") == false)
+	@test(candidate("apple pi e ") == false)
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""Create a function that returns true if the last character
+of a given string is an alphabetical character and is not
+a part of a word, and false otherwise.
+Note: "word" is a group of characters separated by space.
+Examples:
+>>> check_if_last_char_is_a_letter("apple pie")
+false
+>>> check_if_last_char_is_a_letter("apple pi e")
+true
+>>> check_if_last_char_is_a_letter("apple pi e ")
+false
+>>> check_if_last_char_is_a_letter("")
+false"""
+function check_if_last_char_is_a_letter(txt::String)::Bool
+    # Empty string → false
+    n = lastindex(txt)
+    n == 0 && return false
+
+    # Last character must be an alphabetic letter
+    last_char = txt[n]
+    !isletter(last_char) && return false
+
+    # If there's no preceding character, it's a single‑letter word → true
+    n == 1 && return true
+
+    # Otherwise, the preceding character must be a space
+    return txt[n-1] == ' '
+end
+using Test
+
+@testset begin
+
+candidate = check_if_last_char_is_a_letter;
+	@test(candidate("apple") == false)
+	@test(candidate("apple pi e") == true)
+	@test(candidate("eeeee") == false)
+	@test(candidate("A") == true)
+	@test(candidate("Pumpkin pie ") == false)
+	@test(candidate("Pumpkin pie 1") == false)
+	@test(candidate("") == false)
+	@test(candidate("eeeee e ") == false)
+	@test(candidate("apple pie") == false)
+	@test(candidate("apple pi e ") == false)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154813
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   10     10  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""Create a function that returns true if the last character
+of a given string is an alphabetical character and is not
+a part of a word, and false otherwise.
+Note: "word" is a group of characters separated by space.
+Examples:
+>>> check_if_last_char_is_a_letter("apple pie")
+false
+>>> check_if_last_char_is_a_letter("apple pi e")
+true
+>>> check_if_last_char_is_a_letter("apple pi e ")
+false
+>>> check_if_last_char_is_a_letter("")
+false"""
+function check_if_last_char_is_a_letter(txt::String)::Bool
+    n = lastindex(txt)
+    # Empty string → false
+    if n == 0
+        return false
+    end
+
+    last_char = txt[n]
+    # Last character must be a letter
+    if !isletter(last_char)
+        return false
+    end
+
+    # If it's the only character, it's a single‑letter word
+    if n == 1
+        return true
+    end
+
+    # The preceding character must be a space (word separator)
+    prev_char = txt[n - 1]
+    return prev_char == ' '
+end
+using Test
+
+@testset begin
+
+candidate = check_if_last_char_is_a_letter;
+	@test(candidate("apple") == false)
+	@test(candidate("apple pi e") == true)
+	@test(candidate("eeeee") == false)
+	@test(candidate("A") == true)
+	@test(candidate("Pumpkin pie ") == false)
+	@test(candidate("Pumpkin pie 1") == false)
+	@test(candidate("") == false)
+	@test(candidate("eeeee e ") == false)
+	@test(candidate("apple pie") == false)
+	@test(candidate("apple pi e ") == false)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154813
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   10     10  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""Create a function that returns true if the last character
+of a given string is an alphabetical character and is not
+a part of a word, and false otherwise.
+Note: "word" is a group of characters separated by space.
+Examples:
+>>> check_if_last_char_is_a_letter("apple pie")
+false
+>>> check_if_last_char_is_a_letter("apple pi e")
+true
+>>> check_if_last_char_is_a_letter("apple pi e ")
+false
+>>> check_if_last_char_is_a_letter("")
+false"""
+function check_if_last_char_is_a_letter(txt::String)::Bool
+    # Empty string → false
+    if isempty(txt)
+        return false
+    end
+
+    last_char = txt[end]
+    # Must be an alphabetical character
+    if !isletter(last_char)
+        return false
+    end
+
+    # If it's the only character, it's a single‑letter word → true
+    if length(txt) == 1
+        return true
+    end
+
+    # Otherwise, it must be preceded by a space to be "not part of a word"
+    return txt[end - 1] == ' '
+end
+using Test
+
+@testset begin
+
+candidate = check_if_last_char_is_a_letter;
+	@test(candidate("apple") == false)
+	@test(candidate("apple pi e") == true)
+	@test(candidate("eeeee") == false)
+	@test(candidate("A") == true)
+	@test(candidate("Pumpkin pie ") == false)
+	@test(candidate("Pumpkin pie 1") == false)
+	@test(candidate("") == false)
+	@test(candidate("eeeee e ") == false)
+	@test(candidate("apple pie") == false)
+	@test(candidate("apple pi e ") == false)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154813
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   10     10  0.1s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""Create a function that returns true if the last character
+of a given string is an alphabetical character and is not
+a part of a word, and false otherwise.
+Note: "word" is a group of characters separated by space.
+Examples:
+>>> check_if_last_char_is_a_letter("apple pie")
+false
+>>> check_if_last_char_is_a_letter("apple pi e")
+true
+>>> check_if_last_char_is_a_letter("apple pi e ")
+false
+>>> check_if_last_char_is_a_letter("")
+false"""
+function check_if_last_char_is_a_letter(txt::String)::Bool
+    # Return false for an empty string
+    if isempty(txt)
+        return false
+    end
+
+    # Get the last character
+    last_char = last(txt)
+
+    # Must be an alphabetical character
+    if !isletter(last_char)
+        return false
+    end
+
+    # If the string is a single character, it is not part of a longer word
+    if ncodeunits(txt) == 1
+        return true
+    end
+
+    # Check the character immediately before the last one
+    # If it is a space, the last character stands alone
+    prev_idx = prevind(txt, lastindex(txt))
+    prev_char = txt[prev_idx]
+    return prev_char == ' '
+end
+using Test
+
+@testset begin
+
+candidate = check_if_last_char_is_a_letter;
+	@test(candidate("apple") == false)
+	@test(candidate("apple pi e") == true)
+	@test(candidate("eeeee") == false)
+	@test(candidate("A") == true)
+	@test(candidate("Pumpkin pie ") == false)
+	@test(candidate("Pumpkin pie 1") == false)
+	@test(candidate("") == false)
+	@test(candidate("eeeee e ") == false)
+	@test(candidate("apple pie") == false)
+	@test(candidate("apple pi e ") == false)
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154813
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   10     10  0.1s
+STDERR: (empty)
+--------------------
+
+================================================================================
+PROBLEM 136 (JL) - HumanEval_136_largest_smallest_integers
+================================================================================
+
+PROMPT:
+----------------------------------------
+"""Create a function that returns a tuple (a, b), where 'a' is
+the largest of negative integers, and 'b' is the smallest
+of positive integers in a vector.
+If there is no negative or positive integers, return them as nothing.
+Examples:
+>>> largest_smallest_integers([2, 4, 1, 3, 5, 7])
+(nothing, 1)
+>>> largest_smallest_integers([])
+(nothing, nothing)
+>>> largest_smallest_integers([0])
+(nothing, nothing)"""
+
+----------------------------------------
+
+TEST CASES:
+----------------------------------------
+using Test
+
+@testset begin
+
+candidate = largest_smallest_integers;
+	@test(candidate([2, 4, 1, 3, 5, 7]) == (nothing, 1))
+	@test(candidate([2, 4, 1, 3, 5, 7, 0]) == (nothing, 1))
+	@test(candidate([1, 3, 2, 4, 5, 6, -2]) == (-2, 1))
+	@test(candidate([4, 5, 3, 6, 2, 7, -7]) == (-7, 2))
+	@test(candidate([7, 3, 8, 4, 9, 2, 5, -9]) == (-9, 2))
+	@test(candidate(Vector{Int64}([])) == (nothing, nothing))
+	@test(candidate([0]) == (nothing, nothing))
+	@test(candidate([-1, -3, -5, -6]) == (-1, nothing))
+	@test(candidate([-1, -3, -5, -6, 0]) == (-1, nothing))
+	@test(candidate([-6, -4, -4, -3, 1]) == (-3, 1))
+	@test(candidate([-6, -4, -4, -3, -100, 1]) == (-3, 1))
+end
+
+----------------------------------------
+
+COMPLETION 1:
+--------------------
+PROGRAM:
+"""Create a function that returns a tuple (a, b), where 'a' is
+the largest of negative integers, and 'b' is the smallest
+of positive integers in a vector.
+If there is no negative or positive integers, return them as nothing.
+Examples:
+>>> largest_smallest_integers([2, 4, 1, 3, 5, 7])
+(nothing, 1)
+>>> largest_smallest_integers([])
+(nothing, nothing)
+>>> largest_smallest_integers([0])
+(nothing, nothing)"""
+function largest_smallest_integers(lst::Vector{Int64})::Tuple{Union{Int64, Nothing}, Union{Int64, Nothing}}
+    negatives = filter(x -> x < 0, lst)
+    positives = filter(x -> x > 0, lst)
+
+    a = isempty(negatives) ? nothing : maximum(negatives)
+    b = isempty(positives) ? nothing : minimum(positives)
+
+    return (a, b)
+end
+using Test
+
+@testset begin
+
+candidate = largest_smallest_integers;
+	@test(candidate([2, 4, 1, 3, 5, 7]) == (nothing, 1))
+	@test(candidate([2, 4, 1, 3, 5, 7, 0]) == (nothing, 1))
+	@test(candidate([1, 3, 2, 4, 5, 6, -2]) == (-2, 1))
+	@test(candidate([4, 5, 3, 6, 2, 7, -7]) == (-7, 2))
+	@test(candidate([7, 3, 8, 4, 9, 2, 5, -9]) == (-9, 2))
+	@test(candidate(Vector{Int64}([])) == (nothing, nothing))
+	@test(candidate([0]) == (nothing, nothing))
+	@test(candidate([-1, -3, -5, -6]) == (-1, nothing))
+	@test(candidate([-1, -3, -5, -6, 0]) == (-1, nothing))
+	@test(candidate([-6, -4, -4, -3, 1]) == (-3, 1))
+	@test(candidate([-6, -4, -4, -3, -100, 1]) == (-3, 1))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154819
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   11     11  0.3s
+STDERR: (empty)
+--------------------
+
+COMPLETION 2:
+--------------------
+PROGRAM:
+"""Create a function that returns a tuple (a, b), where 'a' is
+the largest of negative integers, and 'b' is the smallest
+of positive integers in a vector.
+If there is no negative or positive integers, return them as nothing.
+Examples:
+>>> largest_smallest_integers([2, 4, 1, 3, 5, 7])
+(nothing, 1)
+>>> largest_smallest_integers([])
+(nothing, nothing)
+>>> largest_smallest_integers([0])
+(nothing, nothing)"""
+function largest_smallest_integers(lst::Vector{Int64})::Tuple{Union{Int64, Nothing}, Union{Int64, Nothing}}
+    largest_neg = nothing
+    smallest_pos = nothing
+
+    for x in lst
+        if x < 0
+            if largest_neg === nothing || x > largest_neg
+                largest_neg = x
+            end
+        elseif x > 0
+            if smallest_pos === nothing || x < smallest_pos
+                smallest_pos = x
+            end
+        end
+    end
+
+    return (largest_neg, smallest_pos)
+end
+using Test
+
+@testset begin
+
+candidate = largest_smallest_integers;
+	@test(candidate([2, 4, 1, 3, 5, 7]) == (nothing, 1))
+	@test(candidate([2, 4, 1, 3, 5, 7, 0]) == (nothing, 1))
+	@test(candidate([1, 3, 2, 4, 5, 6, -2]) == (-2, 1))
+	@test(candidate([4, 5, 3, 6, 2, 7, -7]) == (-7, 2))
+	@test(candidate([7, 3, 8, 4, 9, 2, 5, -9]) == (-9, 2))
+	@test(candidate(Vector{Int64}([])) == (nothing, nothing))
+	@test(candidate([0]) == (nothing, nothing))
+	@test(candidate([-1, -3, -5, -6]) == (-1, nothing))
+	@test(candidate([-1, -3, -5, -6, 0]) == (-1, nothing))
+	@test(candidate([-6, -4, -4, -3, 1]) == (-3, 1))
+	@test(candidate([-6, -4, -4, -3, -100, 1]) == (-3, 1))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154819
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   11     11  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 3:
+--------------------
+PROGRAM:
+"""Create a function that returns a tuple (a, b), where 'a' is
+the largest of negative integers, and 'b' is the smallest
+of positive integers in a vector.
+If there is no negative or positive integers, return them as nothing.
+Examples:
+>>> largest_smallest_integers([2, 4, 1, 3, 5, 7])
+(nothing, 1)
+>>> largest_smallest_integers([])
+(nothing, nothing)
+>>> largest_smallest_integers([0])
+(nothing, nothing)"""
+function largest_smallest_integers(lst::Vector{Int64})::Tuple{Union{Int64, Nothing}, Union{Int64, Nothing}}
+    max_neg = nothing
+    min_pos = nothing
+
+    for x in lst
+        if x < 0
+            if max_neg === nothing || x > max_neg
+                max_neg = x
+            end
+        elseif x > 0
+            if min_pos === nothing || x < min_pos
+                min_pos = x
+            end
+        end
+    end
+
+    return (max_neg, min_pos)
+end
+using Test
+
+@testset begin
+
+candidate = largest_smallest_integers;
+	@test(candidate([2, 4, 1, 3, 5, 7]) == (nothing, 1))
+	@test(candidate([2, 4, 1, 3, 5, 7, 0]) == (nothing, 1))
+	@test(candidate([1, 3, 2, 4, 5, 6, -2]) == (-2, 1))
+	@test(candidate([4, 5, 3, 6, 2, 7, -7]) == (-7, 2))
+	@test(candidate([7, 3, 8, 4, 9, 2, 5, -9]) == (-9, 2))
+	@test(candidate(Vector{Int64}([])) == (nothing, nothing))
+	@test(candidate([0]) == (nothing, nothing))
+	@test(candidate([-1, -3, -5, -6]) == (-1, nothing))
+	@test(candidate([-1, -3, -5, -6, 0]) == (-1, nothing))
+	@test(candidate([-6, -4, -4, -3, 1]) == (-3, 1))
+	@test(candidate([-6, -4, -4, -3, -100, 1]) == (-3, 1))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154819
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   11     11  0.2s
+STDERR: (empty)
+--------------------
+
+COMPLETION 4:
+--------------------
+PROGRAM:
+"""Create a function that returns a tuple (a, b), where 'a' is
+the largest of negative integers, and 'b' is the smallest
+of positive integers in a vector.
+If there is no negative or positive integers, return them as nothing.
+Examples:
+>>> largest_smallest_integers([2, 4, 1, 3, 5, 7])
+(nothing, 1)
+>>> largest_smallest_integers([])
+(nothing, nothing)
+>>> largest_smallest_integers([0])
+(nothing, nothing)"""
+function largest_smallest_integers(lst::Vector{Int64})::Tuple{Union{Int64, Nothing}, Union{Int64, Nothing}}
+    # Initialise the results as `nothing`
+    largest_neg::Union{Int64, Nothing} = nothing
+    smallest_pos::Union{Int64, Nothing} = nothing
+
+    for x in lst
+        if x < 0
+            # Update the largest negative if necessary
+            largest_neg = (largest_neg === nothing || x > largest_neg) ? x : largest_neg
+        elseif x > 0
+            # Update the smallest positive if necessary
+            smallest_pos = (smallest_pos === nothing || x < smallest_pos) ? x : smallest_pos
+        end
+    end
+
+    return (largest_neg, smallest_pos)
+end
+using Test
+
+@testset begin
+
+candidate = largest_smallest_integers;
+	@test(candidate([2, 4, 1, 3, 5, 7]) == (nothing, 1))
+	@test(candidate([2, 4, 1, 3, 5, 7, 0]) == (nothing, 1))
+	@test(candidate([1, 3, 2, 4, 5, 6, -2]) == (-2, 1))
+	@test(candidate([4, 5, 3, 6, 2, 7, -7]) == (-7, 2))
+	@test(candidate([7, 3, 8, 4, 9, 2, 5, -9]) == (-9, 2))
+	@test(candidate(Vector{Int64}([])) == (nothing, nothing))
+	@test(candidate([0]) == (nothing, nothing))
+	@test(candidate([-1, -3, -5, -6]) == (-1, nothing))
+	@test(candidate([-1, -3, -5, -6, 0]) == (-1, nothing))
+	@test(candidate([-6, -4, -4, -3, 1]) == (-3, 1))
+	@test(candidate([-6, -4, -4, -3, -100, 1]) == (-3, 1))
+end
+
+
+EXECUTION RESULTS:
+Exit Code: 0
+Status: OK
+Timestamp: 1755154819
+STDOUT:
+Test Summary: | Pass  Total  Time
+test set      |   11     11  0.2s
+STDERR: (empty)
+--------------------

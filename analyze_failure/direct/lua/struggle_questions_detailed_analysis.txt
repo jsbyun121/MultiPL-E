@@ -1,0 +1,1224 @@
+================================================================================
+DETAILED ANALYSIS: UNIVERSAL ZERO ACCURACY CASES - LUA
+================================================================================
+
+These 16 questions achieved 0% accuracy across ALL 5 languages.
+Analysis focuses on Lua implementations with generated code examples.
+Configuration: DIRECT
+
+============================================================
+QUESTION #1: HumanEval_116_sort_array
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- In this Kata, you have to sort a table of non-negative integers according to
+  -- number of ones in their binary representation in ascending order.
+  -- For similar number of ones, sort based on decimal value.
+  -- It must be implemented like this:
+  -- >>> sort_array({1, 5, 2, 3, 4})
+  -- {1, 2, 3, 4, 5}
+  -- >>> sort_array({-2, -3, -4, -5, -6})
+  -- {-6, -5, -4, -3, -2}
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate({1, 5, 2, 3, 4}), {1, 2, 4, 3, 5})
+  lu.assertEquals(candidate({-2, -3, -4, -5, -6}), {-4, -2, -6, -5, -3})
+  lu.assertEquals(candidate({1, 0, 2, 3, 4}), {0, 1, 2, 4, 3})
+  lu.assertEquals(candidate({}), {})
+  lu.assertEquals(candidate({2, 5, 77, 4, 5, 3, 5, 7, 2, 3, 4}), {2, 2, 4, 4, 3, 3, 5, 5, 5, 7, 77})
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function sort_array(arr)
+      local function count_ones(n)
+          local count = 0
+          while n > 0 do
+              count = count + (n % 2)
+              n = math.floor(n / 2)
+          end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function sort_array(arr)
+      local function count_ones(n)
+          local count = 0
+          while n > 0 do
+              count = count + (n % 2)
+              n = math.floor(n / 2)
+          end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #2: HumanEval_129_minPath
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Given a grid with N rows and N columns (N >= 2) and a positive integer k, 
+  -- each cell of the grid contains a value. Every integer in the range [1, N * N]
+  -- inclusive appears exactly once on the cells of the grid.
+  -- You have to find the minimum path of length k in the grid. You can start
+  -- from any cell, and in each step you can move to any of the neighbor cells,
+  -- in other words, you can go to cells which share an edge with you current
+  -- cell.
+  -- Please note that a path of length k means visiting exactly k cells (not
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, 3), {1, 2, 1})
+  lu.assertEquals(candidate({{5, 9, 3}, {4, 1, 6}, {7, 8, 2}}, 1), {1})
+  lu.assertEquals(candidate({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}}, 4), {1, 2, 1, 2})
+  lu.assertEquals(candidate({{6, 4, 13, 10}, {5, 7, 12, 1}, {3, 16, 11, 15}, {8, 14, 9, 2}}, 7), {1, 10, 1, 10, 1, 10, 1})
+  lu.assertEquals(candidate({{8, 14, 9, 2}, {6, 4, 13, 15}, {5, 7, 1, 12}, {3, 10, 11, 16}}, 5), {1, 7, 1, 7, 1})
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  -- Given a grid with N rows and N columns (N >= 2) and a positive integer k, 
+  -- each cell of the grid contains a value. Every integer in the range [1, N * N]
+  -- inclusive appears exactly once on the cells of the grid.
+  -- You have to find the minimum path of length k in the grid. You can start
+  -- from any cell, and in each step you can move to any of the neighbor cells,
+  -- in other words, you can go to cells which share an edge with you current
+  -- cell.
+  -- Please note that a path of length k means visiting exactly k cells (not
+  -- necessarily distinct).
+  -- You CANNOT go off the grid.
+  -- A path A (of length k) is considered less than a path B (of length k) if
+  -- after making the ordered tables of the values on the cells that A and B go
+  ... (truncated)
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  E
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function minPath(grid, k)
+      local n = #grid
+      local total_cells = n * n
+      
+      -- If k is 1, just return the smallest value in the grid
+      if k == 1 then
+          local min_val = grid[1][1]
+          for i = 1, n do
+              for j = 1, n do
+                  if grid[i][j] < min_val then
+                      min_val = grid[i][j]
+                  end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  E
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #3: HumanEval_130_tri
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Everyone knows Fibonacci sequence, it was studied deeply by mathematicians in 
+  -- the last couple centuries. However, what people don't know is Tribonacci sequence.
+  -- Tribonacci sequence is defined by the recurrence:
+  -- tri(1) = 3
+  -- tri(n) = 1 + n / 2, if n is even.
+  -- tri(n) =  tri(n - 1) + tri(n - 2) + tri(n + 1), if n is odd.
+  -- For example:
+  -- tri(2) = 1 + (2 / 2) = 2
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate(3), {1, 3, 2, 8})
+  lu.assertEquals(candidate(4), {1, 3, 2, 8, 3})
+  lu.assertEquals(candidate(5), {1, 3, 2, 8, 3, 15})
+  lu.assertEquals(candidate(6), {1, 3, 2, 8, 3, 15, 4})
+  lu.assertEquals(candidate(7), {1, 3, 2, 8, 3, 15, 4, 24})
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  -- Everyone knows Fibonacci sequence, it was studied deeply by mathematicians in 
+  -- the last couple centuries. However, what people don't know is Tribonacci sequence.
+  -- Tribonacci sequence is defined by the recurrence:
+  -- tri(1) = 3
+  -- tri(n) = 1 + n / 2, if n is even.
+  -- tri(n) =  tri(n - 1) + tri(n - 2) + tri(n + 1), if n is odd.
+  -- For example:
+  -- tri(2) = 1 + (2 / 2) = 2
+  -- tri(4) = 3
+  -- tri(3) = tri(2) + tri(1) + tri(4)
+  --        = 2 + 3 + 3 = 8 
+  -- You are given a non-negative integer number n, you have to a return a table of the 
+  ... (truncated)
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  E
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  -- Everyone knows Fibonacci sequence, it was studied deeply by mathematicians in 
+  -- the last couple centuries. However, what people don't know is Tribonacci sequence.
+  -- Tribonacci sequence is defined by the recurrence:
+  -- tri(1) = 3
+  -- tri(n) = 1 + n / 2, if n is even.
+  -- tri(n) =  tri(n - 1) + tri(n - 2) + tri(n + 1), if n is odd.
+  -- For example:
+  -- tri(2) = 1 + (2 / 2) = 2
+  -- tri(4) = 3
+  -- tri(3) = tri(2) + tri(1) + tri(4)
+  --        = 2 + 3 + 3 = 8 
+  -- You are given a non-negative integer number n, you have to a return a table of the 
+  ... (truncated)
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  E
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #4: HumanEval_132_is_nested
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Create a function that takes a string as input which contains only square brackets.
+  -- The function should return true if and only if there is a valid subsequence of brackets 
+  -- where at least one bracket in the subsequence is nested.
+  -- >>> is_nested('[[]]')
+  -- true
+  -- >>> is_nested('[]]]]]]][[[[[]')
+  -- false
+  -- >>> is_nested('[][]')
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate('[[]]'), true)
+  lu.assertEquals(candidate('[]]]]]]][[[[[]'), false)
+  lu.assertEquals(candidate('[][]'), false)
+  lu.assertEquals(candidate('[]'), false)
+  lu.assertEquals(candidate('[[[[]]]]'), true)
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function is_nested(string)
+      local stack = {}
+      local has_nested = false
+      
+      for i = 1, #string do
+          local char = string:sub(i, i)
+          
+          if char == '[' then
+              table.insert(stack, i)
+          elseif char == ']' then
+              if #stack > 0 then
+                  local open_index = table.remove(stack)
+  ... (truncated)
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function is_nested(string)
+      local stack = {}
+      local has_nested = false
+      
+      for i = 1, #string do
+          local char = string:sub(i, i)
+          
+          if char == '[' then
+              table.insert(stack, i)
+          elseif char == ']' then
+              if #stack > 0 then
+                  local opening_idx = table.remove(stack)
+  ... (truncated)
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #5: HumanEval_134_check_if_last_char_is_a_letter
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Create a function that returns true if the last character
+  -- of a given string is an alphabetical character and is not
+  -- a part of a word, and false otherwise.
+  -- Note: "word" is a group of characters separated by space.
+  -- Examples:
+  -- >>> check_if_last_char_is_a_letter('apple pie')
+  -- false
+  -- >>> check_if_last_char_is_a_letter('apple pi e')
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate('apple'), false)
+  lu.assertEquals(candidate('apple pi e'), true)
+  lu.assertEquals(candidate('eeeee'), false)
+  lu.assertEquals(candidate('A'), true)
+  lu.assertEquals(candidate('Pumpkin pie '), false)
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function check_if_last_char_is_a_letter(txt)
+      -- Handle empty string
+      if txt == "" then
+          return false
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function check_if_last_char_is_a_letter(txt)
+      -- Handle empty string
+      if txt == "" then
+          return false
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #6: HumanEval_135_can_arrange
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Create a function which returns the largest index of an element which
+  -- is not greater than or equal to the element immediately preceding it. If
+  -- no such element exists then return -1. The given table will not contain
+  -- duplicate values.
+  -- Examples:
+  -- >>> can_arrange({1, 2, 4, 3, 5})
+  -- 3
+  -- >>> can_arrange({1, 2, 3})
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate({1, 2, 4, 3, 5}), 3)
+  lu.assertEquals(candidate({1, 2, 4, 5}), -1)
+  lu.assertEquals(candidate({1, 4, 2, 5, 6, 7, 8, 9, 10}), 2)
+  lu.assertEquals(candidate({4, 8, 5, 7, 3}), 4)
+  lu.assertEquals(candidate({}), -1)
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function can_arrange(arr)
+      local n = #arr
+      
+      -- If array has less than 2 elements, no pair to compare
+      if n <= 1 then
+          return -1
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function can_arrange(arr)
+      local n = #arr
+      
+      -- If array has less than 2 elements, no pair to compare
+      if n <= 1 then
+          return -1
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #7: HumanEval_145_order_by_points
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Write a function which sorts the given table of integers
+  -- in ascending order according to the sum of their digits.
+  -- Note: if there are several items with similar sum of their digits,
+  -- order them based on their index in original table.
+  -- For example:
+  -- >>> order_by_points({1, 11, -1, -11, -12})
+  -- {-1, -11, 1, -12, 11}
+  -- >>> order_by_points({})
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate({1, 11, -1, -11, -12}), {-1, -11, 1, -12, 11})
+  lu.assertEquals(candidate({1234, 423, 463, 145, 2, 423, 423, 53, 6, 37, 3457, 3, 56, 0, 46}), {0, 2, 3, 6, 53, 423, 423, 423, 1234, 145, 37, 46, 56, 463, 3457})
+  lu.assertEquals(candidate({}), {})
+  lu.assertEquals(candidate({1, -11, -32, 43, 54, -98, 2, -3}), {-3, -32, -98, -11, 1, 2, 43, 54})
+  lu.assertEquals(candidate({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}), {1, 10, 2, 11, 3, 4, 5, 6, 7, 8, 9})
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function order_by_points(nums)
+      if #nums == 0 then
+          return {}
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function order_by_points(nums)
+      if #nums == 0 then
+          return {}
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #8: HumanEval_160_do_algebra
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Given two tables operator, and operand. The first table has basic algebra operations, and 
+  -- the second table is a table of integers. Use the two given tables to build the algebric 
+  -- expression and return the evaluation of this expression.
+  -- The basic algebra operations:
+  -- Addition ( + ) 
+  -- Subtraction ( - ) 
+  -- Multiplication ( * ) 
+  -- Floor division ( // ) 
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate({'**', '*', '+'}, {2, 3, 4, 5}), 37)
+  lu.assertEquals(candidate({'+', '*', '-'}, {2, 3, 4, 5}), 9)
+  lu.assertEquals(candidate({'//', '*'}, {7, 3, 4}), 8)
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function do_algebra(operator, operand)
+      local result = operand[1]
+      
+      for i = 1, #operator do
+          local op = operator[i]
+          local next_operand = operand[i + 1]
+          
+          if op == "+" then
+              result = result + next_operand
+          elseif op == "-" then
+              result = result - next_operand
+          elseif op == "*" then
+  ... (truncated)
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function do_algebra(operator, operand)
+      local result = operand[1]
+      
+      for i = 1, #operator do
+          local op = operator[i]
+          local next_operand = operand[i + 1]
+          
+          if op == '+' then
+              result = result + next_operand
+          elseif op == '-' then
+              result = result - next_operand
+          elseif op == '*' then
+  ... (truncated)
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #9: HumanEval_162_string_to_md5
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Given a string 'text', return its md5 hash equivalent string.
+  -- If 'text' is an empty string, return nil.
+  -- >>> string_to_md5('Hello world')
+  -- '3e25960a79dbc69b674cd4ec67a72c62'
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate('Hello world'), '3e25960a79dbc69b674cd4ec67a72c62')
+  lu.assertEquals(candidate(''), None)
+  lu.assertEquals(candidate('A B C'), '0ef78513b0cb8cef12743f5aeb35f888')
+  lu.assertEquals(candidate('password'), '5f4dcc3b5aa765d61d8327deb882cf99')
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function string_to_md5(text)
+      if text == "" then
+          return nil
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  E
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function string_to_md5(text)
+      if text == "" then
+          return nil
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  E
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #10: HumanEval_163_generate_integers
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Given two positive integers a and b, return the even digits between a
+  -- and b, in ascending order.
+  -- For example:
+  -- >>> generate_integers(2, 8)
+  -- {2, 4, 6, 8}
+  -- >>> generate_integers(8, 2)
+  -- {2, 4, 6, 8}
+  -- >>> generate_integers(10, 14)
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate(2, 10), {2, 4, 6, 8})
+  lu.assertEquals(candidate(10, 2), {2, 4, 6, 8})
+  lu.assertEquals(candidate(132, 2), {2, 4, 6, 8})
+  lu.assertEquals(candidate(17, 89), {})
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function generate_integers(a, b)
+      -- Ensure we're working with the correct range (ascending)
+      local start, end_val = math.min(a, b), math.max(a, b)
+      
+      local result = {}
+      
+      -- Iterate through each number in the range
+      for num = start, end_val do
+          -- Check if the number contains any even digits
+          local digits = {}
+          local temp = num
+          while temp > 0 do
+  ... (truncated)
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  E
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function generate_integers(a, b)
+      -- Ensure we are working with the range in ascending order
+      local start, end_val = math.min(a, b), math.max(a, b)
+      
+      local result = {}
+      
+      -- Iterate through each number in the range
+      for num = start, end_val do
+          -- Check if the number contains any even digits (0, 2, 4, 6, 8)
+          local has_even_digit = false
+          local temp = num
+          
+  ... (truncated)
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #11: HumanEval_37_sort_even
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- This function takes a table l and returns a table l' such that
+  -- l' is identical to l in the odd indicies, while its values at the even indicies are equal
+  -- to the values of the even indicies of l, but sorted.
+  -- >>> sort_even({1, 2, 3})
+  -- {1, 2, 3}
+  -- >>> sort_even({5, 6, 3, 4})
+  -- {3, 6, 5, 4}
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate({1, 2, 3}), {1, 2, 3})
+  lu.assertEquals(candidate({5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10}), {-10, 3, -5, 2, -3, 3, 5, 0, 9, 1, 123})
+  lu.assertEquals(candidate({5, 8, -12, 4, 23, 2, 3, 11, 12, -10}), {-12, 8, 3, 4, 5, 2, 12, 11, 23, -10})
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function sort_even(l)
+      -- Create a copy of the original table to avoid modifying it
+      local l_prime = {}
+      for i = 1, #l do
+          l_prime[i] = l[i]
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function sort_even(l)
+      -- Create a copy of the original table to avoid modifying it
+      local l_prime = {}
+      for i = 1, #l do
+          l_prime[i] = l[i]
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #12: HumanEval_54_same_chars
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Check if two words have the same characters.
+  -- >>> same_chars('eabcdzzzz', 'dddzzzzzzzddeddabc')
+  -- true
+  -- >>> same_chars('abcd', 'dddddddabc')
+  -- true
+  -- >>> same_chars('dddddddabc', 'abcd')
+  -- true
+  -- >>> same_chars('eabcd', 'dddddddabc')
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate('eabcdzzzz', 'dddzzzzzzzddeddabc'), true)
+  lu.assertEquals(candidate('abcd', 'dddddddabc'), true)
+  lu.assertEquals(candidate('dddddddabc', 'abcd'), true)
+  lu.assertEquals(candidate('eabcd', 'dddddddabc'), false)
+  lu.assertEquals(candidate('abcd', 'dddddddabcf'), false)
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function same_chars(s0, s1)
+      -- If the lengths are different, they can't have the same characters
+      if #s0 ~= #s1 then
+          return false
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function same_chars(s0, s1)
+      -- If the lengths are different, they can't have the same characters
+      if #s0 ~= #s1 then
+          return false
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #13: HumanEval_68_pluck
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- "Given a table representing a branch of a tree that has non-negative integer nodes
+  -- your task is to pluck one of the nodes and return it.
+  -- The plucked node should be the node with the smallest even value.
+  -- If multiple nodes with the same smallest even value are found return the node that has smallest index.
+  -- The plucked node should be returned in a table, [ smalest_value, its index ],
+  -- If there are no even values or the given table is empty, return [].
+  -- Example 1:
+  -- >>> pluck({4, 2, 3})
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate({4, 2, 3}), {2, 1})
+  lu.assertEquals(candidate({1, 2, 3}), {2, 1})
+  lu.assertEquals(candidate({}), {})
+  lu.assertEquals(candidate({5, 0, 3, 0, 4, 2}), {0, 1})
+  lu.assertEquals(candidate({1, 2, 3, 0, 5, 3}), {0, 3})
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function pluck(arr)
+      if #arr == 0 then
+          return {}
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function pluck(arr)
+      if #arr == 0 then
+          return {}
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #14: HumanEval_84_solve
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Given a positive integer N, return the total sum of its digits in binary.
+  -- Example
+  -- >>> solve(1000)
+  -- '1'
+  -- >>> solve(150)
+  -- '110'
+  -- >>> solve(147)
+  -- '1100'
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate(1000), '1')
+  lu.assertEquals(candidate(150), '110')
+  lu.assertEquals(candidate(147), '1100')
+  lu.assertEquals(candidate(333), '1001')
+  lu.assertEquals(candidate(963), '10010')
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function solve(N)
+      -- Handle edge case where N is 0
+      if N == 0 then
+          return "0"
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function solve(N)
+      -- Handle edge case where N is 0
+      if N == 0 then
+          return "0"
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #15: HumanEval_91_is_bored
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- You'll be given a string of words, and your task is to count the number
+  -- of boredoms. A boredom is a sentence that starts with the word "I".
+  -- Sentences are delimited by '.', '?' or '!'.
+  -- For example:
+  -- >>> is_bored('Hello world')
+  -- 0
+  -- >>> is_bored('The sky is blue. The sun is shining. I love this weather')
+  -- 1
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate('Hello world'), 0)
+  lu.assertEquals(candidate('Is the sky blue?'), 0)
+  lu.assertEquals(candidate('I love It !'), 1)
+  lu.assertEquals(candidate('bIt'), 0)
+  lu.assertEquals(candidate('I feel good today. I will be productive. will kill It'), 2)
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function is_bored(S)
+      local count = 0
+      local sentences = {}
+      
+      -- Split the string by sentence delimiters
+      local delimiters = {".", "?", "!"}
+      for _, delimiter in ipairs(delimiters) do
+          local parts = {}
+          for part in string.gmatch(S, "([^" .. delimiter .. "]+)" .. delimiter) do
+              table.insert(parts, part)
+          end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function is_boud(S)
+      local count = 0
+      local sentences = {}
+      
+      -- Split the string by sentence delimiters
+      local delimiters = {'.', '?', '!'}
+      for i, char in ipairs(S) do
+          if char == '.' or char == '?' or char == '!' then
+              -- Extract the part before the delimiter
+              local sentence = ""
+              for j = 1, i - 1 do
+                  sentence = sentence .. S:sub(j, j)
+  ... (truncated)
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  E
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+============================================================
+QUESTION #16: HumanEval_92_any_int
+============================================================
+
+PROBLEM DESCRIPTION:
+--------------------
+  -- Create a function that takes 3 numbers.
+  -- Returns true if one of the numbers is equal to the sum of the other two, and all numbers are integers.
+  -- Returns false in any other cases.
+  -- Examples
+  -- >>> any_int(5, 2, 7)
+  -- true
+  -- >>> any_int(3, 2, 2)
+  -- false
+
+TEST CASES:
+-----------
+  lu.assertEquals(candidate(2, 3, 1), true)
+  lu.assertEquals(candidate(2.5, 2, 3), false)
+  lu.assertEquals(candidate(1.5, 5, 3.5), false)
+  lu.assertEquals(candidate(2, 6, 2), false)
+  lu.assertEquals(candidate(4, 2, 2), true)
+
+FAILURE ANALYSIS:
+----------------
+  Total attempts: 4
+  Successful: 0
+  Failed: 4
+
+  Failure patterns:
+    - Exception_exit_1: 4 times
+  Common error types:
+    - Test assertion failure: 4 times
+
+EXAMPLE FAILURE #1:
+--------------------
+Generated Function:
+  local function any_int(x, y, z)
+      -- Check if all numbers are integers
+      local is_integer = function(n)
+          return type(n) == "number" and n == math.floor(n)
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+EXAMPLE FAILURE #2:
+--------------------
+Generated Function:
+  local function any_int(x, y, z)
+      -- Check if all numbers are integers
+      local function is_integer(n)
+          return type(n) == "number" and n == math.floor(n)
+      end
+
+Status: Exception
+Exit Code: 1
+Error Output:
+  F
+  Failed tests:
+  -------------
+  1) test_humaneval
+
+
+================================================================================
+OVERALL PATTERNS AND INSIGHTS - LUA
+================================================================================
+
+Common issues observed across these universal failing questions:
+
+1. Lua-specific syntax issues:
+   - Use of deprecated functions like table.getn() instead of # operator
+   - Incorrect table manipulation methods
+   - Missing return statements or incorrect return values
+
+2. Logic errors:
+   - Incorrect algorithm implementation
+   - Off-by-one errors in loops
+   - Misunderstanding of problem requirements
+
+3. Edge case handling:
+   - Poor handling of empty collections
+   - Incorrect handling of special input values
+   - Missing validation for boundary conditions
+
+These patterns suggest the LLM needs better training on:
+- Modern Lua syntax and idioms
+- Algorithm implementation in Lua
+- Edge case handling and input validation
+- Language-specific data structure manipulation
