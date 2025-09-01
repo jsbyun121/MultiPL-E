@@ -7,7 +7,11 @@ cache
 scratch/
 out_preprocessed/
 jsons/
-slurm-*
+slurm*
 before_proc_*/
 after_proc_*/
 results*
+beta/
+debug/
+unused/
+analyze_failure/
