@@ -2,6 +2,33 @@
 
 This repository is a fork of [MultiPL-E](https://github.com/nuprl/MultiPL-E) to evaluate recent LLMs (instruction-tuned models, thinking models, and etc.) on Low Resource Programming Languages (LRPLs).
 
+Crucially, this fork uses a **corrected and improved version of the dataset** for five languages (**Julia, Lua, OCaml, R, Racket**) to ensure a more accurate and reliable evaluation. The original benchmark contains several errors that unfairly penalize modern models.
+
+<details>
+<summary><strong>Click to see the list of dataset corrections</strong></summary>
+
+### 1. Logical Problems in Prompts and Test Cases
+* **`HumanEval_75_is_multiply_prime`**: Resolved a mismatch between problem instructions and test cases.
+* **`HumanEval_92_any_int`**: Fixed an incorrect test case that did not align with the problem's requirements.
+* **`HumanEval_116_sort_array`**: Corrected a discrepancy between the sorting criteria in the instructions and the test cases.
+* **`HumanEval_128_prod_signs`**: Amended an incorrect example in the prompt's docstring.
+* **`HumanEval_140_fix_spaces`**: Corrected a faulty test case.
+* **`HumanEval_142_sum_squares`**: Repaired corrupted or syntactically incorrect examples.
+* **`HumanEval_145_order_by_points`**: Clarified vague and ambiguous logic in the question to provide a more precise problem statement.
+* **`HumanEval_148_bf`**: Fixed a contradiction between the provided examples and the main instructions.
+* **`HumanEval_151_double_the_difference`**: Replaced an incorrect test case that produced an invalid result.
+* **`HumanEval_162_string_to_md5`**: Addressed incorrect handling for language-specific `None`/`null` data types required by the test cases.
+
+### 2. General Prompt Ambiguities
+* **0-Based Indexing:** Added clarifications to prompts where array/list index interpretation was ambiguous, explicitly enforcing a 0-based convention to ensure consistent behavior.
+
+### 3. Language-Specific Fixes
+* **R:** Corrected issues related to the handling of empty vectors, a common edge case.
+* **OCaml:** Fixed incorrect usage of unary operators to align with OCaml's syntax.
+* **Julia:** Resolved parsing issues caused by the triple-quote (`"""`) docstring character.
+
+</details>
+
 # Installation
 
 ```bash
