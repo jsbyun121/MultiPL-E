@@ -82,7 +82,7 @@ case "$MODEL" in
     "gpt-oss")
         MODEL_NAME="openai/gpt-oss-20b"
         MODEL_DIR="openai_gpt-oss-20b"
-        BATCH_SIZE=2 # Use a smaller batch size for the 20B model
+        BATCH_SIZE=16 # Use a smaller batch size for the 20B model
         TEMP=1.0
         EXTRA_FLAGS="--max-tokens ${MAX_TOKENS} --top-p 1.0"
         TOKEN_SUFFIX="_mt_${MAX_TOKENS}"

@@ -28,7 +28,7 @@ if ! [[ "$max_tokens" =~ ^[1-9][0-9]*$ ]]; then
 fi
 
 # Languages to test
-languages=("jl" "lua" "ml" "r" "rkt")
+languages=("lua" "ml" "r" "rkt")
 
 # --- Job Submission Logic ---
 
@@ -63,7 +63,7 @@ if [[ "$model_alias" == "gpt-oss" || "$model_alias" == "all" ]]; then
       job_name="gpt_oss_${lang}_${max_tokens}"
       command_to_run="bash scripts/run_eval.sh -m gpt-oss -l ${lang} -x ${max_tokens}"
       echo "Submitting job: ${job_name}"
-      bsr ad 1 -j "${job_name}" -c "${command_to_run}"
+      bsr h1 1 -j "${job_name}" -c "${command_to_run}"
       echo "--------------------"
     done
 fi
