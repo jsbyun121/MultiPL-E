@@ -78,7 +78,7 @@ for LANG in "${LANG_ARRAY[@]}"; do
     # Construct the Docker command
     CMD="docker run --rm --network none --user $(id -u):$(id -g) \
         -v ${BASE_DIR}:/out:rw \
-        ghcr.io/nuprl/multipl-e-evaluation \
+        multipl-e-updated:latest \
         --dir /out/${LANG} \
         --output-dir /out/result/${LANG}"
 

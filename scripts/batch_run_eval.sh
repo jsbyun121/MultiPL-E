@@ -28,7 +28,7 @@ if ! [[ "$max_tokens" =~ ^[1-9][0-9]*$ ]]; then
 fi
 
 # Languages to test
-languages=("lua" "ml" "r" "rkt")
+languages=("lua" "ml" "r" "rkt" "jl")
 
 # --- Job Submission Logic ---
 

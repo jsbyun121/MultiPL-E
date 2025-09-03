@@ -12,44 +12,118 @@ import argparse
 from typing import Dict, Tuple, Optional
 from typing import List
 from pprint import pprint
-import re
 
-def _clean_code(completion, function_signature):
+def multiline_prefix_comments():
+    """Define comment start patterns for different languages."""
+    return {
+        'ml': ['(*'],
+        'jl': ['"""'],
+        'lua': [],
+        'r': [],
+        'rkt': []
+    }
+
+def multiline_postfix_comments():
+    """Define comment end patterns for different languages."""
+    return {
+        'ml': ['*)'],
+        'jl': ['"""'],
+        'lua': [],
+        'r': [],
+        'rkt': []
+    }
+
+def prefix_comments():
+    """Define comment start patterns for different languages."""
+    return {
+        'ml': ['(*', '*'],
+        'jl': ['"""'],
+        'lua': ['--'],
+        'r': ['#'],
+        'rkt': [';;'],
+    }
+
+def postfix_comments():
+    """Define comment end patterns for different languages."""
+    return {
+        'ml': ['*)'],
+        'jl': ['"""'],
+        'lua': [],
+        'r': [],
+        'rkt': [],
+    }
+
+def _clean_code(completion, language):
         """Clean up chat template completions to extract just the code"""
+        import re
 
-        completion_split = completion.split('\n')
+        prefixes = multiline_prefix_comments().get(language, [])
+        postfixes = multiline_postfix_comments().get(language, [])
 
-        while completion_split:
-            line = completion_split[0]
-            # Check if the line contains the function signature
-            if function_signature in line:
-                # If found, we can use this line
-                _, _, after = line.partition(function_signature)
-                completion_split[0] = after
-                break
-            else:
-                completion_split = completion_split[1:]
+        comment_patterns = []
 
-        results = []
+        if prefixes and postfixes:
+            # This handles cases like 'ml': (* ... *) or 'jl': """ ... """
+            # We escape the special characters for regex
+            start_delims = [re.escape(p) for p in prefixes]
+            end_delims = [re.escape(p) for p in postfixes]
+            
+            # Create patterns for each start/end pair.
+            # This logic assumes a simple structure but is robust for your defined languages.
+            for start in start_delims:
+                for end in end_delims:
+                    # The '.*?' is a non-greedy match for any characters, including newlines
+                    comment_patterns.append(f'{start}.*?{end}')
 
-        for line in completion_split:
-            markdown = "```"
-            if markdown in line:
-                before, _, _ = line.partition(markdown)
-                results.append(before)
-                break
-            else:
-                results.append(line)
+        if comment_patterns:
+            # Join all possible comment patterns with OR '|'
+            full_pattern = '|'.join(comment_patterns)
+            
+            # Remove all occurrences of comments.
+            # re.DOTALL is crucial: it allows '.' to match newline characters,
+            # which is essential for multiline block comments.
+            completion = re.sub(full_pattern, '', completion, flags=re.DOTALL)
 
-        result = '\n'.join(results)
+        # Extract code from markdown blocks if present
+        code_block_match = re.search(
+            r'```(?:\S+)?\s*\n(.*?)\n?```',
+            completion,
+            re.DOTALL
+        )
+        if code_block_match:
+            extracted_code = code_block_match.group(1).strip()
+
+            # breakpoint()
+            
+            # Remove duplicate #lang racket if it already exists in prompt
+            lines = extracted_code.split('\n')
+
+            while len(lines) > 0 and lines[0].strip() == '':
+                lines = lines[1:]
+
+            # breakpoint()
+
+            for i, line in enumerate(lines):
+                stripped_line = line.strip()
+                if stripped_line.lower().startswith(('#lang', '#julia', '#r', '#rkt', '#ocaml', '#lua')):
+                    lines.pop(i)
+                    break
+            
+            result = '\n'.join(lines)
+
+            # breakpoint()
+            
+            return result
         
+        # Fallback: clean up the completion as-is
+        result = ""
         return result
 
-def process_post_completions(post_completions: List[str], function_signature: str, model: str) -> List[str]:
+def process_post_completions(post_completions: List[str], model: str, language: str) -> List[str]:
     cleaned_completions = []
     for post_completion in post_completions:
         post_completion = remove_until_end_reasoning(post_completion, model)
-        post_completion = _clean_code(post_completion, function_signature)
+        post_completion = _clean_code(post_completion, language)
         cleaned_completions.append(post_completion)
 
     return cleaned_completions
@@ -74,19 +148,52 @@ def remove_until_end_reasoning(post_completion: str, model: str) -> str:
         return post_completion[match.start():]
     return post_completion
 
-def get_function_signature(prompt: str) -> str:
-    """Extract the function signature from the prompt."""
-    prompt_str = prompt.strip()
 
-    if not prompt_str:
+def remove_code_from_bottom(prompt: str, language: str) -> str:
+    """
+    Search from bottom up. Keep everything until we find a comment line.
+    """
+    lines = prompt.split('\n')
+    if not lines:
         return ""
-    else:
-        prompt_split = prompt_str.split('\n')
-        function_signature = prompt_split[-1]
-        return function_signature.strip()
 
-def process_json_file(input_path: Path, output_path: Path, dry_run: bool = False, model: str = ""):
+    if prefix_comments().get(language, []):
+        start_patterns = prefix_comments()[language]
+    else:
+        start_patterns = ['"""', "'''"]
+
+    if postfix_comments().get(language, []):
+        end_patterns = postfix_comments()[language]
+    else:
+        end_patterns = ['"""', "'''"]
+
+    # Search from bottom up
+    for i in range(len(lines) - 1, -1, -1):
+        line = lines[i]
+        stripped = line.strip()
+
+        # Skip empty lines
+        if not stripped:
+            continue
+
+        # Check if this line is a comment
+        for start_pattern in start_patterns:
+            if stripped.startswith(start_pattern):
+                # Found comment - keep everything up to and including this line
+                return '\n'.join(lines[:i + 1])
+            
+            else:
+                for end_pattern in end_patterns:
+                    if stripped.endswith(end_pattern):
+                        # Found comment - keep everything up to and including this line
+                        return '\n'.join(lines[:i + 1])
+
+    # No comments found, return original
+    return '\n'.join(lines)
+
+def process_json_file(input_path: Path, output_path: Path, dry_run: bool = False, model: str = "") -> Dict[str, int]:
     """Process a single JSON file to separate signature from prompt"""
+    stats = {"processed": 0, "modified": 0, "errors": 0}
     
     try:
         # Read the file (handle both .json and .json.gz)
@@ -97,19 +204,33 @@ def process_json_file(input_path: Path, output_path: Path, dry_run: bool = False
             with open(input_path, 'r') as f:
                 data = json.load(f)
         
+        stats["processed"] = 1
+        
         # Remove code from bottom, keeping headers and comments
         original_prompt = data.get("prompt", "")
         language = data.get("language", "")
         post_completions = data.get("post_completions", "")
-
-        function_signature = get_function_signature(original_prompt)
-        processed_completions = process_post_completions(post_completions, function_signature, model) if post_completions else ""
+        
+        processed_prompt = remove_code_from_bottom(original_prompt, language) + '\n'
+        processed_completions = process_post_completions(post_completions, model, language) if post_completions else ""
 
         data["completions"] = processed_completions
 
         for key in ["post_completions", "pre_completions"]:
             if key in data:
                 del data[key]
+        
+        if processed_prompt != original_prompt:
+            # Modify the data structure
+            data["prompt"] = processed_prompt
+            stats["modified"] = 1
+            
+            print(f"Modified {input_path.name}:")
+            print(f"  Language: {language}")
+            print(f"  Original prompt lines: {len(original_prompt.splitlines())}")
+            print(f"  Processed prompt lines: {len(processed_prompt.splitlines())}")
+            print(f"  Removed code from bottom, kept headers and comments")
+            print()
         
         # Write the modified file if not dry run
         if not dry_run:
@@ -124,6 +245,9 @@ def process_json_file(input_path: Path, output_path: Path, dry_run: bool = False
     
     except Exception as e:
         print(f"Error processing {input_path}: {e}")
+        stats["errors"] = 1
+    
+    return stats
 
 def main():
     parser = argparse.ArgumentParser(description="Preprocess MultiPL-E JSON files to separate signature from prompt")
@@ -134,6 +258,7 @@ def main():
     parser.add_argument("--language", type=str, help="Process only files with specific language")
     parser.add_argument("--model", "-m", type=str, help="Give information about the model")
 
+    
     args = parser.parse_args()
     
     if not args.input_dir.exists():
@@ -152,6 +277,8 @@ def main():
     if args.dry_run:
         print("DRY RUN MODE - No files will be modified")
     print()
+    
+    total_stats = {"processed": 0, "modified": 0, "errors": 0}
     
     for json_file in json_files:
         # Filter by language if specified
@@ -174,7 +301,15 @@ def main():
         output_path = args.output_dir / relative_path
         
         # Process the file
-        process_json_file(json_file, output_path, args.dry_run, args.model)
+        stats = process_json_file(json_file, output_path, args.dry_run, args.model)
+        
+        for key in total_stats:
+            total_stats[key] += stats[key]
+    
+    print(f"\nSummary:")
+    print(f"  Files processed (prompts): {total_stats['processed']}")
+    print(f"  Files modified (prompts): {total_stats['modified']}")
+    print(f"  Errors: {total_stats['errors']}")
     
     if args.dry_run:
         print(f"\nTo apply changes, run without --dry-run flag")
