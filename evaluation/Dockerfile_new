@@ -28,14 +28,20 @@ ENV PATH="/usr/racket/bin:${PATH}"
 # Install common Racket packages at installation scope
 RUN raco pkg install --auto --scope installation crypto srfi math data
 
-# OCaml (FIXED: Using the official opam package from Ubuntu's repository)
-# The external PPA does not support Ubuntu 22.04, so we use the stable version
-# from the main repository. This version of opam can still install the latest OCaml compiler.
+# OCaml (FIXED: System-wide installation for multi-user access)
+ENV OPAMROOT=/opt/opam
 RUN apt-get update && apt-get install -y --no-install-recommends opam && \
+    # Initialize opam in the system-wide location defined by OPAMROOT
     opam init --disable-sandboxing --bare && \
+    # Create the OCaml compiler switch
     opam switch create 5.2.1 && \
+    # Ensure all users can read and execute the files
+    chmod -R a+rX "$OPAMROOT" && \
     rm -rf /var/lib/apt/lists/*
-ENV PATH="/root/.opam/5.2.1/bin:${PATH}"
+
+# Set the PATH to the system-wide OCaml binaries.
+# Note: opam automatically creates the switch inside the OPAMROOT dir.
+ENV PATH="${OPAMROOT}/5.2.1/bin:${PATH}"
 
 
 # Lua (FIXED)

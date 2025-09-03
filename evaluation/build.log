@@ -1,11 +1,11 @@
 #0 building with "default" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile_new
-#1 transferring dockerfile: 2.41kB done
+#1 transferring dockerfile: 2.57kB done
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/ubuntu:22.04
-#2 DONE 1.2s
+#2 DONE 0.6s
 
 #3 [internal] load .dockerignore
 #3 transferring context: 2B done
@@ -14,290 +14,156 @@
 #4 [ 1/11] FROM docker.io/library/ubuntu:22.04@sha256:4e0171b9275e12d375863f2b3ae9ce00a4c53ddda176bd55868df97ac6f21a6e
 #4 DONE 0.0s
 
-#5 [ 4/11] RUN wget -nv https://download.racket-lang.org/installers/8.18/racket-8.18-x86_64-linux-buster-cs.sh -O racket-installer.sh &&     sh racket-installer.sh --in-place --dest /usr/racket &&     rm racket-installer.sh
+#5 [ 2/11] RUN apt-get update -yqq && apt-get install -yqq --fix-missing     curl build-essential python3-pip python3-tqdm     wget     software-properties-common
 #5 CACHED
 
-#6 [ 2/11] RUN apt-get update -yqq && apt-get install -yqq --fix-missing     curl build-essential python3-pip python3-tqdm     wget     software-properties-common
+#6 [ 3/11] RUN apt-get update &&     apt-get install -y --no-install-recommends     r-base r-base-dev &&     rm -rf /var/lib/apt/lists/*
 #6 CACHED
 
-#7 [ 3/11] RUN apt-get update &&     apt-get install -y --no-install-recommends     r-base r-base-dev &&     rm -rf /var/lib/apt/lists/*
+#7 [ 4/11] RUN wget -nv https://download.racket-lang.org/installers/8.18/racket-8.18-x86_64-linux-buster-cs.sh -O racket-installer.sh &&     sh racket-installer.sh --in-place --dest /usr/racket &&     rm racket-installer.sh
 #7 CACHED
 
 #8 [ 5/11] RUN raco pkg install --auto --scope installation crypto srfi math data
 #8 CACHED
 
-#9 [internal] load build context
-#9 transferring context: 1.94kB done
-#9 DONE 0.0s
+#9 [ 6/11] RUN apt-get update && apt-get install -y --no-install-recommends opam &&     opam init --disable-sandboxing --bare &&     opam switch create 5.2.1 &&     chmod -R a+rX "/opt/opam" &&     rm -rf /var/lib/apt/lists/*
+#9 CACHED
 
-#10 [ 6/11] RUN apt-get update && apt-get install -y --no-install-recommends opam &&     opam init --disable-sandboxing --bare &&     opam switch create 5.2.1 &&     rm -rf /var/lib/apt/lists/*
-#10 0.597 Get:1 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
-#10 0.717 Get:2 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
-#10 1.473 Get:3 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [3310 kB]
-#10 2.039 Get:4 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
-#10 2.357 Get:5 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
-#10 2.530 Get:6 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1272 kB]
-#10 2.576 Get:7 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [48.5 kB]
-#10 2.577 Get:8 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [5374 kB]
-#10 2.677 Get:9 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
-#10 4.456 Get:10 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
-#10 4.461 Get:11 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
-#10 4.469 Get:12 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
-#10 4.562 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [5560 kB]
-#10 4.875 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [75.9 kB]
-#10 4.878 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1579 kB]
-#10 4.986 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [3623 kB]
-#10 5.192 Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [83.2 kB]
-#10 5.195 Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.2 kB]
-#10 5.328 Fetched 41.3 MB in 5s (8134 kB/s)
-#10 5.328 Reading package lists...
-#10 6.194 Reading package lists...
-#10 6.979 Building dependency tree...
-#10 7.148 Reading state information...
-#10 7.287 The following additional packages will be installed:
-#10 7.287   bubblewrap libamd2 libcolamd2 libglpk40 libltdl7 libsuitesparseconfig5
-#10 7.288   opam-installer
-#10 7.288 Suggested packages:
-#10 7.288   libiodbc2-dev default-libmysqlclient-dev opam-doc
-#10 7.288 Recommended packages:
-#10 7.288   ocaml git darcs mercurial m4 rsync
-#10 7.381 The following NEW packages will be installed:
-#10 7.382   bubblewrap libamd2 libcolamd2 libglpk40 libltdl7 libsuitesparseconfig5 opam
-#10 7.382   opam-installer
-#10 8.525 0 upgraded, 8 newly installed, 0 to remove and 0 not upgraded.
-#10 8.525 Need to get 4348 kB of archives.
-#10 8.525 After this operation, 15.4 MB of additional disk space will be used.
-#10 8.525 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 bubblewrap amd64 0.6.1-1ubuntu0.1 [46.3 kB]
-#10 9.243 Get:2 http://archive.ubuntu.com/ubuntu jammy/main amd64 libsuitesparseconfig5 amd64 1:5.10.1+dfsg-4build1 [10.4 kB]
-#10 9.264 Get:3 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libamd2 amd64 1:5.10.1+dfsg-4build1 [21.6 kB]
-#10 9.330 Get:4 http://archive.ubuntu.com/ubuntu jammy/main amd64 libcolamd2 amd64 1:5.10.1+dfsg-4build1 [18.0 kB]
-#10 9.379 Get:5 http://archive.ubuntu.com/ubuntu jammy/main amd64 libltdl7 amd64 2.4.6-15build2 [39.6 kB]
-#10 9.548 Get:6 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libglpk40 amd64 5.0-1 [361 kB]
-#10 10.05 Get:7 http://archive.ubuntu.com/ubuntu jammy/universe amd64 opam-installer amd64 2.1.2-1 [1273 kB]
-#10 10.49 Get:8 http://archive.ubuntu.com/ubuntu jammy/universe amd64 opam amd64 2.1.2-1 [2578 kB]
-#10 10.95 debconf: delaying package configuration, since apt-utils is not installed
-#10 11.00 Fetched 4348 kB in 3s (1278 kB/s)
-#10 11.06 Selecting previously unselected package bubblewrap.
-#10 11.06 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 25338 files and directories currently installed.)
-#10 11.08 Preparing to unpack .../0-bubblewrap_0.6.1-1ubuntu0.1_amd64.deb ...
-#10 11.10 Unpacking bubblewrap (0.6.1-1ubuntu0.1) ...
-#10 11.26 Selecting previously unselected package libsuitesparseconfig5:amd64.
-#10 11.26 Preparing to unpack .../1-libsuitesparseconfig5_1%3a5.10.1+dfsg-4build1_amd64.deb ...
-#10 11.28 Unpacking libsuitesparseconfig5:amd64 (1:5.10.1+dfsg-4build1) ...
-#10 11.39 Selecting previously unselected package libamd2:amd64.
-#10 11.39 Preparing to unpack .../2-libamd2_1%3a5.10.1+dfsg-4build1_amd64.deb ...
-#10 11.40 Unpacking libamd2:amd64 (1:5.10.1+dfsg-4build1) ...
-#10 11.48 Selecting previously unselected package libcolamd2:amd64.
-#10 11.49 Preparing to unpack .../3-libcolamd2_1%3a5.10.1+dfsg-4build1_amd64.deb ...
-#10 11.50 Unpacking libcolamd2:amd64 (1:5.10.1+dfsg-4build1) ...
-#10 11.58 Selecting previously unselected package libltdl7:amd64.
-#10 11.58 Preparing to unpack .../4-libltdl7_2.4.6-15build2_amd64.deb ...
-#10 11.60 Unpacking libltdl7:amd64 (2.4.6-15build2) ...
-#10 11.68 Selecting previously unselected package libglpk40:amd64.
-#10 11.68 Preparing to unpack .../5-libglpk40_5.0-1_amd64.deb ...
-#10 11.70 Unpacking libglpk40:amd64 (5.0-1) ...
-#10 11.78 Selecting previously unselected package opam-installer.
-#10 11.78 Preparing to unpack .../6-opam-installer_2.1.2-1_amd64.deb ...
-#10 11.80 Unpacking opam-installer (2.1.2-1) ...
-#10 11.90 Selecting previously unselected package opam.
-#10 11.90 Preparing to unpack .../7-opam_2.1.2-1_amd64.deb ...
-#10 11.92 Unpacking opam (2.1.2-1) ...
-#10 12.04 Setting up bubblewrap (0.6.1-1ubuntu0.1) ...
-#10 12.06 sysctl: setting key "kernel.unprivileged_userns_clone", ignoring: Read-only file system
-#10 12.08 Setting up libltdl7:amd64 (2.4.6-15build2) ...
-#10 12.11 Setting up opam-installer (2.1.2-1) ...
-#10 12.15 Setting up libsuitesparseconfig5:amd64 (1:5.10.1+dfsg-4build1) ...
-#10 12.18 Setting up libamd2:amd64 (1:5.10.1+dfsg-4build1) ...
-#10 12.22 Setting up libcolamd2:amd64 (1:5.10.1+dfsg-4build1) ...
-#10 12.26 Setting up libglpk40:amd64 (5.0-1) ...
-#10 12.29 Setting up opam (2.1.2-1) ...
-#10 12.33 Processing triggers for libc-bin (2.35-0ubuntu3.10) ...
-#10 12.45 [WARNING] Running as root is not recommended
-#10 12.45 No configuration file found, using built-in defaults.
-#10 12.45 Checking for available remotes: none.
-#10 12.45   - you won't be able to use rsync and local repositories unless you install the rsync command on your system.
-#10 12.45   - you won't be able to use git repositories unless you install the git command on your system.
-#10 12.45   - you won't be able to use mercurial repositories unless you install the hg command on your system.
-#10 12.45   - you won't be able to use darcs repositories unless you install the darcs command on your system.
-#10 12.45 
-#10 12.46 
-#10 12.46 <><> Fetching repository information ><><><><><><><><><><><><><><><><><><><><><>
-#10 17.56 [default] Initialised
-#10 17.56 default (at https://opam.ocaml.org): 
-#10 17.56     [WARNING] opam is out-of-date. Please consider updating it (https://opam.ocaml.org/doc/Install.html)
-#10 17.56 
-#10 28.99 
-#10 28.99 <><> Required setup - please read <><><><><><><><><><><><><><><><><><><><><><><>
-#10 28.99 
-#10 28.99   In normal operation, opam only alters files within ~/.opam.
-#10 28.99 
-#10 28.99   However, to best integrate with your system, some environment variables
-#10 28.99   should be set. If you allow it to, this initialisation step will update
-#10 28.99   your sh configuration by adding the following line to ~/.profile:
-#10 28.99 
-#10 28.99     test -r /root/.opam/opam-init/init.sh && . /root/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
-#10 28.99 
-#10 28.99   Otherwise, every time you want to access your opam installation, you will
-#10 28.99   need to run:
-#10 28.99 
-#10 28.99     eval $(opam env)
-#10 28.99 
-#10 28.99   You can always re-run this setup with 'opam init' later.
-#10 28.99 
-#10 28.99 Do you want opam to modify ~/.profile? [N/y/f]
-#10 28.99 (default is 'no', use 'f' to choose a different file) 
-#10 30.56 [WARNING] Running as root is not recommended
-#10 30.88 
-#10 30.88 <><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
-#10 30.88 Switch invariant: ["ocaml-base-compiler" {= "5.2.1"} | "ocaml-system" {= "5.2.1"}]
-#10 35.69 
-#10 35.69 <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-#10 37.84 -> installed base-bigarray.base
-#10 37.84 -> installed base-threads.base
-#10 37.84 -> installed base-unix.base
-#10 37.84 -> installed ocaml-options-vanilla.1
-#10 38.65 -> retrieved ocaml-config.3  (2 extra sources)
-#10 40.23 -> retrieved ocaml-base-compiler.5.2.1  (https://opam.ocaml.org/cache)
-#10 123.0 -> installed ocaml-base-compiler.5.2.1
-#10 123.0 -> installed ocaml-config.3
-#10 123.1 -> installed ocaml.5.2.1
-#10 123.1 -> installed base-domains.base
-#10 123.1 -> installed base-nnp.base
-#10 123.5 Done.
-#10 123.5 # Run eval $(opam env --switch=5.2.1) to update the current shell environment
-#10 DONE 125.3s
+#10 [internal] load build context
+#10 transferring context: 1.94kB done
+#10 DONE 0.0s
 
 #11 [ 7/11] RUN apt-get update && apt-get install -yqq lua5.4 luarocks &&     luarocks install luaunit &&     rm -rf /var/lib/apt/lists/*
-#11 0.601 Get:1 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
-#11 0.739 Get:2 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
-#11 1.462 Get:3 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [3310 kB]
-#11 2.092 Get:4 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
-#11 2.416 Get:5 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
-#11 2.500 Get:6 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [5374 kB]
-#11 2.742 Get:7 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [48.5 kB]
-#11 2.742 Get:8 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
-#11 2.743 Get:9 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1272 kB]
-#11 2.853 Get:10 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
-#11 3.034 Get:11 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
-#11 3.556 Get:12 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
-#11 4.680 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [5560 kB]
-#11 5.002 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1579 kB]
-#11 5.090 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [3623 kB]
-#11 5.301 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [75.9 kB]
-#11 5.304 Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.2 kB]
-#11 5.306 Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [83.2 kB]
-#11 5.493 Fetched 41.3 MB in 5s (7893 kB/s)
-#11 5.493 Reading package lists...
-#11 9.777 debconf: delaying package configuration, since apt-utils is not installed
-#11 9.881 Selecting previously unselected package libmagic-mgc.
-#11 9.881 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 25396 files and directories currently installed.)
-#11 9.898 Preparing to unpack .../00-libmagic-mgc_1%3a5.41-3ubuntu0.1_amd64.deb ...
-#11 9.910 Unpacking libmagic-mgc (1:5.41-3ubuntu0.1) ...
-#11 10.05 Selecting previously unselected package libmagic1:amd64.
-#11 10.06 Preparing to unpack .../01-libmagic1_1%3a5.41-3ubuntu0.1_amd64.deb ...
-#11 10.08 Unpacking libmagic1:amd64 (1:5.41-3ubuntu0.1) ...
-#11 10.17 Selecting previously unselected package file.
-#11 10.17 Preparing to unpack .../02-file_1%3a5.41-3ubuntu0.1_amd64.deb ...
-#11 10.18 Unpacking file (1:5.41-3ubuntu0.1) ...
-#11 10.27 Selecting previously unselected package libsigsegv2:amd64.
-#11 10.28 Preparing to unpack .../03-libsigsegv2_2.13-1ubuntu3_amd64.deb ...
-#11 10.29 Unpacking libsigsegv2:amd64 (2.13-1ubuntu3) ...
-#11 10.35 Selecting previously unselected package m4.
-#11 10.36 Preparing to unpack .../04-m4_1.4.18-5ubuntu2_amd64.deb ...
-#11 10.37 Unpacking m4 (1.4.18-5ubuntu2) ...
-#11 10.45 Selecting previously unselected package autoconf.
-#11 10.45 Preparing to unpack .../05-autoconf_2.71-2_all.deb ...
-#11 10.47 Unpacking autoconf (2.71-2) ...
-#11 10.56 Selecting previously unselected package autotools-dev.
-#11 10.56 Preparing to unpack .../06-autotools-dev_20220109.1_all.deb ...
-#11 10.57 Unpacking autotools-dev (20220109.1) ...
-#11 10.67 Selecting previously unselected package automake.
-#11 10.67 Preparing to unpack .../07-automake_1%3a1.16.5-1.3_all.deb ...
-#11 10.69 Unpacking automake (1:1.16.5-1.3) ...
-#11 10.78 Selecting previously unselected package libltdl-dev:amd64.
-#11 10.78 Preparing to unpack .../08-libltdl-dev_2.4.6-15build2_amd64.deb ...
-#11 10.79 Unpacking libltdl-dev:amd64 (2.4.6-15build2) ...
-#11 10.89 Selecting previously unselected package liblua5.1-0:amd64.
-#11 10.89 Preparing to unpack .../09-liblua5.1-0_5.1.5-8.1build4_amd64.deb ...
-#11 10.90 Unpacking liblua5.1-0:amd64 (5.1.5-8.1build4) ...
-#11 10.98 Selecting previously unselected package liblua5.1-0-dev:amd64.
-#11 10.98 Preparing to unpack .../10-liblua5.1-0-dev_5.1.5-8.1build4_amd64.deb ...
-#11 10.99 Unpacking liblua5.1-0-dev:amd64 (5.1.5-8.1build4) ...
-#11 11.08 Selecting previously unselected package libtool.
-#11 11.08 Preparing to unpack .../11-libtool_2.4.6-15build2_all.deb ...
-#11 11.09 Unpacking libtool (2.4.6-15build2) ...
-#11 11.16 Selecting previously unselected package libtool-bin.
-#11 11.16 Preparing to unpack .../12-libtool-bin_2.4.6-15build2_amd64.deb ...
-#11 11.18 Unpacking libtool-bin (2.4.6-15build2) ...
-#11 11.26 Selecting previously unselected package lua5.1.
-#11 11.26 Preparing to unpack .../13-lua5.1_5.1.5-8.1build4_amd64.deb ...
-#11 11.27 Unpacking lua5.1 (5.1.5-8.1build4) ...
-#11 11.35 Selecting previously unselected package lua5.4.
-#11 11.36 Preparing to unpack .../14-lua5.4_5.4.4-1_amd64.deb ...
-#11 11.37 Unpacking lua5.4 (5.4.4-1) ...
-#11 11.44 Selecting previously unselected package lua-any.
-#11 11.44 Preparing to unpack .../15-lua-any_27ubuntu1_all.deb ...
-#11 11.45 Unpacking lua-any (27ubuntu1) ...
-#11 11.53 Selecting previously unselected package lua-socket:amd64.
-#11 11.53 Preparing to unpack .../16-lua-socket_3.0~rc1+git+ac3201d-6_amd64.deb ...
-#11 11.55 Unpacking lua-socket:amd64 (3.0~rc1+git+ac3201d-6) ...
-#11 11.64 Selecting previously unselected package lua-sec:amd64.
-#11 11.64 Preparing to unpack .../17-lua-sec_1.0.2-1_amd64.deb ...
-#11 11.65 Unpacking lua-sec:amd64 (1.0.2-1) ...
-#11 11.74 Selecting previously unselected package luarocks.
-#11 11.74 Preparing to unpack .../18-luarocks_3.8.0+dfsg1-1_all.deb ...
-#11 11.76 Unpacking luarocks (3.8.0+dfsg1-1) ...
-#11 11.90 Setting up lua5.4 (5.4.4-1) ...
-#11 11.93 update-alternatives: using /usr/bin/lua5.4 to provide /usr/bin/lua (lua-interpreter) in auto mode
-#11 11.94 update-alternatives: warning: skip creation of /usr/share/man/man1/lua.1.gz because associated file /usr/share/man/man1/lua5.4.1.gz (of link group lua-interpreter) doesn't exist
-#11 11.95 update-alternatives: using /usr/bin/luac5.4 to provide /usr/bin/luac (lua-compiler) in auto mode
-#11 11.95 update-alternatives: warning: skip creation of /usr/share/man/man1/luac.1.gz because associated file /usr/share/man/man1/luac5.4.1.gz (of link group lua-compiler) doesn't exist
-#11 11.97 Setting up libmagic-mgc (1:5.41-3ubuntu0.1) ...
-#11 12.00 Setting up lua-any (27ubuntu1) ...
-#11 12.04 Setting up libmagic1:amd64 (1:5.41-3ubuntu0.1) ...
-#11 12.10 Setting up lua-socket:amd64 (3.0~rc1+git+ac3201d-6) ...
-#11 12.14 Setting up file (1:5.41-3ubuntu0.1) ...
-#11 12.17 Setting up lua5.1 (5.1.5-8.1build4) ...
-#11 12.20 update-alternatives: using /usr/bin/lua5.1 to provide /usr/bin/lua (lua-interpreter) in auto mode
-#11 12.20 update-alternatives: warning: skip creation of /usr/share/man/man1/lua.1.gz because associated file /usr/share/man/man1/lua5.1.1.gz (of link group lua-interpreter) doesn't exist
-#11 12.21 update-alternatives: using /usr/bin/luac5.1 to provide /usr/bin/luac (lua-compiler) in auto mode
-#11 12.21 update-alternatives: warning: skip creation of /usr/share/man/man1/luac.1.gz because associated file /usr/share/man/man1/luac5.1.1.gz (of link group lua-compiler) doesn't exist
-#11 12.23 Setting up autotools-dev (20220109.1) ...
-#11 12.26 Setting up libsigsegv2:amd64 (2.13-1ubuntu3) ...
-#11 12.30 Setting up liblua5.1-0:amd64 (5.1.5-8.1build4) ...
-#11 12.33 Setting up lua-sec:amd64 (1.0.2-1) ...
-#11 12.37 Setting up liblua5.1-0-dev:amd64 (5.1.5-8.1build4) ...
-#11 12.41 Setting up libtool (2.4.6-15build2) ...
-#11 12.44 Setting up luarocks (3.8.0+dfsg1-1) ...
-#11 12.54 Setting up m4 (1.4.18-5ubuntu2) ...
-#11 12.57 Setting up autoconf (2.71-2) ...
-#11 12.62 Setting up automake (1:1.16.5-1.3) ...
-#11 12.65 update-alternatives: using /usr/bin/automake-1.16 to provide /usr/bin/automake (automake) in auto mode
-#11 12.65 update-alternatives: warning: skip creation of /usr/share/man/man1/automake.1.gz because associated file /usr/share/man/man1/automake-1.16.1.gz (of link group automake) doesn't exist
-#11 12.65 update-alternatives: warning: skip creation of /usr/share/man/man1/aclocal.1.gz because associated file /usr/share/man/man1/aclocal-1.16.1.gz (of link group automake) doesn't exist
-#11 12.67 Setting up libtool-bin (2.4.6-15build2) ...
-#11 12.70 Setting up libltdl-dev:amd64 (2.4.6-15build2) ...
-#11 12.74 Processing triggers for libc-bin (2.35-0ubuntu3.10) ...
-#11 14.61 Installing https://luarocks.org/luaunit-3.4-1.rockspec
-#11 15.96 
-#11 15.96 luaunit 3.4-1 depends on lua >= 5.1 (5.1-1 provided by VM)
-#11 15.96 luaunit 3.4-1 depends on lua < 5.5 (5.1-1 provided by VM)
-#11 16.03 No existing manifest. Attempting to rebuild...
-#11 16.05 luaunit 3.4-1 is now installed in /usr/local (license: BSD)
-#11 16.05 
-#11 DONE 16.1s
+#11 0.736 Get:1 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+#11 1.245 Get:2 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+#11 1.912 Get:3 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [5374 kB]
+#11 2.568 Get:4 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+#11 2.887 Get:5 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+#11 3.208 Get:6 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+#11 3.316 Get:7 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+#11 3.536 Get:8 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [3310 kB]
+#11 3.639 Get:9 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [48.5 kB]
+#11 3.639 Get:10 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1272 kB]
+#11 3.969 Get:11 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+#11 4.007 Get:12 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+#11 5.156 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [3623 kB]
+#11 5.363 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1579 kB]
+#11 5.475 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [5560 kB]
+#11 5.810 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [75.9 kB]
+#11 5.813 Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.2 kB]
+#11 5.815 Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [83.2 kB]
+#11 6.002 Fetched 41.3 MB in 6s (7188 kB/s)
+#11 6.002 Reading package lists...
+#11 11.16 debconf: delaying package configuration, since apt-utils is not installed
+#11 11.29 Selecting previously unselected package libmagic-mgc.
+#11 11.29 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 25396 files and directories currently installed.)
+#11 11.30 Preparing to unpack .../00-libmagic-mgc_1%3a5.41-3ubuntu0.1_amd64.deb ...
+#11 11.33 Unpacking libmagic-mgc (1:5.41-3ubuntu0.1) ...
+#11 11.56 Selecting previously unselected package libmagic1:amd64.
+#11 11.56 Preparing to unpack .../01-libmagic1_1%3a5.41-3ubuntu0.1_amd64.deb ...
+#11 11.61 Unpacking libmagic1:amd64 (1:5.41-3ubuntu0.1) ...
+#11 11.75 Selecting previously unselected package file.
+#11 11.75 Preparing to unpack .../02-file_1%3a5.41-3ubuntu0.1_amd64.deb ...
+#11 11.77 Unpacking file (1:5.41-3ubuntu0.1) ...
+#11 11.92 Selecting previously unselected package libsigsegv2:amd64.
+#11 11.92 Preparing to unpack .../03-libsigsegv2_2.13-1ubuntu3_amd64.deb ...
+#11 11.94 Unpacking libsigsegv2:amd64 (2.13-1ubuntu3) ...
+#11 12.05 Selecting previously unselected package m4.
+#11 12.06 Preparing to unpack .../04-m4_1.4.18-5ubuntu2_amd64.deb ...
+#11 12.08 Unpacking m4 (1.4.18-5ubuntu2) ...
+#11 12.18 Selecting previously unselected package autoconf.
+#11 12.19 Preparing to unpack .../05-autoconf_2.71-2_all.deb ...
+#11 12.20 Unpacking autoconf (2.71-2) ...
+#11 12.29 Selecting previously unselected package autotools-dev.
+#11 12.29 Preparing to unpack .../06-autotools-dev_20220109.1_all.deb ...
+#11 12.30 Unpacking autotools-dev (20220109.1) ...
+#11 12.40 Selecting previously unselected package automake.
+#11 12.40 Preparing to unpack .../07-automake_1%3a1.16.5-1.3_all.deb ...
+#11 12.42 Unpacking automake (1:1.16.5-1.3) ...
+#11 12.51 Selecting previously unselected package libltdl-dev:amd64.
+#11 12.51 Preparing to unpack .../08-libltdl-dev_2.4.6-15build2_amd64.deb ...
+#11 12.52 Unpacking libltdl-dev:amd64 (2.4.6-15build2) ...
+#11 12.62 Selecting previously unselected package liblua5.1-0:amd64.
+#11 12.62 Preparing to unpack .../09-liblua5.1-0_5.1.5-8.1build4_amd64.deb ...
+#11 12.64 Unpacking liblua5.1-0:amd64 (5.1.5-8.1build4) ...
+#11 12.71 Selecting previously unselected package liblua5.1-0-dev:amd64.
+#11 12.71 Preparing to unpack .../10-liblua5.1-0-dev_5.1.5-8.1build4_amd64.deb ...
+#11 12.72 Unpacking liblua5.1-0-dev:amd64 (5.1.5-8.1build4) ...
+#11 12.81 Selecting previously unselected package libtool.
+#11 12.81 Preparing to unpack .../11-libtool_2.4.6-15build2_all.deb ...
+#11 12.83 Unpacking libtool (2.4.6-15build2) ...
+#11 12.90 Selecting previously unselected package libtool-bin.
+#11 12.90 Preparing to unpack .../12-libtool-bin_2.4.6-15build2_amd64.deb ...
+#11 12.91 Unpacking libtool-bin (2.4.6-15build2) ...
+#11 12.99 Selecting previously unselected package lua5.1.
+#11 12.99 Preparing to unpack .../13-lua5.1_5.1.5-8.1build4_amd64.deb ...
+#11 13.00 Unpacking lua5.1 (5.1.5-8.1build4) ...
+#11 13.09 Selecting previously unselected package lua5.4.
+#11 13.09 Preparing to unpack .../14-lua5.4_5.4.4-1_amd64.deb ...
+#11 13.10 Unpacking lua5.4 (5.4.4-1) ...
+#11 13.17 Selecting previously unselected package lua-any.
+#11 13.17 Preparing to unpack .../15-lua-any_27ubuntu1_all.deb ...
+#11 13.18 Unpacking lua-any (27ubuntu1) ...
+#11 13.26 Selecting previously unselected package lua-socket:amd64.
+#11 13.27 Preparing to unpack .../16-lua-socket_3.0~rc1+git+ac3201d-6_amd64.deb ...
+#11 13.28 Unpacking lua-socket:amd64 (3.0~rc1+git+ac3201d-6) ...
+#11 13.37 Selecting previously unselected package lua-sec:amd64.
+#11 13.37 Preparing to unpack .../17-lua-sec_1.0.2-1_amd64.deb ...
+#11 13.38 Unpacking lua-sec:amd64 (1.0.2-1) ...
+#11 13.47 Selecting previously unselected package luarocks.
+#11 13.47 Preparing to unpack .../18-luarocks_3.8.0+dfsg1-1_all.deb ...
+#11 13.49 Unpacking luarocks (3.8.0+dfsg1-1) ...
+#11 13.63 Setting up lua5.4 (5.4.4-1) ...
+#11 13.66 update-alternatives: using /usr/bin/lua5.4 to provide /usr/bin/lua (lua-interpreter) in auto mode
+#11 13.67 update-alternatives: warning: skip creation of /usr/share/man/man1/lua.1.gz because associated file /usr/share/man/man1/lua5.4.1.gz (of link group lua-interpreter) doesn't exist
+#11 13.68 update-alternatives: using /usr/bin/luac5.4 to provide /usr/bin/luac (lua-compiler) in auto mode
+#11 13.68 update-alternatives: warning: skip creation of /usr/share/man/man1/luac.1.gz because associated file /usr/share/man/man1/luac5.4.1.gz (of link group lua-compiler) doesn't exist
+#11 13.70 Setting up libmagic-mgc (1:5.41-3ubuntu0.1) ...
+#11 13.74 Setting up lua-any (27ubuntu1) ...
+#11 13.77 Setting up libmagic1:amd64 (1:5.41-3ubuntu0.1) ...
+#11 13.83 Setting up lua-socket:amd64 (3.0~rc1+git+ac3201d-6) ...
+#11 13.87 Setting up file (1:5.41-3ubuntu0.1) ...
+#11 13.91 Setting up lua5.1 (5.1.5-8.1build4) ...
+#11 13.93 update-alternatives: using /usr/bin/lua5.1 to provide /usr/bin/lua (lua-interpreter) in auto mode
+#11 13.93 update-alternatives: warning: skip creation of /usr/share/man/man1/lua.1.gz because associated file /usr/share/man/man1/lua5.1.1.gz (of link group lua-interpreter) doesn't exist
+#11 13.94 update-alternatives: using /usr/bin/luac5.1 to provide /usr/bin/luac (lua-compiler) in auto mode
+#11 13.94 update-alternatives: warning: skip creation of /usr/share/man/man1/luac.1.gz because associated file /usr/share/man/man1/luac5.1.1.gz (of link group lua-compiler) doesn't exist
+#11 13.96 Setting up autotools-dev (20220109.1) ...
+#11 14.00 Setting up libsigsegv2:amd64 (2.13-1ubuntu3) ...
+#11 14.03 Setting up liblua5.1-0:amd64 (5.1.5-8.1build4) ...
+#11 14.07 Setting up lua-sec:amd64 (1.0.2-1) ...
+#11 14.11 Setting up liblua5.1-0-dev:amd64 (5.1.5-8.1build4) ...
+#11 14.14 Setting up libtool (2.4.6-15build2) ...
+#11 14.18 Setting up luarocks (3.8.0+dfsg1-1) ...
+#11 14.28 Setting up m4 (1.4.18-5ubuntu2) ...
+#11 14.31 Setting up autoconf (2.71-2) ...
+#11 14.36 Setting up automake (1:1.16.5-1.3) ...
+#11 14.39 update-alternatives: using /usr/bin/automake-1.16 to provide /usr/bin/automake (automake) in auto mode
+#11 14.39 update-alternatives: warning: skip creation of /usr/share/man/man1/automake.1.gz because associated file /usr/share/man/man1/automake-1.16.1.gz (of link group automake) doesn't exist
+#11 14.39 update-alternatives: warning: skip creation of /usr/share/man/man1/aclocal.1.gz because associated file /usr/share/man/man1/aclocal-1.16.1.gz (of link group automake) doesn't exist
+#11 14.41 Setting up libtool-bin (2.4.6-15build2) ...
+#11 14.44 Setting up libltdl-dev:amd64 (2.4.6-15build2) ...
+#11 14.48 Processing triggers for libc-bin (2.35-0ubuntu3.10) ...
+#11 16.30 Installing https://luarocks.org/luaunit-3.4-1.rockspec
+#11 17.53 
+#11 17.53 luaunit 3.4-1 depends on lua >= 5.1 (5.1-1 provided by VM)
+#11 17.53 luaunit 3.4-1 depends on lua < 5.5 (5.1-1 provided by VM)
+#11 17.59 No existing manifest. Attempting to rebuild...
+#11 17.62 luaunit 3.4-1 is now installed in /usr/local (license: BSD)
+#11 17.62 
+#11 DONE 17.7s
 
 #12 [ 8/11] RUN mkdir -p /opt/julia &&     wget -nv "https://julialang-s3.julialang.org/bin/linux/x64/1.11/julia-1.11.6-linux-x86_64.tar.gz" -O /tmp/julia.tar.gz &&     tar -xzf /tmp/julia.tar.gz -C /opt/julia --strip-components=1 &&     rm /tmp/julia.tar.gz
-#12 5.864 2025-09-03 14:54:16 URL:https://julialang-s3.julialang.org/bin/linux/x64/1.11/julia-1.11.6-linux-x86_64.tar.gz [286557288/286557288] -> "/tmp/julia.tar.gz" [1]
-#12 DONE 11.3s
+#12 5.258 2025-09-03 15:27:55 URL:https://julialang-s3.julialang.org/bin/linux/x64/1.11/julia-1.11.6-linux-x86_64.tar.gz [286557288/286557288] -> "/tmp/julia.tar.gz" [1]
+#12 DONE 10.7s
 
 #13 [ 9/11] RUN python3 -m pip install numpy
-#13 1.053 Collecting numpy
-#13 1.114   Downloading numpy-2.2.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.8 MB)
-#13 1.484      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.8/16.8 MB 45.3 MB/s eta 0:00:00
-#13 1.549 Installing collected packages: numpy
-#13 3.016 Successfully installed numpy-2.2.6
-#13 3.016 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#13 1.009 Collecting numpy
+#13 1.069   Downloading numpy-2.2.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.8 MB)
+#13 1.458      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.8/16.8 MB 45.1 MB/s eta 0:00:00
+#13 1.522 Installing collected packages: numpy
+#13 2.936 Successfully installed numpy-2.2.6
+#13 2.936 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
 #13 DONE 3.1s
 
 #14 [10/11] COPY src /code
@@ -308,7 +174,7 @@
 
 #16 exporting to image
 #16 exporting layers
-#16 exporting layers 4.8s done
-#16 writing image sha256:0c90dd3e0358c353bc68d6855d342f2ffcf8a3303e412b30bda18df9800cf309 done
+#16 exporting layers 1.8s done
+#16 writing image sha256:18483675634d712b49b1d42b9dae95747c598b7bc54ddd8568098356fac522e3 done
 #16 naming to docker.io/library/multipl-e-updated:latest 0.0s done
-#16 DONE 4.9s
+#16 DONE 1.8s
