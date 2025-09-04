@@ -4,7 +4,7 @@ This repository is a fork of [MultiPL-E](https://github.com/nuprl/MultiPL-E) to 
 
 Crucially, this fork uses a **corrected and improved version of the dataset** for five languages (**Julia, Lua, OCaml, R, Racket**) to ensure a more accurate and reliable evaluation. The original benchmark contains several errors that unfairly penalize modern models.
 
-Detailed Modifications are summarized in this [table](https://docs.google.com/spreadsheets/d/1lnDubSv39__ZuSFmnnXoXCUuPS85jcFScS9hlzI9ohI/edit?usp=sharing).
+Detailed modifications are summarized in this [table](https://docs.google.com/spreadsheets/d/1lnDubSv39__ZuSFmnnXoXCUuPS85jcFScS9hlzI9ohI/edit?usp=sharing).
 
 # Installation
 
