@@ -66,7 +66,7 @@ case "$MODEL" in
     "qwen-think")
         MODEL_NAME="Qwen/Qwen3-4B-Thinking-2507"
         MODEL_DIR="Qwen_Qwen3-4B-Thinking-2507"
-        BATCH_SIZE=4
+        BATCH_SIZE=8
         TEMP=0.6
         # Only 'qwen-think' uses the max-tokens flag and has a token-specific output folder
         EXTRA_FLAGS="--max-tokens ${MAX_TOKENS}"

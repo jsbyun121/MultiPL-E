@@ -13,8 +13,11 @@ conda create -n multiplt python=3.10
 pip install torch
 pip install transformers datasets accelerate
 pip install 'huggingface_hub[cli]'
-# Download the MultiPL-E container
-docker pull ghcr.io/nuprl/multipl-e-evaluation
+```
+
+To build docker container to evaluate the code generation, run
+```bash
+bash scripts/build-updated-container.sh
 ```
 
 To enable MXFP4 inference for GPT-OSS (in Hopper or Blackwell architectures / e.g., H100 GPUs), install:
@@ -42,6 +45,7 @@ Supported models: Qwen3-2507, Qwen3, GPT-OSS
 The bash script provides a convenient wrapper around the evaluation pipeline with the following options:
 
 ```bash
+chmod +x ./scripts/run_eval.sh
 ./scripts/run_eval.sh [OPTIONS]
 
 Options:
