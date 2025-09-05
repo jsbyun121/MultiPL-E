@@ -6,7 +6,7 @@ set -e
 
 SCRIPT_DIR=$(dirname "$0")
 PROJECT_DIR=$(dirname "$SCRIPT_DIR")
-DOCKERFILE_PATH="$PROJECT_DIR/evaluation/Dockerfile_new"
+DOCKERFILE_PATH="$PROJECT_DIR/evaluation/Dockerfile"
 IMAGE_NAME="multipl-e-updated:latest"
 
 echo "🚀 Building Updated MultiPL-E Container"
@@ -25,7 +25,7 @@ fi
 echo "⏳ Building container (this may take 10-15 minutes)..."
 cd "$PROJECT_DIR/evaluation"
 
-if docker build -f Dockerfile_new -t "$IMAGE_NAME" . 2>&1 | tee build.log; then
+if docker build -f Dockerfile -t "$IMAGE_NAME" . 2>&1 | tee build.log; then
     echo "✅ Container built successfully!"
     echo
     
