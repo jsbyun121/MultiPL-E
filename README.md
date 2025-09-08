@@ -6,6 +6,8 @@ Crucially, this fork uses a **corrected and improved version of the dataset** fo
 
 Detailed modifications are summarized in this [table](https://docs.google.com/spreadsheets/d/1lnDubSv39__ZuSFmnnXoXCUuPS85jcFScS9hlzI9ohI/edit?usp=sharing).
 
+The dataset itself is also available on [Hugging Face](https://huggingface.co/datasets/jsbyun121/MultiPL-E-fixed)
+
 # Installation
 
 ```bash
