@@ -18,7 +18,7 @@ analyze_failure/
 _unsloth_temporary*/
 unsloth_compiled_cache/
 wandb/
-outputs
-run*.sh
+ckpt
 test/
+bsr*.sh
 question*

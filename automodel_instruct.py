@@ -14,7 +14,7 @@ lang2Language = {
 }
 
 class Model:
-    def __init__(self, name, lang, use_chat_template=True):
+    def __init__(self, name, lang, use_chat_template=True, lora_path=None):
         if "qwen" in name.lower():
             dtype = torch.bfloat16
         elif "openai" in name.lower():
@@ -25,6 +25,9 @@ class Model:
         self.model = AutoModelForCausalLM.from_pretrained(
             name, dtype=dtype, device_map="auto", trust_remote_code=True
         )
+        if lora_path:
+            print(f"Loading LoRA checkpoint from {lora_path}")
+            self.model = PeftModelForCausalLM.from_pretrained(self.model, lora_path)
         self.tokenizer = AutoTokenizer.from_pretrained(
             name, padding_side="left", trust_remote_code=True
         )
@@ -259,6 +262,7 @@ def automodel_partial_arg_parser():
     args.add_argument("--name", type=str, required=True)
     args.add_argument("--use-chat-template", action="store_true",
                         help="Use chat template for the model. This is useful for models that support chat templates, such as Qwen and OpenAI models.")
+    args.add_argument("--lora-path", type=str, help="Path to the LORA checkpoint.")
     return args
 
 def main():
@@ -268,6 +272,7 @@ def main():
     model = Model(
         args.name, args.lang,
         use_chat_template=args.use_chat_template,
+        lora_path=args.lora_path,
     )
 
     model_name = args.name.replace("/", "_").replace("-", "_")

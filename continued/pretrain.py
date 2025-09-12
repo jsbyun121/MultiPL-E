@@ -69,7 +69,7 @@ training_args = {
     "weight_decay": 0.01,
     "lr_scheduler_type": "cosine",
     "seed": 3407,
-    "output_dir": f"outputs/{args.lang}-manuals",
+    "output_dir": f"ckpt/pt/{args.lang}-manuals",
     "report_to": "wandb",  # Use this for WandB etc
     "save_only_model": True,  # Save only adapter weights, no optimizer state
     "max_length": max_seq_length,

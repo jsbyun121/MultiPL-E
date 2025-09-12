@@ -21,8 +21,9 @@ def main(lang="julia", target_epoch=4):
     if target_epoch > 0:
         steps_per_epoch = steps_per_epoch_dict[lang]
         steps = steps_per_epoch * target_epoch
-        peft_model_name = f"outputs/{lang}-manuals/checkpoint-{steps}"
+        peft_model_name = f"ckpt/pt/{lang}-manuals/checkpoint-{steps}"
         model = PeftModelForCausalLM.from_pretrained(model, peft_model_name)
+    model.eval()
 
     streamer = TextStreamer(tokenizer)
 
