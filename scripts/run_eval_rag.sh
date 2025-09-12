@@ -4,26 +4,27 @@
 usage() {
     echo "Usage: $0 -m <model_alias> -l <language> [OPTIONS]"
     echo ""
-    echo "Required Arguments:"
-    echo "  -m, --model      Model alias. Must be one of:"
-    echo "                   'qwen-think'    -> Qwen/Qwen3-4B-Thinking-2507"
-    echo "                   'qwen-instruct' -> Qwen/Qwen3-4B-Instruct-2507"
-    echo "                   'gpt-oss'       -> openai/gpt-oss-20b"
-    echo "  -l, --lang       Programming language (e.g., rkt, lua, py)."
+    echo "Options:"
+    echo "  -m, --model         Model alias. Must be one of:"
+    echo "                      'qwen-think'    (-> Qwen/Qwen3-4B-Thinking-2507)"
+    echo "                      'qwen-instruct' (-> Qwen/Qwen3-4B-Instruct-2507)"
+    echo "                      'gpt-oss'       (-> openai/gpt-oss-20b)"
+    echo "  -l, --lang          Programming language (jl, lua, ml, r, rkt)"
+    echo "  -x, --max-tokens    Maximum number of tokens (default: 1024)"
+    echo "  -c, --force-choice  Force to make a query in the given list (default: False)"
+    echo "  -h, --help          Display help message"
     echo ""
-    echo "Optional Arguments:"
-    echo "  -x, --max-tokens Maximum number of new tokens for 'qwen-think' (default: 1024)."
-    echo "  -h, --help       Display this help message."
+    echo "Example:"
+    echo "$0 -m qwen-think -l rkt -x 4096"
     echo ""
-    echo "Example: $0 -m qwen-think -l rkt -x 4096"
-    echo "Example: $0 -m qwen-instruct -l py"
     exit 1
 }
 
 # Default values
 MODEL=""
 LANG=""
-MAX_TOKENS="1024" # Changed default to 1024
+MAX_TOKENS="1024"
+FORCE_CHOICE=false
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -39,6 +40,10 @@ while [[ $# -gt 0 ]]; do
     -x|--max-tokens)
         MAX_TOKENS="$2"
         shift 2
+        ;;
+    -c|--force-choice)
+        FORCE_CHOICE=true
+        shift
         ;;
     -h|--help)
         usage
@@ -61,30 +66,39 @@ fi
 # Variables for the final command
 EXTRA_FLAGS=""
 TOKEN_SUFFIX="" # Suffix for the output directory
+CHOICE_SUFFIX=""
+
+# Set choice suffix and extra flags
+if [[ "$FORCE_CHOICE" == true ]]; then
+    CHOICE_SUFFIX="_rag_choice"
+    EXTRA_FLAGS="--force-choice"
+else
+    CHOICE_SUFFIX="_rag_no_choice"
+fi
 
 case "$MODEL" in
     "qwen-think")
         MODEL_NAME="Qwen/Qwen3-4B-Thinking-2507"
         MODEL_DIR="Qwen_Qwen3-4B-Thinking-2507"
-        BATCH_SIZE=16
+        BATCH_SIZE=8
         TEMP=0.6
         # Only 'qwen-think' uses the max-tokens flag and has a token-specific output folder
-        EXTRA_FLAGS="--max-tokens ${MAX_TOKENS}"
+        EXTRA_FLAGS="--max-tokens ${MAX_TOKENS} ${EXTRA_FLAGS}"
         TOKEN_SUFFIX="_mt_${MAX_TOKENS}"
         ;;
     "qwen-instruct")
         MODEL_NAME="Qwen/Qwen3-4B-Instruct-2507"
         MODEL_DIR="Qwen_Qwen3-4B-Instruct-2507"
-        BATCH_SIZE=32
+        BATCH_SIZE=16
         TEMP=0.7
         TOKEN_SUFFIX="_mt_${MAX_TOKENS}"
         ;;
     "gpt-oss")
         MODEL_NAME="openai/gpt-oss-20b"
         MODEL_DIR="openai_gpt-oss-20b"
-        BATCH_SIZE=8 # Use a smaller batch size for the 20B model
+        BATCH_SIZE=16 # Use a smaller batch size for the 20B model
         TEMP=1.0
-        EXTRA_FLAGS="--max-tokens ${MAX_TOKENS} --top-p 1.0"
+        EXTRA_FLAGS="--max-tokens ${MAX_TOKENS} --top-p 1.0 ${EXTRA_FLAGS}"
         TOKEN_SUFFIX="_mt_${MAX_TOKENS}"
         ;;
     *)
@@ -94,11 +108,11 @@ case "$MODEL" in
 esac
 
 # Construct a clean output directory
-OUTPUT_DIR="before_proc_${MODEL_DIR}${TOKEN_SUFFIX}_test_time/${LANG}"
+OUTPUT_DIR="before_proc_${MODEL_DIR}${TOKEN_SUFFIX}${CHOICE_SUFFIX}/${LANG}"
 mkdir -p ${OUTPUT_DIR}
 
 # Construct the final command, conditionally adding flags via EXTRA_FLAGS
-CMD="python automodel_instruct.py \
+CMD="python automodel_instruct_rag.py \
     --name ${MODEL_NAME} \
     --root-dataset humaneval \
     --lang ${LANG} \
@@ -107,6 +121,7 @@ CMD="python automodel_instruct.py \
     --output-dir ${OUTPUT_DIR} \
     --batch-size ${BATCH_SIZE} \
     --use-chat-template \
+    --use-rag \
     ${EXTRA_FLAGS}"
 
 # Display and execute the command
@@ -115,7 +130,7 @@ echo "Executing command:"
 echo "$CMD" | xargs
 echo ""
 
-python automodel_instruct.py \
+python automodel_instruct_rag.py \
     --name ${MODEL_NAME} \
     --root-dataset humaneval \
     --lang ${LANG} \
@@ -124,4 +139,5 @@ python automodel_instruct.py \
     --output-dir ${OUTPUT_DIR} \
     --batch-size ${BATCH_SIZE} \
     --use-chat-template \
+    --use-rag \
     ${EXTRA_FLAGS}

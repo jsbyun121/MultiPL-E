@@ -19,7 +19,7 @@ class Model:
         
         self.model = AutoModelForCausalLM.from_pretrained(
             name, revision=revision, torch_dtype=dtype, device_map="auto", trust_remote_code=True, **model_kwargs
-        ).cuda()
+        )
         self.tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_name or name,
             revision=tokenizer_revision,

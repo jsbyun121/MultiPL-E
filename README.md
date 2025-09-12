@@ -89,6 +89,52 @@ python preprocess_json.py ~/MultiPL-E/before_proc_openai_gpt-oss-20b_mt_4096 aft
 
 ```
 
+Beta: Currently Researching RAG method
+
+```bash
+chmod +x ./scripts/run_eval_rag.sh
+./scripts/run_eval_rag.sh [OPTIONS]
+
+Options:
+  -m, --model         Model alias. Must be one of:
+                      'qwen-think'    (-> Qwen/Qwen3-4B-Thinking-2507)
+                      'qwen-instruct' (-> Qwen/Qwen3-4B-Instruct-2507)
+                      'gpt-oss'       (-> openai/gpt-oss-20b)
+  -l, --lang          Programming language (jl, lua, ml, r, rkt)
+  -x, --max-tokens    Maximum number of tokens (default: 1024)
+  -c, --force-choice  Force to make a query in the given list (default: False)
+  -h, --help          Display help message
+
+
+Example:
+./scripts/run_eval_rag.sh -m qwen-think -l rkt -x 4096
+
+```
+
+You can just run as below to run generations of all language at once with specific max_token_len.
+
+```bash
+chmod +x ./scripts/batch_run_eval_rag.sh
+
+Example:
+./scripts/batch_run_eval_rag.sh --force-choice qwen-think 4096
+./scripts/batch_run_eval_rag.sh gpt-oss 4096
+./scripts/batch_run_eval_rag.sh qwen-instruct
+
+```
+
+After generation, you have to preprocess generations before evaluation. below is the code example.
+
+```bash
+python preprocess_json_rag.py <path/to/raw/results> <path/you/want/to/save/results> --model <model_type>
+
+Example:
+python preprocess_json_rag.py ~/MultiPL-E/before_proc_Qwen_Qwen3-4B-Thinking-2507_mt_2048_rag_choice after_proc_Qwen_Qwen3-4B-Thinking-2507_mt_2048_rag_choice --model qwen-think
+python preprocess_json_rag.py ~/MultiPL-E/before_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024_rag_no_choice after_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024_rag_no_choice --model qwen-instruct
+python preprocess_json_rag.py ~/MultiPL-E/before_proc_openai_gpt-oss-20b_mt_4096_rag_choice after_proc_openai_gpt-oss-20b_mt_4096_rag_choice --model gpt-oss
+
+```
+
 After preprocessing, you can get a compiled result json with docker.
 below is the code.
 
