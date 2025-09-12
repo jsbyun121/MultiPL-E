@@ -1,15 +1,20 @@
-"""
-This script produces completions for roughly any AutoModelForCausalLM.
-"""
 from multipl_e.completions import make_main, partial_arg_parser
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModelForCausalLM
 import itertools
 from typing import List
-from transformers import pipeline
+
+lang2Language = {
+    "r": "R",
+    "rkt": "Racket",
+    "ml": "OCaml",
+    "jl": "Julia",
+    "lua": "Lua",
+}
 
 class Model:
-    def __init__(self, name, revision, lang, model_kwargs, tokenizer_name=None, tokenizer_revision=None,  use_chat_template=True):
+    def __init__(self, name, lang, use_chat_template=True):
         if "qwen" in name.lower():
             dtype = torch.bfloat16
         elif "openai" in name.lower():
@@ -18,13 +23,10 @@ class Model:
             raise ValueError(f"Unsupported model: {name}")
         
         self.model = AutoModelForCausalLM.from_pretrained(
-            name, revision=revision, torch_dtype=dtype, device_map="auto", trust_remote_code=True, **model_kwargs
+            name, dtype=dtype, device_map="auto", trust_remote_code=True
         )
         self.tokenizer = AutoTokenizer.from_pretrained(
-            tokenizer_name or name,
-            revision=tokenizer_revision,
-            padding_side="left",
-            trust_remote_code=True,
+            name, padding_side="left", trust_remote_code=True
         )
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
@@ -32,7 +34,6 @@ class Model:
             self.tokenizer.pad_token is not None
         ), "tokenizer has neither pad_token nor eos_token"
 
-        self._all_special_token_ids = self.tokenizer.all_special_ids
         self.use_chat_template = use_chat_template
         self.team_name = name.split("/")[0]
         self.model_name = name.split("/")[1]
@@ -41,28 +42,7 @@ class Model:
         else:
             self.enable_thinking = False
 
-        assert (
-            len(self._all_special_token_ids) >= 1
-        ), "tokenizer.all_special_ids() is empty"
-        assert (
-            self.tokenizer.pad_token_id in self._all_special_token_ids
-        ), "pad_token_id not in all_special_ids"
-        assert (
-            self.tokenizer.eos_token_id in self._all_special_token_ids
-        ), "eos_token_id not in all_special_ids"
-
-        if lang.lower() == 'r':
-            self.language = 'R'
-        elif lang.lower() == 'rkt':
-            self.language = 'Racket'
-        elif lang.lower() == 'ml':
-            self.language = 'OCaml'
-        elif lang.lower() == 'jl':
-            self.language = 'Julia'
-        elif lang.lower() == 'lua':
-            self.language = 'Lua'
-        else:
-            raise ValueError(f"Unsupported language: {lang}")
+        self.language = lang2Language[lang.lower()]
 
     def continue_completion_tensor(
         self,
@@ -112,21 +92,20 @@ class Model:
                         {"role": "system", "content": system_msg},
                         {"role": "user", "content": f"Using given examples and the signature, generate the missing implementation in {self.language} by wrapping your code in ```{self.language.lower()} markdown blocks:\n\n{prompt}\n\n"}
                     ]
-                    text = self.tokenizer.apply_chat_template(
-                        messages,
-                        tokenize=False,
-                        add_generation_prompt=True
-                    )
+                    template_kwargs = {}
                 elif self.team_name.lower() == "openai":
                     messages = [
                         {"role": "user", "content": f"Using given examples and the signature, generate the missing implementation in {self.language} by wrapping your code in ```{self.language.lower()} markdown blocks:\n\n{prompt}\n\n"}
                     ]
-                    text = self.tokenizer.apply_chat_template(
-                        messages,
-                        tokenize=False,
-                        add_generation_prompt=True,
-                        reasoning_effort="medium"
-                    )
+                    template_kwargs = {
+                        "reasoning_effort": "medium"
+                    }
+                text = self.tokenizer.apply_chat_template(
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True,
+                    **template_kwargs
+                )
                 formatted_prompts.append(text)
             final_prompts = formatted_prompts
         else:
@@ -163,19 +142,9 @@ class Model:
         return False
 
     def _remove_padding_tokens(self, token_id_list: List[int]):
-        # Removes all the pad tokens or BOS tokens on the left-hand side using the 
-        # pad token ID. This is more robust than looking for the string representation of
-        # the pad token. Thus the prompt can begin with the literal string
-        # "<|endoftext|>" (which is a common representation of the pad token).
         left_padding_removed = itertools.dropwhile(
             self._is_pad_or_bos_token_id, token_id_list
         )
-        # Returns all tokens to the left of the first special token. This has
-        # the effect of removing all right-hand padding. Moreover, it also
-        # stops generation at other special tokens. For example, consider
-        # StarCoder 2, where a completion may reach the end of a file and then
-        # continue onto a second file: A<file_sep>B. The code below removes
-        # <file_sep>B and only produces A.
         right_padding_removed = itertools.takewhile(
             lambda x: not self._is_pad_or_bos_token_id(x), left_padding_removed
         )
@@ -255,15 +224,12 @@ class Model:
                 new_tensor = new_output_tensor[0]
                 new_input_length = new_input_ids.shape[1]
 
-
                 # Combine original thinking + suffix + new completion
                 pre_completion, post_completion = self.decode_single_output(
                     new_tensor, new_input_length
                 )
 
                 return (pre_completion, post_completion)
-                
-            
         else:
             # Non-thinking mode processing
             pre_completion, post_completion = self.decode_single_output(output_tensor, input_length)
@@ -291,45 +257,21 @@ def automodel_partial_arg_parser():
     """
     args = partial_arg_parser()
     args.add_argument("--name", type=str, required=True)
-    args.add_argument("--revision", type=str)
-    args.add_argument("--tokenizer_name", type=str)
-    args.add_argument("--tokenizer_revision", type=str)
-    args.add_argument("--name-override", type=str)
-    args.add_argument("--flash-attention2", action="store_true")
     args.add_argument("--use-chat-template", action="store_true",
                         help="Use chat template for the model. This is useful for models that support chat templates, such as Qwen and OpenAI models.")
     return args
 
-
-def do_name_override(args):
-    """
-    Applies the --name-override flag, or uses the model name, correcting / and - which the rest of
-    the toolchain does not like.
-    """
-    if args.name_override:
-        name = args.name_override
-    else:
-        name = args.name.replace("/", "_").replace("-", "_")
-    return name
-
-
 def main():
     args = automodel_partial_arg_parser()
     args = args.parse_args()
-    model_kwargs = { }
-    if args.flash_attention2:
-        model_kwargs["attn_implementation"] = "flash_attention_2"
 
     model = Model(
-        args.name, args.revision, args.lang,
-        model_kwargs=model_kwargs,
-        tokenizer_name=args.tokenizer_name,
-        tokenizer_revision=args.tokenizer_revision,
+        args.name, args.lang,
         use_chat_template=args.use_chat_template,
     )
 
-    name = do_name_override(args)
-    make_main(args, name, model.completions)
+    model_name = args.name.replace("/", "_").replace("-", "_")
+    make_main(args, model_name, model.completions)
 
 
 if __name__ == "__main__":
