@@ -28,7 +28,7 @@ pip install triton kernels
 pip install -U "git+https://github.com/triton-lang/triton.git@f33bcbd4f1051d0d9ea3fdfc0b2e68f53ededfe4#subdirectory=python/triton_kernels"
 ```
 
-To use RAG, install:
+To use RAG (2nd way), install additional dependencies:
 ```bash
 pip install langchain
 pip install langchain-community
@@ -40,11 +40,17 @@ pip install pymupdf
 pip install faiss-gpu
 ```
 
-## Quick Start with Bash Automation Script
+# Evaluation Methods
 
 Supported models: Qwen3-2507, Qwen3, GPT-OSS
 
-The bash script provides a convenient wrapper around the evaluation pipeline with the following options:
+This repository supports two inference approaches for code generation evaluation:
+
+## 1st Way: Direct Inference
+
+Direct inference without retrieval augmentation. This is the standard approach for evaluating language models on code generation tasks.
+
+### Single Language Evaluation
 
 ```bash
 chmod +x ./scripts/run_eval.sh
@@ -59,13 +65,11 @@ Options:
   -x, --max-tokens    Maximum number of tokens (default: 1024)
   -h, --help          Display help message
 
-
 Example:
 ./scripts/run_eval.sh -m qwen-think -l rkt -x 4096
-
 ```
 
-You can just run as below to run generations of all language at once with specific max_token_len.
+### Batch Evaluation (All Languages)
 
 ```bash
 chmod +x ./scripts/batch_run_eval.sh
@@ -74,10 +78,11 @@ Example:
 ./scripts/batch_run_eval.sh qwen-think 4096
 ./scripts/batch_run_eval.sh gpt-oss 4096
 ./scripts/batch_run_eval.sh qwen-instruct
-
 ```
 
-After generation, you have to preprocess generations before evaluation. below is the code example.
+### Preprocessing
+
+After generation, preprocess the results:
 
 ```bash
 python preprocess_json.py <path/to/raw/results> <path/you/want/to/save/results> --model <model_type>
@@ -86,10 +91,13 @@ Example:
 python preprocess_json.py ~/MultiPL-E/before_proc_Qwen_Qwen3-4B-Thinking-2507_mt_2048 after_proc_Qwen_Qwen3-4B-Thinking-2507_mt_2048 --model qwen-think
 python preprocess_json.py ~/MultiPL-E/before_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024 after_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024 --model qwen-instruct
 python preprocess_json.py ~/MultiPL-E/before_proc_openai_gpt-oss-20b_mt_4096 after_proc_openai_gpt-oss-20b_mt_4096 --model gpt-oss
-
 ```
 
-Beta: Currently Researching RAG method
+## 2nd Way: RAG Method
+
+Retrieval-Augmented Generation (RAG) approach that provides additional context to models during code generation.
+
+### Single Language Evaluation
 
 ```bash
 chmod +x ./scripts/run_eval_rag.sh
@@ -105,13 +113,11 @@ Options:
   -c, --force-choice  Force to make a query in the given list (default: False)
   -h, --help          Display help message
 
-
 Example:
 ./scripts/run_eval_rag.sh -m qwen-think -l rkt -x 4096
-
 ```
 
-You can just run as below to run generations of all language at once with specific max_token_len.
+### Batch Evaluation (All Languages)
 
 ```bash
 chmod +x ./scripts/batch_run_eval_rag.sh
@@ -120,10 +126,11 @@ Example:
 ./scripts/batch_run_eval_rag.sh --force-choice qwen-think 4096
 ./scripts/batch_run_eval_rag.sh gpt-oss 4096
 ./scripts/batch_run_eval_rag.sh qwen-instruct
-
 ```
 
-After generation, you have to preprocess generations before evaluation. below is the code example.
+### Preprocessing
+
+After generation, preprocess the results:
 
 ```bash
 python preprocess_json_rag.py <path/to/raw/results> <path/you/want/to/save/results> --model <model_type>
@@ -132,11 +139,15 @@ Example:
 python preprocess_json_rag.py ~/MultiPL-E/before_proc_Qwen_Qwen3-4B-Thinking-2507_mt_2048_rag_choice after_proc_Qwen_Qwen3-4B-Thinking-2507_mt_2048_rag_choice --model qwen-think
 python preprocess_json_rag.py ~/MultiPL-E/before_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024_rag_no_choice after_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024_rag_no_choice --model qwen-instruct
 python preprocess_json_rag.py ~/MultiPL-E/before_proc_openai_gpt-oss-20b_mt_4096_rag_choice after_proc_openai_gpt-oss-20b_mt_4096_rag_choice --model gpt-oss
-
 ```
 
-After preprocessing, you can get a compiled result json with docker.
-below is the code.
+# Shared Evaluation Process
+
+Both methods (direct inference and RAG) use the same evaluation and accuracy recording process:
+
+## Docker Compilation
+
+After preprocessing, compile results with docker:
 
 ```bash
 chmod +x ./scripts/docker.sh
@@ -149,10 +160,11 @@ Options:
 
 Example:
 ./scripts/docker.sh -l r,rkt,ml -d ./after_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024
-
 ```
 
-After preprocessing, finally you can run evaluation. below is the code.
+## Final Evaluation
+
+Run the final accuracy evaluation:
 
 ```bash
 Think(qwen_2507_4b):
@@ -161,7 +173,6 @@ python pass_k.py ./<result_base_dir>/<lang>
 Instruct(qwen_2507_4b):
 python pass_k.py ./after_proc_Qwen_Qwen3-4B-Thinking-2507_mt_4096/result/<lang>
 ```
-
 
 # Acknowledgement 
 
