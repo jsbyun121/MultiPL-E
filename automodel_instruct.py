@@ -9,7 +9,7 @@ from typing import List
 from transformers import pipeline
 
 class Model:
-    def __init__(self, name, revision, model_kwargs, tokenizer_name=None, tokenizer_revision=None,  use_chat_template=True):
+    def __init__(self, name, revision, lang, model_kwargs, tokenizer_name=None, tokenizer_revision=None,  use_chat_template=True):
         if "qwen" in name.lower():
             dtype = torch.bfloat16
         elif "openai" in name.lower():
@@ -19,7 +19,7 @@ class Model:
         
         self.model = AutoModelForCausalLM.from_pretrained(
             name, revision=revision, torch_dtype=dtype, device_map="auto", trust_remote_code=True, **model_kwargs
-        ).cuda()
+        )
         self.tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_name or name,
             revision=tokenizer_revision,
@@ -50,6 +50,19 @@ class Model:
         assert (
             self.tokenizer.eos_token_id in self._all_special_token_ids
         ), "eos_token_id not in all_special_ids"
+
+        if lang.lower() == 'r':
+            self.language = 'R'
+        elif lang.lower() == 'rkt':
+            self.language = 'Racket'
+        elif lang.lower() == 'ml':
+            self.language = 'OCaml'
+        elif lang.lower() == 'jl':
+            self.language = 'Julia'
+        elif lang.lower() == 'lua':
+            self.language = 'Lua'
+        else:
+            raise ValueError(f"Unsupported language: {lang}")
 
     def continue_completion_tensor(
         self,
@@ -97,7 +110,7 @@ class Model:
                     system_msg = "You are a helpful assistant."
                     messages = [
                         {"role": "system", "content": system_msg},
-                        {"role": "user", "content": f"Using given examples and the signature, generate the missing implementation by wrapping your code in ```language markdown blocks:\n\n{prompt}\n\n"}
+                        {"role": "user", "content": f"Using given examples and the signature, generate the missing implementation in {self.language} by wrapping your code in ```{self.language.lower()} markdown blocks:\n\n{prompt}\n\n"}
                     ]
                     text = self.tokenizer.apply_chat_template(
                         messages,
@@ -106,7 +119,7 @@ class Model:
                     )
                 elif self.team_name.lower() == "openai":
                     messages = [
-                        {"role": "user", "content": f"Using given examples and the signature, generate the missing implementation by wrapping your code in ```language markdown blocks:\n\n{prompt}\n\n"}
+                        {"role": "user", "content": f"Using given examples and the signature, generate the missing implementation in {self.language} by wrapping your code in ```{self.language.lower()} markdown blocks:\n\n{prompt}\n\n"}
                     ]
                     text = self.tokenizer.apply_chat_template(
                         messages,
@@ -308,7 +321,7 @@ def main():
         model_kwargs["attn_implementation"] = "flash_attention_2"
 
     model = Model(
-        args.name, args.revision,
+        args.name, args.revision, args.lang,
         model_kwargs=model_kwargs,
         tokenizer_name=args.tokenizer_name,
         tokenizer_revision=args.tokenizer_revision,

@@ -95,20 +95,55 @@ def make_main(args, model_name, gen_completions):
             )
         )
 
+    question_list = getattr(args, 'question_numbers', None)
+    if question_list:
+        indices_str = ",".join(map(str, question_list))
+    else:
+        indices_str = "all"
+
     if args.output_dir_prefix is not None:
         args.output_dir = f"{args.output_dir_prefix}/{args.output_dir}"
 
     exp_dir = Path(args.output_dir)
     if not exp_dir.exists():
         exp_dir.mkdir(parents=True, exist_ok=True)
-
+    
     if args.use_local:
-        problems = datasets.load_dataset(
-            "json", data_files=args.dataset, split="train")
+        if question_list:
+            # For local datasets, we need to load and filter differently
+            problems = datasets.load_dataset(
+                "json", data_files=args.dataset, split="train"
+            )
+            def extract_question_number(name):
+                import re
+                match = re.search(r'HumanEval_(\d+)_', name)
+                return int(match.group(1)) if match else None
+            
+            problems = problems.filter(
+                lambda x: extract_question_number(x["name"]) in question_list
+            )
+        else:
+            problems = datasets.load_dataset(
+                "json", data_files=args.dataset, split="train"
+            )
     else:
+        # Load the full dataset first
         problems = datasets.load_dataset(
-            "nuprl/MultiPL-E", f"{args.root_dataset}-{args.lang}", revision=DATASET_REVISION, split="test"
+            "jsbyun121/MultiPL-E-fixed",
+            f"{args.root_dataset}-{args.lang}",
+            split="test"
         )
+        
+        # Filter by question numbers if specified
+        if question_list:
+            def extract_question_number(name):
+                import re
+                match = re.search(r'HumanEval_(\d+)_', name)
+                return int(match.group(1)) if match else None
+            
+            problems = problems.filter(
+                lambda x: extract_question_number(x["name"]) in question_list
+            )
 
     start_index = args.input_start_index if args.input_start_index is not None else 0
     stop_index = min(
@@ -142,11 +177,11 @@ def make_main(args, model_name, gen_completions):
 
         assert completions["temperature"] == args.temperature, "Temperature must be the same for all completions"
 
-        if len(completions["final_responses"]) >= args.completion_limit:
+        if len(completions["pre_completions"]) >= args.completion_limit:
             continue
 
         num_new_completions = args.completion_limit - \
-            len(completions["final_responses"])
+            len(completions["pre_completions"])
 
         if args.prompt_prefix is not None:
             prompt = args.prompt_prefix + completions["prompt"]
@@ -166,22 +201,12 @@ def make_main(args, model_name, gen_completions):
             max_tokens=args.max_tokens,
             temperature=args.temperature,
             top_p=args.top_p,
-            stop=stop,
-            force_choice=args.force_choice
+            stop=stop
         )
         modified_problems = set()
-        for item, completion_result in zip(batch, new_completions):
-            intermediate_response = completion_result["intermediate_response"]
-            final_response = completion_result["final_response"]
-            intermediate_prompt = completion_result.get("intermediate_prompt", "")
-            final_prompt = completion_result.get("final_prompt", "")
-            success = completion_result.get("success", True)
-            
-            all_completions[item["name"]]["intermediate_prompts"].append(intermediate_prompt)
-            all_completions[item["name"]]["intermediate_responses"].append(intermediate_response)
-            all_completions[item["name"]]["final_prompts"].append(final_prompt)
-            all_completions[item["name"]]["final_responses"].append(final_response)
-            all_completions[item["name"]]["success_flags"].append(success)
+        for item, (pre_completion, post_completion) in zip(batch, new_completions):
+            all_completions[item["name"]]["pre_completions"].append(pre_completion)
+            all_completions[item["name"]]["post_completions"].append(post_completion) 
             modified_problems.add(item["name"])
 
         for name in modified_problems:
@@ -195,17 +220,6 @@ def read_completions(exp_dir, temperature, top_p, max_tokens, problem):
     if problem_filename.exists():
         with gzip.open(problem_filename, "rt") as f:
             existing = json.loads(f.read())
-            # Ensure backward compatibility by adding missing fields
-            if "intermediate_prompts" not in existing:
-                existing["intermediate_prompts"] = []
-            if "intermediate_responses" not in existing:
-                existing["intermediate_responses"] = existing.get("pre_completions", [])
-            if "final_prompts" not in existing:
-                existing["final_prompts"] = []
-            if "final_responses" not in existing:
-                existing["final_responses"] = existing.get("post_completions", [])
-            if "success_flags" not in existing:
-                existing["success_flags"] = []
             return (existing["name"], existing)
 
     new_completions = {
@@ -213,14 +227,11 @@ def read_completions(exp_dir, temperature, top_p, max_tokens, problem):
         "language": problem["language"],
         "temperature": temperature,
         "top_p": top_p,
-        "max_new_tokens": max_tokens,
+        "max_tokens": max_tokens,
         "prompt": problem["prompt"],
         "tests": problem["tests"],
-        "intermediate_prompts": [],
-        "intermediate_responses": [],
-        "final_prompts": [],
-        "final_responses": [],
-        "success_flags": [],
+        "pre_completions": [],
+        "post_completions": [],
         "stop_tokens": problem["stop_tokens"],
     }
     return (new_completions["name"], new_completions)

@@ -27,17 +27,6 @@ cd "$PROJECT_DIR/evaluation"
 
 if docker build -f Dockerfile -t "$IMAGE_NAME" . 2>&1 | tee build.log; then
     echo "✅ Container built successfully!"
-    echo
-    
-    # Verify versions
-    echo "🔍 Verifying compiler versions..."
-    bash "$SCRIPT_DIR/verify-versions.sh" "$IMAGE_NAME"
-    
-    echo
-    echo "🎯 Next Steps:"
-    echo "1. Test with small dataset: $SCRIPT_DIR/docker.sh -l r,jl,lua -d ./test-small"
-    echo "2. Update docker.sh to use new image: sed -i 's|ghcr.io/nuprl/multipl-e-evaluation|$IMAGE_NAME|g' $SCRIPT_DIR/docker.sh"
-    echo "3. Run full evaluation: $SCRIPT_DIR/docker.sh -l r,rkt,ml,jl,lua -d ./after_proc_Qwen_Qwen3-4B-Instruct-2507_mt_1024"
 else
     echo "❌ Build failed! Check build.log for details."
     exit 1

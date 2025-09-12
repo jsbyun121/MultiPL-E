@@ -20,3 +20,5 @@ unsloth_compiled_cache/
 wandb/
 outputs
 run*.sh
+test/
+question*

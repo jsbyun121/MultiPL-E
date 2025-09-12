@@ -66,7 +66,7 @@ case "$MODEL" in
     "qwen-think")
         MODEL_NAME="Qwen/Qwen3-4B-Thinking-2507"
         MODEL_DIR="Qwen_Qwen3-4B-Thinking-2507"
-        BATCH_SIZE=8
+        BATCH_SIZE=16
         TEMP=0.6
         # Only 'qwen-think' uses the max-tokens flag and has a token-specific output folder
         EXTRA_FLAGS="--max-tokens ${MAX_TOKENS}"
@@ -75,14 +75,14 @@ case "$MODEL" in
     "qwen-instruct")
         MODEL_NAME="Qwen/Qwen3-4B-Instruct-2507"
         MODEL_DIR="Qwen_Qwen3-4B-Instruct-2507"
-        BATCH_SIZE=16
+        BATCH_SIZE=32
         TEMP=0.7
         TOKEN_SUFFIX="_mt_${MAX_TOKENS}"
         ;;
     "gpt-oss")
         MODEL_NAME="openai/gpt-oss-20b"
         MODEL_DIR="openai_gpt-oss-20b"
-        BATCH_SIZE=16 # Use a smaller batch size for the 20B model
+        BATCH_SIZE=8 # Use a smaller batch size for the 20B model
         TEMP=1.0
         EXTRA_FLAGS="--max-tokens ${MAX_TOKENS} --top-p 1.0"
         TOKEN_SUFFIX="_mt_${MAX_TOKENS}"
@@ -94,7 +94,7 @@ case "$MODEL" in
 esac
 
 # Construct a clean output directory
-OUTPUT_DIR="before_proc_${MODEL_DIR}${TOKEN_SUFFIX}/${LANG}"
+OUTPUT_DIR="before_proc_${MODEL_DIR}${TOKEN_SUFFIX}_test_time/${LANG}"
 mkdir -p ${OUTPUT_DIR}
 
 # Construct the final command, conditionally adding flags via EXTRA_FLAGS
