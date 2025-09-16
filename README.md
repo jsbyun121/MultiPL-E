@@ -174,6 +174,73 @@ Instruct(qwen_2507_4b):
 python pass_k.py ./after_proc_Qwen_Qwen3-4B-Thinking-2507_mt_4096/result/<lang>
 ```
 
+# REST API Server
+
+For real-time code evaluation (e.g., RL reward systems), use the FastAPI server with all language runtimes in Docker.
+
+## Quick Start
+
+```bash
+# Build and run API server
+./scripts/docker_api_server.sh build
+./scripts/docker_api_server.sh run
+
+# Test API
+python evaluation/src/test_api.py
+
+# API Documentation
+# http://localhost:8888/docs (in server node)
+# http://147.46.15.142:8888/docs (in request node) (147.46.15.142 is an IP address of tao)
+```
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Health check and supported languages |
+| `/evaluate` | POST | Execute code and return results |
+| `/docs` | GET | Interactive API documentation |
+
+### Code Evaluation Request
+
+```bash
+curl -X POST http://147.46.15.142:8888/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "program": "result <- 2 + 2\nprint(result)",
+    "language": "r"
+  }'
+```
+
+### Response
+
+```json
+{
+  "stdout": "[1] 4\n",
+  "stderr": "",
+  "exit_code": 0,
+  "status": "OK",
+  "execution_time_ms": 427,
+  "timestamp": 1234567890
+}
+```
+
+## Management
+
+```bash
+# Container management (port set as 8888)
+./scripts/docker_api_server.sh stop    # Stop server
+./scripts/docker_api_server.sh logs    # View logs
+./scripts/docker_api_server.sh restart # Restart server
+
+# Remote access (set environment variables)
+# export API_HOST="your-server-ip" (Default: tao IP Address)
+# export API_PORT="8888" (Set as same port with the node of docker container)
+python evaluation/src/test_api.py
+```
+
+**Supported Languages**: Julia, OCaml, R, Racket, Lua
+
 # Acknowledgement 
 
 - https://github.com/nuprl/MultiPL-E
